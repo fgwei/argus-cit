@@ -16,4 +16,3 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: org.python.pydev.shared_ui
