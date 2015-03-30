@@ -1,94 +1,375 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
-<plugin>
+<plugin
+>
 
    <extension
+         id="AmanIDEEditor"
          point="org.eclipse.ui.editors">
       <editor
             name="Pilar Editor"
             extensions="pilar, plr"
             icon="icons/plr_icon.png"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            class="iamandroid.editors.PilarEditor"
-            id="iamandroid.editors.PilarEditor">
+            class="amanide.editors.PilarEditor"
+            id="amanide.editors.PilarEditor">
       </editor>
    </extension>
    <extension
-         id="AmandroidNature"
+         id="amanide.pilarNature"
          point="org.eclipse.core.resources.natures"
-         name="Amandroid Project Nature">
+         name="Aman IDE Nature">
       <runtime>
          <run
-               class="iamandroid.natures.PilarNature">
+               class="amanide.natures.PilarNature">
          </run>
       </runtime>
+      <builder
+            id="amanide.builders">
+      </builder>
    </extension>
    <extension
-         id="AmandroidBuilder"
+         id="AmanIDEBuilder"
          point="org.eclipse.core.resources.builders"
-         name="Amandroid Project Builder">
+         name="Aman IDE Builder">
       <builder
             hasNature="true">
          <run
-               class="iamandroid.builders.AmandroidBuilder">
+               class="amanide.builders.AmandroidBuilder">
                <parameter name="optimize" value="true" />
             	 <parameter name="comment" value="Builder comment" />
          </run>
       </builder>
    </extension>
    <extension
+         id="AmanIDEPreferencePages"
          point="org.eclipse.ui.preferencePages">
       <page
-            category="IAmandroid.amandroid.prefs"
-            class="iamandroid.preferences.PilarEditorPrefs"
-            id="IAmandroid.amandroid.prefs.editor"
+            category="amanide.prefs"
+            class="amanide.preferences.PilarEditorPrefs"
+            id="amanide.prefs.editor"
             name="PilarEditor">
       </page>
       <page
-            class="iamandroid.preferences.AmandroidRootPrefs"
-            id="IAmandroid.amandroid.prefs"
-            name="Amandroid">
+            class="amanide.preferences.AmanIDERootPrefs"
+            id="amanide.prefs"
+            name="AmanIDE">
       </page>
       <page
-            category="IAmandroid.amandroid.prefs.editor"
-            class="iamandroid.preferences.PilarTypingPrefs"
-            id="IAmandroid.amandroid.prefs.editor.typing"
+            category="amanide.prefs.editor"
+            class="amanide.preferences.PilarTypingPrefs"
+            id="amanide.prefs.editor.typing"
             name="Typing">
       </page>
       <page
-            category="IAmandroid.amandroid.prefs.editor"
-            class="iamandroid.preferences.PilarCodeFormatterPage"
-            id="IAmandroid.amandroid.prefs.editor.formatter"
+            category="amanide.prefs.editor"
+            class="amanide.preferences.PilarCodeFormatterPage"
+            id="amanide.prefs.editor.formatter"
             name="Code Formatter">
       </page>
       <page
-            category="IAmandroid.amandroid.prefs.editor"
-            class="iamandroid.preferences.FileTypesPreferencesPage"
-            id="IAmandroid.amandroid.prefs.editor.formatter"
+            category="amanide.prefs.editor"
+            class="amanide.preferences.FileTypesPreferencesPage"
+            id="amanide.prefs.editor.formatter"
             name="File types">
       </page>
    </extension>
    <extension
+         id="AmanIDEPreferences"
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="iamandroid.preferences.PilarEditorPrefsInitializer">
+            class="amanide.preferences.PilarEditorPrefsInitializer">
       </initializer>
    </extension>
    <extension
+         id="AmanIDEWizards"
          point="org.eclipse.ui.newWizards">
       <category
-            id="IAmandroid.category"
+            id="amandroid.category"
             name="Amandroid">
       </category>
       <wizard
-            category="IAmandroid.category"
-            class="iamandroid.ui.wizards.project.AmandroidProjectWizard"
+            category="amandroid.category"
+            class="amanide.ui.wizards.project.AmandroidProjectWizard"
             descriptionImage="icons/amandroid_logo.png"
+            finalPerspective="amanide.ui.PilarPerspective"
             icon="icons/amandroid_16x16.png"
-            id="IAmandroid.ui.wizards.project.AmandroidProjectWizard"
+            id="amanide.ui.wizards.project.AmandroidProjectWizard"
             name="Amandroid Project"
             project="true">
       </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="amandroid.category"
+            class="amanide.ui.wizards.files.PilarPackageWizard"
+            descriptionImage="icons/plr_logo.png"
+            finalPerspective="amanide.ui.PilarPerspective"
+            hasPages="true"
+            icon="icons/package_obj.gif"
+            id="amanide.ui.wizards.files.PilarPackageWizard"
+            name="AmanIDE Package"
+            project="false">
+      </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="amandroid.category"
+            class="amanide.ui.wizards.files.PilarSourceFolderWizard"
+            descriptionImage="icons/plr_logo.png"
+            finalPerspective="amanide.ui.PilarPerspective"
+            hasPages="true"
+            icon="icons/packagefolder_obj.gif"
+            id="amanide.ui.wizards.files.PilarSourceFolderWizard"
+            name="Source Folder"
+            project="false">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="amanide.ui.AmanIDEProjectPilarDetails"
+            id="amanide.ui.amanideProjectPilarDetails"
+            name="AmanIDE Grammar">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            viewerId="amanide.navigator.view">
+      </viewer>
+      <viewerContentBinding
+            viewerId="amanide.navigator.view">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.*">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.linkHelper">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.workingSets">
+            </contentExtension>
+            <contentExtension
+                  pattern="amanide.navigator.pilarcontent">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="true"
+            contentProvider="amanide.navigator.PilarModelProvider"
+            icon="icons/amandroid_16x16.png"
+            id="amanide.navigator.pilarcontent"
+            labelProvider="amanide.navigator.PilarLabelProvider"
+            name="AmanIDE Navigator Content"
+            priority="higher">
+         <triggerPoints>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IWorkspaceRoot">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.ui.IWorkingSet">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IFolder">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IStorage">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IFile">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <instanceof
+                     value="amanide.navigator.elements.IWrappedResource">
+               </instanceof>
+               <instanceof
+                     value="amanide.structure.TreeNode">
+               </instanceof>
+               <instanceof
+                     value="amanide.navigator.elements.ProjectConfigError">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+               </adapt>
+               <adapt
+                     type="org.eclipse.ui.IWorkingSet">
+               </adapt>
+               <instanceof
+                     value="org.eclipse.core.resources.IWorkspaceRoot">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IFolder">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IStorage">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IFile">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <instanceof
+                     value="amanide.navigator.elements.IWrappedResource">
+               </instanceof>
+               <instanceof
+                     value="amanide.structure.TreeNode">
+               </instanceof>
+            </or>
+         </possibleChildren>
+         <commonSorter
+               class="amanide.navigator.sorter.PilarModelSorter"
+               id="PilarModelSorter">
+         </commonSorter>
+      </navigatorContent>
+      <commonWizard
+            type="import"
+            wizardId="AmanIDE.commonWizard1">
+         <enablement>
+            <or>
+               <instanceof
+                     value="amanide.navigator.elements.PilarFolder">
+               </instanceof>
+               <instanceof
+                     value="amanide.navigator.elements.PilarSourceFolder">
+               </instanceof></or>
+         </enablement>
+      </commonWizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="amanide.ui.perspective.PilarPerspectiveFactory"
+            icon="icons/amandroid_16x16.png"
+            id="amanide.ui.PilarPerspective"
+            name="AmanIDE">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="amanide.ui.PilarPerspective">
+         <view
+               id="amanide.navigator.viewer"
+               ratio="0.5"
+               relationship="stack"
+               relative="org.eclipse.ui.navigator.ProjectExplorer">
+         </view>
+         <showInPart
+               id="org.eclipse.ui.views.ResourceNavigator">
+         </showInPart>
+         <showInPart
+               id="org.eclipse.ui.views.ContentOutline">
+         </showInPart>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="amanide.ui.actions.container.AddSrcFolder"
+            objectClass="org.eclipse.core.resources.IContainer">
+         <menu
+               id="amanide.ui.actions.menu"
+               label="AmanIDE">
+         </menu>
+         <action
+               class="amanide.ui.actions.container.AddSrcFolder"
+               enablesFor="+"
+               icon="icons/packagefolder_obj.gif"
+               id="org.python.pydev.ui.actions.container.addNature"
+               label="Set as Source Folder"
+               menubarPath="amanide.ui.actions.menu/amanide"
+               tooltip="Include this folder in its project&apos;s PILARPATH">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="amanide.ui.actions.container.RemSrcFolder"
+            objectClass="org.python.pydev.navigator.elements.PythonSourceFolder">
+         <menu
+               id="amanide.ui.actions.menu"
+               label="AmanIDE">
+         </menu>
+         <action
+               class="amanide.ui.actions.container.RemSrcFolder"
+               enablesFor="+"
+               icon="icons/packagefolder_obj_remove.gif"
+               id="amanide.ui.actions.container.remSrcFolder"
+               label="Set as non-source folder"
+               menubarPath="amanide.ui.actions.menu/amanide"
+               tooltip="Remove this folder from its project&apos;s PILARPATH">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="amanide.ui.actions.container.DeleteErrors"
+            objectClass="org.eclipse.core.resources.IContainer">
+         <menu
+               id="amanide.ui.actions.menu"
+               label="AmanIDE">
+         </menu>
+         <action
+               class="amanide.ui.actions.container.DeleteErrors"
+               enablesFor="+"
+               id="amanide.ui.actions.container.deleteErrors"
+               label="Remove error markers"
+               menubarPath="amanide.ui.actions.menu/amanide"
+               tooltip="Remove error markers">
+         </action>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.documentProviders">
+      <provider
+            class="amanide.editors.PilarDocumentProvider"
+            extensions=".pilar,.plr"
+            id="amanide.editors.PilarDocumentProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+   </extension>
+   <extension
+         id="AmanIDEProjectErrorMarkers"
+         name="AmanIDE Project Error"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="false">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="amanide"
+            name="AmanIDE">
+      </category>
+      <view
+            allowMultiple="false"
+            category="amanide"
+            class="amanide.navigator.ui.AmanIDEPackageExplorer"
+            icon="icons/amanide_package_explorer.gif"
+            id="amanide.navigator.view"
+            name="AmanIDE Package Explorer">
+      </view>
    </extension>
 
 </plugin>
