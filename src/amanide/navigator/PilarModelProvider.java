@@ -81,7 +81,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	@SuppressWarnings("unchecked")
 	public void getPipelinedChildren(Object parent, Set currentElements) {
 		if (DEBUG) {
-			System.out.println("getPipelinedChildren for: " + parent);
+			Log.log("getPipelinedChildren for: " + parent);
 		}
 
 		if (parent instanceof IWrappedResource) {
@@ -91,8 +91,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 			currentElements.clear();
 			currentElements.addAll(Arrays.asList(children));
 			if (DEBUG) {
-				System.out.println("getPipelinedChildren RETURN: "
-						+ currentElements);
+				Log.log("getPipelinedChildren RETURN: " + currentElements);
 			}
 			if (parent instanceof PilarProjectSourceFolder) {
 				PilarProjectSourceFolder projectSourceFolder = (PilarProjectSourceFolder) parent;
@@ -131,7 +130,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 				parent, currentElements);
 		convertToPilarElementsAddOrRemove(modification, true);
 		if (DEBUG) {
-			System.out.println("getPipelinedChildren RETURN: "
+			Log.log("getPipelinedChildren RETURN: "
 					+ modification.getChildren());
 		}
 	}
@@ -139,16 +138,9 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	@SuppressWarnings("unchecked")
 	private void fillChildrenForProject(Set currentElements, IProject project,
 			Object parent) {
-		ProjectInfoForPackageExplorer projectInfo = ProjectInfoForPackageExplorer
-				.getProjectInfo(project);
+		ProjectInfoForPackageExplorer projectInfo = getProjectInfo(project);
 		if (projectInfo != null) {
 			currentElements.addAll(projectInfo.configErrors);
-			// InterpreterInfoTreeNode<LabelAndImage> projectInfoTreeStructure =
-			// projectInfo
-			// .getProjectInfoTreeStructure(project, parent);
-			// if (projectInfoTreeStructure != null) {
-			// currentElements.add(projectInfoTreeStructure);
-			// }
 		}
 	}
 
@@ -162,7 +154,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	@Override
 	public void getPipelinedElements(Object input, Set currentElements) {
 		if (DEBUG) {
-			System.out.println("getPipelinedElements for: " + input);
+			Log.log("getPipelinedElements for: " + input);
 		}
 		getPipelinedChildren(input, currentElements);
 	}
@@ -178,7 +170,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	@Override
 	public Object getPipelinedParent(Object object, Object aSuggestedParent) {
 		if (DEBUG) {
-			System.out.println("getPipelinedParent for: " + object);
+			Log.log("getPipelinedParent for: " + object);
 		}
 		// Now, we got the parent for the resources correctly at this point, but
 		// there's one last thing we may need to
@@ -222,7 +214,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	public PipelinedShapeModification interceptAdd(
 			PipelinedShapeModification addModification) {
 		if (DEBUG) {
-			System.out.println("interceptAdd");
+			Log.log("interceptAdd");
 		}
 		convertToPilarElementsAddOrRemove(addModification, true);
 		return addModification;
@@ -231,7 +223,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	@Override
 	public boolean interceptRefresh(PipelinedViewerUpdate refreshSynchronization) {
 		if (DEBUG) {
-			System.out.println("interceptRefresh");
+			Log.log("interceptRefresh");
 		}
 		return convertToPilarElementsUpdateOrRefresh(refreshSynchronization
 				.getRefreshTargets());
@@ -241,7 +233,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	public PipelinedShapeModification interceptRemove(
 			PipelinedShapeModification removeModification) {
 		if (DEBUG) {
-			System.out.println("interceptRemove");
+			Log.log("interceptRemove");
 		}
 		convertToPilarElementsAddOrRemove(removeModification, false);
 		return removeModification;
@@ -264,10 +256,10 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	 * Helper for debugging the things we have in an update
 	 */
 	private void debug(String desc, PipelinedViewerUpdate updateSynchronization) {
-		System.out.println("\nDesc:" + desc);
-		System.out.println("Refresh targets:");
+		Log.log("\nDesc:" + desc);
+		Log.log("Refresh targets:");
 		for (Object o : updateSynchronization.getRefreshTargets()) {
-			System.out.println(o);
+			Log.log(o.toString());
 		}
 	}
 
@@ -275,12 +267,12 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	 * Helper for debugging the things we have in a modification
 	 */
 	private void debug(String desc, PipelinedShapeModification modification) {
-		System.out.println("\nDesc:" + desc);
+		Log.log("\nDesc:" + desc);
 		Object parent = modification.getParent();
-		System.out.println("Parent:" + parent);
-		System.out.println("Children:");
+		Log.log("Parent:" + parent);
+		Log.log("Children:");
 		for (Object o : modification.getChildren()) {
-			System.out.println(o);
+			Log.log(o.toString());
 		}
 	}
 
@@ -663,7 +655,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 			} else {
 				return null; // some other container we don't know how to treat!
 			}
-			// System.out.println("Created source folder: "+ret[i]+" - "+folder.getProject()+" - "+folder.getProjectRelativePath());
+			// Log.log("Created source folder: "+ret[i]+" - "+folder.getProject()+" - "+folder.getProjectRelativePath());
 			Set<PilarSourceFolder> sourceFolders = getProjectSourceFolders(container
 					.getProject());
 			sourceFolders.add(sourceFolder);
@@ -678,7 +670,7 @@ public final class PilarModelProvider extends PilarBaseModelProvider implements
 	 */
 	@SuppressWarnings("unchecked")
 	protected boolean convertToPilarElementsUpdateOrRefresh(Set currentChildren) {
-		LinkedHashSet convertedChildren = new LinkedHashSet();
+		LinkedHashSet<Object> convertedChildren = new LinkedHashSet();
 		for (Iterator childrenItr = currentChildren.iterator(); childrenItr
 				.hasNext();) {
 			Object child = childrenItr.next();

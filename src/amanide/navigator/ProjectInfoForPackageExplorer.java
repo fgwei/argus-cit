@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import amanide.natures.PilarNature;
+import amanide.natures.PilarNatureWithoutProjectException;
 import amanide.navigator.elements.PilarSourceFolder;
 import amanide.navigator.elements.ProjectConfigError;
 import amanide.utils.Log;
@@ -24,46 +26,6 @@ import amanide.utils.PilarMarkerUtils;
  * the tree).
  */
 public class ProjectInfoForPackageExplorer {
-
-	/**
-	 * These are the source folders that can be found in this file provider. The
-	 * way we see things in this provider, the python model starts only after
-	 * some source folder is found.
-	 */
-	private static final Map<IProject, ProjectInfoForPackageExplorer> projectToSourceFolders = new HashMap<IProject, ProjectInfoForPackageExplorer>();
-	private static final Object lockProjectToSourceFolders = new Object();
-
-	/**
-	 * @return the information on a project. Can create it if it's not
-	 *         available.
-	 */
-	public static ProjectInfoForPackageExplorer getProjectInfo(
-			final IProject project) {
-		if (project == null) {
-			return null;
-		}
-		synchronized (lockProjectToSourceFolders) {
-			ProjectInfoForPackageExplorer projectInfo = projectToSourceFolders
-					.get(project);
-			if (projectInfo == null) {
-				if (!project.isOpen()) {
-					return null;
-				}
-				// No project info: create it
-				projectInfo = projectToSourceFolders.get(project);
-				if (projectInfo == null) {
-					projectInfo = new ProjectInfoForPackageExplorer(project);
-					projectToSourceFolders.put(project, projectInfo);
-				}
-			} else {
-				if (!project.isOpen()) {
-					projectToSourceFolders.remove(project);
-					projectInfo = null;
-				}
-			}
-			return projectInfo;
-		}
-	}
 
 	/**
 	 * Note that the source folders are added/removed lazily (not when the info
@@ -79,7 +41,7 @@ public class ProjectInfoForPackageExplorer {
 	/**
 	 * Creates the info for the passed project.
 	 */
-	private ProjectInfoForPackageExplorer(IProject project) {
+	public ProjectInfoForPackageExplorer(IProject project) {
 		this.recreateInfo(project);
 	}
 
@@ -88,15 +50,14 @@ public class ProjectInfoForPackageExplorer {
 	 */
 	public void recreateInfo(IProject project) {
 		configErrors.clear();
-		// configErrors.addAll(configErrorsAndInfo.o1);
+		List<ProjectConfigError> configErrorsAndInfo = getConfigErrorsAndInfo(project);
+		configErrors.addAll(configErrorsAndInfo);
 	}
 
 	/**
 	 * Do the update of the markers in a separate job so that we don't do that
 	 * in the ui-thread.
 	 * 
-	 * See: #PyDev-88: Eclipse freeze on project import and project creation
-	 * (presumable cause: virtualenvs as custom interpreters)
 	 */
 	private static final class UpdateAmanIDEPackageExplorerProblemMarkers
 			extends Job {
@@ -118,13 +79,6 @@ public class ProjectInfoForPackageExplorer {
 				projectConfigErrors = this.fProjectConfigErrors;
 				this.fProject = null;
 				this.fProjectConfigErrors = null;
-
-				// In a racing condition it's possible that it was scheduled
-				// again when the projectConfigErrors was already
-				// set to null.
-				if (projectConfigErrors == null) {
-					return Status.OK_STATUS;
-				}
 			}
 
 			ArrayList lst = new ArrayList(projectConfigErrors.length);
@@ -168,5 +122,62 @@ public class ProjectInfoForPackageExplorer {
 
 	private static final Map<IProject, UpdateAmanIDEPackageExplorerProblemMarkers> projectToJob = new HashMap<IProject, UpdateAmanIDEPackageExplorerProblemMarkers>();
 	private static final Object lock = new Object();
+
+	/**
+	 * Never returns null.
+	 * 
+	 * This method should only be called through recreateInfo.
+	 */
+	private List<ProjectConfigError> getConfigErrorsAndInfo(IProject project) {
+		if (project == null || !project.isOpen()) {
+			return new ArrayList<ProjectConfigError>();
+		}
+		PilarNature nature = PilarNature.getPilarNature(project);
+		if (nature == null) {
+			return new ArrayList<ProjectConfigError>();
+		}
+
+		// If the info is not readily available, we try to get some more
+		// times... after that, if still not available,
+		// we just return as if it's all OK.
+		List<ProjectConfigError> configErrorsAndInfo = null;
+		boolean goodToGo = false;
+		for (int i = 0; i < 10 && !goodToGo; i++) {
+			try {
+				configErrorsAndInfo = nature.getConfigErrorsAndInfo(project);
+				goodToGo = true;
+			} catch (PilarNatureWithoutProjectException e1) {
+				goodToGo = false;
+				synchronized (this) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		}
+		if (configErrorsAndInfo == null) {
+			return new ArrayList<ProjectConfigError>();
+		}
+
+		if (nature != null) {
+			synchronized (lock) {
+				UpdateAmanIDEPackageExplorerProblemMarkers job = projectToJob
+						.get(project);
+				if (job == null) {
+					job = new UpdateAmanIDEPackageExplorerProblemMarkers(
+							"Update pydev package explorer markers for: "
+									+ project);
+					projectToJob.put(project, job);
+				}
+				job.setInfo(project, configErrorsAndInfo
+						.toArray(new ProjectConfigError[configErrorsAndInfo
+								.size()]));
+				job.schedule();
+			}
+		}
+
+		return configErrorsAndInfo;
+	}
 
 }

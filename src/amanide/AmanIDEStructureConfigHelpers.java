@@ -149,7 +149,7 @@ public class AmanIDEStructureConfigHelpers {
 
 				if (success) {
 					StringBuffer buf = new StringBuffer();
-					String containerPath = "/${PROJECT_DIR_NAME}/classes";
+					String containerPath = "/${PROJECT_DIR_NAME}|/${PROJECT_DIR_NAME}/classes";
 					buf.append(containerPath);
 
 					projectPilarpath = buf.toString();

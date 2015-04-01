@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import amanide.core.IGrammarVersionProvider;
-import amanide.core.IToken;
 import amanide.utils.MisconfigurationException;
 
 /**
@@ -113,21 +112,6 @@ public interface IPilarNature extends IProjectNature, IGrammarVersionProvider {
 	 */
 	void rebuildPath();
 
-	/**
-	 * @return the tokens for the builtins. As getting the builtins is VERY
-	 *         usual, we'll keep them here. (we can't forget to change it when
-	 *         the interpreter is changed -- on rebuildPath)
-	 * 
-	 *         May return null if not set
-	 */
-	IToken[] getBuiltinCompletions();
-
-	/**
-	 * @param toks
-	 *            those are the tokens that are set as builtin completions.
-	 */
-	void clearBuiltinCompletions();
-
 	IPilarPathNature getPilarPathNature();
 
 	/**
@@ -156,9 +140,9 @@ public interface IPilarNature extends IProjectNature, IGrammarVersionProvider {
 			boolean addExternal) throws MisconfigurationException,
 			CoreException;
 
-	boolean startRequests();
-
-	void endRequests();
+	// boolean startRequests();
+	//
+	// void endRequests();
 
 	/**
 	 * @return true if it is ok to use the nature

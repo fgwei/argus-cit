@@ -22,15 +22,15 @@ public class WrappedResource<X extends IResource> implements IWrappedResource,
 
 	protected IWrappedResource parentElement;
 	protected X actualObject;
-	protected PilarSourceFolder pythonSourceFolder;
+	protected PilarSourceFolder pilarSourceFolder;
 	protected int rank;
 
 	public WrappedResource(IWrappedResource parentElement, X actualObject,
-			PilarSourceFolder pythonSourceFolder, int rank) {
+			PilarSourceFolder pilarSourceFolder, int rank) {
 		this.parentElement = parentElement;
 		this.actualObject = actualObject;
-		this.pythonSourceFolder = pythonSourceFolder;
-		this.pythonSourceFolder.addChild(this);
+		this.pilarSourceFolder = pilarSourceFolder;
+		this.pilarSourceFolder.addChild(this);
 		this.rank = rank;
 	}
 
@@ -46,7 +46,7 @@ public class WrappedResource<X extends IResource> implements IWrappedResource,
 
 	@Override
 	public PilarSourceFolder getSourceFolder() {
-		return pythonSourceFolder;
+		return pilarSourceFolder;
 	}
 
 	@Override
@@ -101,12 +101,7 @@ public class WrappedResource<X extends IResource> implements IWrappedResource,
 	@Override
 	public String toString() {
 		FastStringBuffer buf = new FastStringBuffer();
-		buf.append(FullRepIterable.getLastPart(super.toString())); // something
-																	// as
-																	// org.eclipse.ui.internal.WorkingSet@2813
-																	// will
-																	// become
-																	// WorkingSet@2813
+		buf.append(FullRepIterable.getLastPart(super.toString()));
 		buf.append(" (");
 		buf.append(this.getActualObject().toString());
 		buf.append(")");

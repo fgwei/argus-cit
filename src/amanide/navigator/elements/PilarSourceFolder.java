@@ -28,12 +28,12 @@ public class PilarSourceFolder implements IWrappedResource, IAdaptable,
 	/**
 	 * Maps the 'actual objects' to their pilar counterparts
 	 */
-	public Map<IResource, IWrappedResource> children = new HashMap<IResource, IWrappedResource>();
+	private Map<IResource, IWrappedResource> children = new HashMap<IResource, IWrappedResource>();
 
 	/**
 	 * Maps from a wrapped resource (that must be a container) to its children
 	 */
-	public Map<IResource, List<IWrappedResource>> childrenForContainer = new HashMap<IResource, List<IWrappedResource>>();
+	private Map<IResource, List<IWrappedResource>> childrenForContainer = new HashMap<IResource, List<IWrappedResource>>();
 
 	protected PilarSourceFolder(Object parentElement, IContainer container) {
 		this.parentElement = parentElement;
@@ -42,7 +42,8 @@ public class PilarSourceFolder implements IWrappedResource, IAdaptable,
 
 	public PilarSourceFolder(Object parentElement, IFolder folder) {
 		this(parentElement, (IContainer) folder);
-		// System.out.println("Created PilarSourceFolder:"+this+" - "+folder+" parent:"+parentElement);
+		Log.log("Created PilarSourceFolder:" + this + " - " + folder
+				+ " parent:" + parentElement);
 	}
 
 	@Override

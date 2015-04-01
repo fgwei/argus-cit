@@ -55,7 +55,7 @@ public class PilarPerspectiveFactory implements IPerspectiveFactory {
 		layout.addNewWizardShortcut("org.eclipse.ui.editors.wizards.UntitledTextFileWizard");//$NON-NLS-1$
 
 		// layout.addShowViewShortcut("org.python.pydev.views.PyCodeCoverageView");
-		// layout.addShowViewShortcut("org.python.pydev.navigator.view");
+		layout.addShowViewShortcut("amanide.navigator.view");
 		// layout.addShowViewShortcut("org.python.pydev.debug.pyunit.pyUnitView");
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);

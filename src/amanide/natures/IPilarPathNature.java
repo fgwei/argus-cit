@@ -124,9 +124,8 @@ public interface IPilarPathNature {
 	public IPilarNature getNature();
 
 	/**
-	 * Gets the folders or zip files which are added to the pilarpath relative
-	 * to the project. Won't add external files (as it's made only to get what's
-	 * inside the workspace).
+	 * Gets the folders files which are added to the pilarpath relative to the
+	 * project..
 	 */
 	public Set<IResource> getProjectSourcePathFolderSet() throws CoreException;
 

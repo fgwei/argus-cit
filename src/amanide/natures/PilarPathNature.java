@@ -77,7 +77,6 @@ public class PilarPathNature implements IPilarPathNature {
 	@Override
 	public String getOnlyProjectPilarPathStr() throws CoreException {
 		String source = null;
-		String external = null;
 		// String contributed = null;
 		IProject project = fProject;
 		PilarNature nature = fNature;
@@ -91,8 +90,6 @@ public class PilarPathNature implements IPilarPathNature {
 
 		source = (String) getProjectSourcePath(true, stringSubstitution,
 				RETURN_STRING_WITH_SEPARATOR);
-		// contributed = stringSubstitution
-		// .performPilarpathStringSubstitution(getContributedSourcePath(project));
 
 		if (source == null) {
 			source = "";
@@ -134,13 +131,8 @@ public class PilarPathNature implements IPilarPathNature {
 				}
 			}
 		}
-
-		if (external == null) {
-			external = "";
-		}
-		return buf.append("|").append(external).append("|")
-		// .append(contributed)
-				.toString();
+		Log.log("getOnlyProjectPilarPathStr: " + buf.toString());
+		return buf.toString();
 	}
 
 	/**
@@ -226,6 +218,7 @@ public class PilarPathNature implements IPilarPathNature {
 			return new HashSet<String>();
 		}
 		projectSourcePath = getProjectSourcePath(replace);
+		Log.log("projectSourcePath:::" + projectSourcePath);
 		return new HashSet<String>(StringUtils.splitAndRemoveEmptyTrimmed(
 				projectSourcePath, '|'));
 	}

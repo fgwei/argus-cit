@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
@@ -44,6 +45,7 @@ import org.eclipse.ui.part.ShowInContext;
 
 import amanide.callbacks.CallbackWithListeners;
 import amanide.callbacks.ICallbackWithListeners;
+import amanide.navigator.elements.IWrappedResource;
 import amanide.utils.Log;
 
 /**
@@ -107,7 +109,7 @@ public class AmanIDEPackageExplorer extends CommonNavigator implements
 				public int compare(Object arg0, Object arg1) {
 					CommonDropAdapterAssistant a = (CommonDropAdapterAssistant) arg0;
 					CommonDropAdapterAssistant b = (CommonDropAdapterAssistant) arg1;
-					// This is to ensure that the PyDev drop assistant will
+					// This is to ensure that the AmanIDE drop assistant will
 					// always
 					// be chosen over non-PyDev ones, if a conflict ever occurs.
 					String id = "amanide.navigator.actions"; //$NON-NLS-1$
@@ -249,42 +251,41 @@ public class AmanIDEPackageExplorer extends CommonNavigator implements
 			// We need to be able to compare actual resources and
 			// IWrappedResources
 			// as if they were the same thing.
-			// setComparer(new IElementComparer() {
+			setComparer(new IElementComparer() {
 
-			// @Override
-			// public int hashCode(Object element) {
-			// if (element instanceof IWrappedResource) {
-			// IWrappedResource wrappedResource = (IWrappedResource)
-			// element;
-			// return wrappedResource.getActualObject().hashCode();
-			// }
-			// return element.hashCode();
-			// }
-			//
-			// @Override
-			// public boolean equals(Object a, Object b) {
-			// if (a instanceof IWrappedResource) {
-			// IWrappedResource wrappedResource = (IWrappedResource) a;
-			// a = wrappedResource.getActualObject();
-			// }
-			// if (b instanceof IWrappedResource) {
-			// IWrappedResource wrappedResource = (IWrappedResource) b;
-			// b = wrappedResource.getActualObject();
-			// }
-			// if (a == null) {
-			// if (b == null) {
-			// return true;
-			// } else {
-			// return false;
-			// }
-			// }
-			// if (b == null) {
-			// return false;
-			// }
-			//
-			// return a.equals(b);
-			// }
-			// });
+				@Override
+				public int hashCode(Object element) {
+					if (element instanceof IWrappedResource) {
+						IWrappedResource wrappedResource = (IWrappedResource) element;
+						return wrappedResource.getActualObject().hashCode();
+					}
+					return element.hashCode();
+				}
+
+				@Override
+				public boolean equals(Object a, Object b) {
+					if (a instanceof IWrappedResource) {
+						IWrappedResource wrappedResource = (IWrappedResource) a;
+						a = wrappedResource.getActualObject();
+					}
+					if (b instanceof IWrappedResource) {
+						IWrappedResource wrappedResource = (IWrappedResource) b;
+						b = wrappedResource.getActualObject();
+					}
+					if (a == null) {
+						if (b == null) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					if (b == null) {
+						return false;
+					}
+
+					return a.equals(b);
+				}
+			});
 		}
 
 		@Override
@@ -417,6 +418,7 @@ public class AmanIDEPackageExplorer extends CommonNavigator implements
 	 */
 	@Override
 	public void createPartControl(Composite aParent) {
+		Log.log("aParent: " + aParent);
 		super.createPartControl(aParent);
 		AmanIDECommonViewer viewer = (AmanIDECommonViewer) getCommonViewer();
 		this.viewer = viewer;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -31,7 +33,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 
 import amanide.AmanIDEPlugin;
-import amanide.core.IToken;
+import amanide.navigator.elements.ProjectConfigError;
 import amanide.utils.JobProgressComunicator;
 import amanide.utils.Log;
 import amanide.utils.MisconfigurationException;
@@ -63,7 +65,7 @@ public class PilarNature extends AbstractPilarNature implements IProjectNature {
 	/**
 	 * Builder id for amanide (code completion todo and others)
 	 */
-	public static final String BUILDER_ID = "org.python.pydev.AmanIDEBuilder";
+	public static final String BUILDER_ID = "amanide.AmanIDEBuilder";
 
 	/**
 	 * Contains a list with the natures created.
@@ -829,12 +831,11 @@ public class PilarNature extends AbstractPilarNature implements IProjectNature {
 	 * file). This is so that we don't have a runtime penalty for it.
 	 */
 	private String versionPropertyCache = null;
-	private String interpreterPropertyCache = null;
 
 	/**
 	 * Returns the Pilar version of the Project.
 	 * 
-	 * It's a String in the format "python 2.4", as defined by the constants
+	 * It's a String in the format "pilar 4.0", as defined by the constants
 	 * PYTHON_VERSION_XX and JYTHON_VERSION_XX in IPilarNature.
 	 * 
 	 * @note it might have changed on disk (e.g. a repository update).
@@ -849,28 +850,28 @@ public class PilarNature extends AbstractPilarNature implements IProjectNature {
 	private Tuple<String, String> getVersionAndError() throws CoreException {
 		if (project != null) {
 			if (versionPropertyCache == null) {
-				// String storeVersion = getStore().getPropertyFromXml(
-				// getPilarProjectVersionQualifiedName());
-				// if (storeVersion == null) { // there is no such property set
-				// // (let's set it to the default)
-				// setVersion(getDefaultVersion()); // will set the
-				// // versionPropertyCache
-				// // too
-				// } else {
-				// // now, before returning and setting in the cache, let's
-				// // make sure it's a valid version.
-				// if (!IPilarNature.Versions.ALL_VERSIONS_ANY_FLAVOR
-				// .contains(storeVersion)) {
-				// Log.log("The stored version is invalid ("
-				// + storeVersion + "). Setting default.");
-				// setVersion(getDefaultVersion()); // will set the
-				// // versionPropertyCache
-				// // too
-				// } else {
-				// // Ok, it's correct.
-				// versionPropertyCache = storeVersion;
-				// }
-				// }
+				String storeVersion = getStore().getPropertyFromXml(
+						getPilarProjectVersionQualifiedName());
+				if (storeVersion == null) { // there is no such property set
+					// (let's set it to the default)
+					setVersion(getDefaultVersion()); // will set the
+					// versionPropertyCache
+					// too
+				} else {
+					// now, before returning and setting in the cache, let's
+					// make sure it's a valid version.
+					if (!IPilarNature.Versions.ALL_VERSIONS_ANY_FLAVOR
+							.contains(storeVersion)) {
+						Log.log("The stored version is invalid ("
+								+ storeVersion + "). Setting default.");
+						setVersion(getDefaultVersion()); // will set the
+						// versionPropertyCache
+						// too
+					} else {
+						// Ok, it's correct.
+						versionPropertyCache = storeVersion;
+					}
+				}
 			}
 		} else {
 			String msg = "Trying to get version without project set. Returning default.";
@@ -1073,75 +1074,11 @@ public class PilarNature extends AbstractPilarNature implements IProjectNature {
 	// ------------------------------------------------------------------------------------------
 	// LOCAL CACHES
 	public void clearCaches(boolean clearGlobalModulesCache) {
-		this.interpreterType = null;
 		this.versionPropertyCache = null;
-		this.interpreterPropertyCache = null;
 		this.pilarPathNature.clearCaches();
 		if (clearGlobalModulesCache) {
 			// ModulesManager.clearCache();
 		}
-	}
-
-	Integer interpreterType = null; // cache
-
-	@Override
-	public void clearBuiltinCompletions() {
-		// try {
-		// this.getRelatedInterpreterManager().clearBuiltinCompletions(
-		// this.getProjectInterpreterName());
-		// } catch (CoreException e) {
-		// throw new RuntimeException(e);
-		// }
-	}
-
-	// @Override
-	// public IToken[] getBuiltinCompletions() {
-	// try {
-	// return this.getRelatedInterpreterManager().getBuiltinCompletions(
-	// this.getProjectInterpreterName());
-	// } catch (Exception e) {
-	// throw new RuntimeException(e);
-	// }
-	// }
-
-	// @Override
-	// public IModule getBuiltinMod() {
-	// try {
-	// return this.getRelatedInterpreterManager().getBuiltinMod(
-	// this.getProjectInterpreterName());
-	// } catch (Exception e) {
-	// throw new RuntimeException(e);
-	// }
-	// }
-	//
-	// @Override
-	// public void clearBuiltinMod() {
-	// try {
-	// this.getRelatedInterpreterManager().clearBuiltinMod(
-	// this.getProjectInterpreterName());
-	// } catch (CoreException e) {
-	// throw new RuntimeException(e);
-	// }
-	// }
-
-	public static List<IPilarNature> getPilarNaturesRelatedTo(int relatedTo) {
-		ArrayList<IPilarNature> ret = new ArrayList<IPilarNature>();
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IProject[] projects = root.getProjects();
-		for (IProject project : projects) {
-			PilarNature nature = getPilarNature(project);
-			// try {
-			// if (nature != null) {
-			// if (nature.getInterpreterType() == relatedTo) {
-			// ret.add(nature);
-			// }
-			// }
-			// } catch (CoreException e) {
-			// throw new RuntimeException(e);
-			// }
-		}
-
-		return ret;
 	}
 
 	/**
@@ -1160,19 +1097,19 @@ public class PilarNature extends AbstractPilarNature implements IProjectNature {
 			List<String> splitted = StringUtils.split(version, ' ');
 			if (splitted.size() != 2) {
 				String storeVersion;
-				// try {
-				// storeVersion = getStore().getPropertyFromXml(
-				// getPilarProjectVersionQualifiedName());
-				// } catch (Exception e) {
-				// storeVersion = "Unable to get storeVersion. Reason: "
-				// + e.getMessage();
-				// }
+				try {
+					storeVersion = getStore().getPropertyFromXml(
+							getPilarProjectVersionQualifiedName());
+				} catch (Exception e) {
+					storeVersion = "Unable to get storeVersion. Reason: "
+							+ e.getMessage();
+				}
 
-				// Log.log("Found invalid version: " + version + "\n"
-				// + "Returning default\n" + "Project: " + this.project
-				// + "\n" + "versionPropertyCache: "
-				// + versionPropertyCache + "\n" + "storeVersion:"
-				// + storeVersion);
+				Log.log("Found invalid version: " + version + "\n"
+						+ "Returning default\n" + "Project: " + this.project
+						+ "\n" + "versionPropertyCache: "
+						+ versionPropertyCache + "\n" + "storeVersion:"
+						+ storeVersion);
 
 				return LATEST_GRAMMAR_VERSION;
 			}
@@ -1218,30 +1155,59 @@ public class PilarNature extends AbstractPilarNature implements IProjectNature {
 		return "PilarNature: " + this.project;
 	}
 
-	@Override
-	public IToken[] getBuiltinCompletions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	// @Override
+	// public boolean startRequests() {
+	// // TODO Auto-generated method stub
+	// return false;
+	// }
 
-	@Override
-	public boolean isResourceInPilarpath(IResource resource)
-			throws MisconfigurationException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	/**
+	 * @return a list of configuration errors and the interpreter info for the
+	 *         project (the interpreter info can be null)
+	 * @throws PythonNatureWithoutProjectException
+	 */
+	public List<ProjectConfigError> getConfigErrorsAndInfo(
+			final IProject relatedToProject)
+			throws PilarNatureWithoutProjectException {
+		ArrayList<ProjectConfigError> lst = new ArrayList<ProjectConfigError>();
+		if (this.project == null) {
+			lst.add(new ProjectConfigError(relatedToProject,
+					"The configured nature has no associated project."));
+		}
+		try {
 
-	@Override
-	public boolean isResourceInPilarpath(String resource)
-			throws MisconfigurationException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+			List<String> projectSourcePathSet = new ArrayList<String>(this
+					.getPilarPathNature().getProjectSourcePathSet(true));
+			Collections.sort(projectSourcePathSet);
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
-	@Override
-	public boolean startRequests() {
-		// TODO Auto-generated method stub
-		return false;
+			for (String path : projectSourcePathSet) {
+				if (path.trim().length() > 0) {
+					IPath p = new Path(path);
+					IResource resource = root.findMember(p);
+					if (resource == null) {
+						relatedToProject.refreshLocal(p.segmentCount(), null);
+						resource = root.findMember(p); // 2nd attempt (after
+														// refresh)
+					}
+					if (resource == null || !resource.exists()) {
+						lst.add(new ProjectConfigError(relatedToProject,
+								"Source folder: " + path + " not found"));
+					}
+				}
+			}
+
+			Tuple<String, String> versionAndError = getVersionAndError();
+			if (versionAndError.o2 != null) {
+				lst.add(new ProjectConfigError(relatedToProject, StringUtils
+						.replaceNewLines(versionAndError.o2, " ")));
+			}
+
+		} catch (Throwable e) {
+			lst.add(new ProjectConfigError(relatedToProject, StringUtils
+					.replaceNewLines("Unexpected error:" + e.getMessage(), " ")));
+		}
+		return lst;
 	}
 
 }

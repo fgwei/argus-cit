@@ -32,6 +32,7 @@ import amanide.core.IIndentPrefs;
 import amanide.core.IPilarFormatStdProvider;
 import amanide.editors.autoedit.DefaultIndentPrefs;
 import amanide.natures.IPilarNature;
+import amanide.natures.PilarNature;
 import amanide.preferences.AmanIDEPrefs;
 import amanide.preferences.CheckDefaultPreferencesDialog;
 import amanide.preferences.PilarEditorPrefs;
@@ -48,7 +49,7 @@ public class PilarEditor extends TextEditor implements IPilarFormatStdProvider,
 	public static final String PILAR_EDIT_CONTEXT = "#PilarEditorContext";
 	public static final String PILAR_EDIT_RULER_CONTEXT = "#PilarEditorRulerContext";
 
-	static public final String EDITOR_ID = "iamandroid.editor.PilarEditor";
+	static public final String EDITOR_ID = "amanide.editors.PilarEditor";
 
 	static public final String ACTION_OPEN = "OpenEditor";
 
@@ -109,10 +110,6 @@ public class PilarEditor extends TextEditor implements IPilarFormatStdProvider,
 	// private volatile ErrorDescription errorDescription;
 
 	// ---------------------------- listeners stuff
-	/**
-	 * Those are the ones that register with the PYDEV_PYEDIT_LISTENER extension
-	 * point
-	 */
 	// private static List<IPilarListener> editListeners;
 
 	/**
@@ -394,33 +391,16 @@ public class PilarEditor extends TextEditor implements IPilarFormatStdProvider,
 		if (project == null || !project.isOpen()) {
 			return null;
 		}
-		// IPilarNature pilarNature = PilarNature.getPilarNature(project);
-		// if (pilarNature != null) {
-		// return pilarNature;
-		// }
-		//
-		// //if it's an external file, there's the possibility that it won't be
+		IPilarNature pilarNature = PilarNature.getPilarNature(project);
+		if (pilarNature != null) {
+			return pilarNature;
+		}
+
+		// if it's an external file, there's the possibility that it won't be
 		// added even here.
-		// pilarNature = PilarNature.addNature(this.getEditorInput());
-		//
-		// if (pilarNature != null) {
-		// return pilarNature;
-		// }
-		//
-		// Tuple<IPilarNature, String> infoForFile =
-		// AmandroidPlugin.getInfoForFile(getEditorFile());
-		// if (infoForFile == null) {
-		// NotConfiguredInterpreterException e = new
-		// NotConfiguredInterpreterException();
-		// ErrorDialog.openError(EditorUtils.getShell(),
-		// "Error: no interpreter configured",
-		// "Interpreter not configured\n(Please, Configure it under window->preferences->PyDev)",
-		// PydevPlugin.makeStatus(IStatus.ERROR, e.getMessage(), e));
-		// throw e;
-		//
-		// }
-		// pilarNature = infoForFile.o1;
-		return null;
+		pilarNature = PilarNature.addNature(this.getEditorInput());
+
+		return pilarNature;
 	}
 
 	/**

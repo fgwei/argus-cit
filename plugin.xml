@@ -8,11 +8,14 @@
          point="org.eclipse.ui.editors">
       <editor
             name="Pilar Editor"
-            extensions="pilar, plr"
+            extensions="pilar,plr"
             icon="icons/plr_icon.png"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             class="amanide.editors.PilarEditor"
             id="amanide.editors.PilarEditor">
+         <contentTypeBinding
+               contentTypeId="amanide.pilarfile">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension
@@ -82,7 +85,6 @@
       </initializer>
    </extension>
    <extension
-         id="AmanIDEWizards"
          point="org.eclipse.ui.newWizards">
       <category
             id="amandroid.category"
@@ -135,6 +137,51 @@
          point="org.eclipse.ui.navigator.viewer">
       <viewer
             viewerId="amanide.navigator.view">
+         <popupMenu
+               allowsPlatformContributions="true"
+               id="amanide.navigator.view#PopupMenu">
+            <insertionPoint
+                  name="group.new">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.open"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.openWith">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.edit"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.reorganize">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.port"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.build"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.generate"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.search"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="additions"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.properties"
+                  separator="true">
+            </insertionPoint>
+         </popupMenu>
       </viewer>
       <viewerContentBinding
             viewerId="amanide.navigator.view">
@@ -156,6 +203,10 @@
             </contentExtension>
          </includes>
       </viewerContentBinding>
+      <dragAssistant
+            class="org.eclipse.ui.navigator.resources.ResourceDragAdapterAssistant"
+            viewerId="amanide.navigator.view">
+      </dragAssistant>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
@@ -238,8 +289,9 @@
          </commonSorter>
       </navigatorContent>
       <commonWizard
-            type="import"
-            wizardId="AmanIDE.commonWizard1">
+            menuGroupId="amanide.ui.wizards"
+            type="new"
+            wizardId="amanide.ui.wizards.files.PilarPackageWizard">
          <enablement>
             <or>
                <instanceof
@@ -247,7 +299,36 @@
                </instanceof>
                <instanceof
                      value="amanide.navigator.elements.PilarSourceFolder">
-               </instanceof></or>
+               </instanceof>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="amanide.pilarNature">
+                  </test>
+               </adapt></or>
+         </enablement>
+      </commonWizard>
+      <commonWizard
+            menuGroupId="amanide.ui.wizards"
+            type="new"
+            wizardId="amanide.ui.wizards.files.PilarSourceFolderWizard">
+         <enablement>
+            <or>
+               <instanceof
+                     value="amanide.navigator.elements.PilarFolder">
+               </instanceof>
+               <instanceof
+                     value="amanide.navigator.elements.PilarSourceFolder">
+               </instanceof>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="amanide.pilarNature">
+                  </test>
+               </adapt>
+            </or>
          </enablement>
       </commonWizard>
    </extension>
@@ -264,17 +345,14 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="amanide.ui.PilarPerspective">
-         <view
-               id="amanide.navigator.viewer"
-               ratio="0.5"
-               relationship="stack"
-               relative="org.eclipse.ui.navigator.ProjectExplorer">
-         </view>
          <showInPart
                id="org.eclipse.ui.views.ResourceNavigator">
          </showInPart>
          <showInPart
                id="org.eclipse.ui.views.ContentOutline">
+         </showInPart>
+         <showInPart
+               id="amanide.navigator.view">
          </showInPart>
       </perspectiveExtension>
    </extension>
@@ -292,7 +370,7 @@
                class="amanide.ui.actions.container.AddSrcFolder"
                enablesFor="+"
                icon="icons/packagefolder_obj.gif"
-               id="org.python.pydev.ui.actions.container.addNature"
+               id="amanide.ui.actions.container.addSrcFolder"
                label="Set as Source Folder"
                menubarPath="amanide.ui.actions.menu/amanide"
                tooltip="Include this folder in its project&apos;s PILARPATH">
@@ -301,7 +379,7 @@
       <objectContribution
             adaptable="false"
             id="amanide.ui.actions.container.RemSrcFolder"
-            objectClass="org.python.pydev.navigator.elements.PythonSourceFolder">
+            objectClass="amanide.navigator.elements.PilarSourceFolder">
          <menu
                id="amanide.ui.actions.menu"
                label="AmanIDE">
@@ -370,6 +448,57 @@
             id="amanide.navigator.view"
             name="AmanIDE Package Explorer">
       </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="amanide.navigator.view">
+         <includes>
+            <contentExtension
+                  pattern="amanide.navigator.pilarcontent">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="amanide.navigator.actions.pilarLinkHelper">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+      <viewerActionBinding
+            viewerId="amanide.navigator.view">
+         <includes>
+            <actionExtension
+                  pattern="amanide.navigator.actions.*">
+            </actionExtension>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="pilar,plr"
+            file-names="SConstruct"
+            id="amanide.pilarfile"
+            name="Pilar File"
+            priority="high">
+      </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="amanide.editors.PilarEditor.activeEditor">
+         <with
+               variable="activeEditorId">
+            <equals
+                  value="amanide.editors.PilarEditor">
+            </equals>
+         </with>
+      </definition>
    </extension>
 
 </plugin>

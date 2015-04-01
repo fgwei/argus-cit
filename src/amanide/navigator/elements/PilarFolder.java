@@ -10,8 +10,8 @@ import org.eclipse.core.resources.IFolder;
 public class PilarFolder extends WrappedResource<IFolder> {
 
 	public PilarFolder(IWrappedResource parentElement, IFolder folder,
-			PilarSourceFolder pythonSourceFolder) {
-		super(parentElement, folder, pythonSourceFolder,
+			PilarSourceFolder pilarSourceFolder) {
+		super(parentElement, folder, pilarSourceFolder,
 				IWrappedResource.RANK_PILAR_FOLDER);
 	}
 }

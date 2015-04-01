@@ -1,6 +1,5 @@
 package amanide.navigator;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,15 +35,12 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
-import org.eclipse.ui.navigator.INavigatorContentService;
-import org.eclipse.ui.navigator.INavigatorFilterService;
 
 import amanide.AmanIDEPlugin;
 import amanide.callbacks.ICallback;
@@ -61,6 +57,7 @@ import amanide.navigator.elements.PilarResource;
 import amanide.navigator.elements.PilarSourceFolder;
 import amanide.structure.TreeNode;
 import amanide.utils.Log;
+import amanide.utils.StringUtils;
 
 /**
  * A good part of the refresh for the model was gotten from
@@ -88,6 +85,13 @@ public abstract class PilarBaseModelProvider extends
 	 * Type of the error markers to show in the amanide package explorer.
 	 */
 	public static final String AMANIDE_PACKAGE_EXPORER_PROBLEM_MARKER = "amanide.AmanIDEProjectErrorMarkers";
+
+	/**
+	 * These are the source folders that can be found in this file provider. The
+	 * way we see things in this provider, the pilar model starts only after
+	 * some source folder is found.
+	 */
+	private Map<IProject, ProjectInfoForPackageExplorer> projectToSourceFolders = new HashMap<IProject, ProjectInfoForPackageExplorer>();
 
 	/**
 	 * This is the viewer that we're using to see the contents of this file
@@ -243,19 +247,17 @@ public abstract class PilarBaseModelProvider extends
 			// the nature has just been removed.
 			projectPilarpath = new ArrayList<String>();
 		} else {
-			// try {
-			// projectPilarpath = nature.getPilarPathNature()
-			// .getCompleteProjectPilarPath(
-			// nature.getProjectInterpreter(),
-			// nature.getRelatedInterpreterManager());
-			// } catch (PilarNatureWithoutProjectException e) {
-			// projectPilarpath = new ArrayList<String>();
-			// } catch (MisconfigurationException e) {
-			// projectPilarpath = new ArrayList<String>();
-			// }
+			try {
+				String source = nature.getPilarPathNature()
+						.getOnlyProjectPilarPathStr();
+				projectPilarpath = StringUtils.splitAndRemoveEmptyTrimmed(
+						source, '|');
+			} catch (CoreException e) {
+				projectPilarpath = new ArrayList<String>();
+			}
 		}
 
-		// createAndStartUpdater(project, projectPilarpath);
+		createAndStartUpdater(project, projectPilarpath);
 	}
 
 	@Override
@@ -299,7 +301,7 @@ public abstract class PilarBaseModelProvider extends
 		}
 
 		if (DEBUG) {
-			System.out.println("\n\nRebuilding pilarpath: " + project + " - "
+			Log.log("Rebuilding pilarpath: " + project + " - "
 					+ projectPilarpath);
 		}
 		HashSet<Path> projectPilarpathSet = new HashSet<Path>();
@@ -312,36 +314,71 @@ public abstract class PilarBaseModelProvider extends
 			projectPilarpathSet.add(newPath);
 		}
 
-		ProjectInfoForPackageExplorer projectInfo = ProjectInfoForPackageExplorer
-				.getProjectInfo(project);
+		ProjectInfoForPackageExplorer projectInfo = getProjectInfo(project);
 		if (projectInfo != null) {
 			projectInfo.recreateInfo(project);
 
 			Set<PilarSourceFolder> existingSourceFolders = projectInfo.sourceFolders;
+			Log.log("existingSourceFolders:" + existingSourceFolders);
 			if (existingSourceFolders != null) {
 				// iterate in a copy
 				for (PilarSourceFolder pilarSourceFolder : new HashSet<PilarSourceFolder>(
 						existingSourceFolders)) {
 					IPath fullPath = pilarSourceFolder.container.getLocation();
+					Log.log("fullPath:" + fullPath);
 					if (!projectPilarpathSet.contains(fullPath)) {
 						if (pilarSourceFolder instanceof PilarProjectSourceFolder) {
 							refreshObject = project.getParent();
 						}
 						existingSourceFolders.remove(pilarSourceFolder);
 						if (DEBUG) {
-							System.out.println("Removing:" + pilarSourceFolder
-									+ " - " + fullPath);
+							Log.log("Removing:" + pilarSourceFolder + " - "
+									+ fullPath);
 						}
 					}
 				}
 			}
 		}
-
+		Log.log("refreshObject:" + refreshObject);
 		Runnable refreshRunnable = getRefreshRunnable(refreshObject);
 		final Collection<Runnable> runnables = new ArrayList<Runnable>();
 		runnables.add(refreshRunnable);
 		processRunnables(runnables);
 		return refreshObject;
+	}
+
+	/**
+	 * @return the information on a project. Can create it if it's not
+	 *         available.
+	 */
+	protected synchronized ProjectInfoForPackageExplorer getProjectInfo(
+			final IProject project) {
+		if (project == null) {
+			return null;
+		}
+		Map<IProject, ProjectInfoForPackageExplorer> p = projectToSourceFolders;
+		if (p != null) {
+			ProjectInfoForPackageExplorer projectInfo = p.get(project);
+			if (projectInfo == null) {
+				if (!project.isOpen()) {
+					return null;
+				}
+				// No project info: create it
+				projectInfo = p.get(project);
+				if (projectInfo == null) {
+					projectInfo = new ProjectInfoForPackageExplorer(project);
+					p.put(project, projectInfo);
+				}
+			} else {
+				if (!project.isOpen()) {
+					p.remove(project);
+					projectInfo = null;
+				}
+			}
+			Log.log("projectInfo:" + projectInfo);
+			return projectInfo;
+		}
+		return null;
 	}
 
 	/**
@@ -362,7 +399,7 @@ public abstract class PilarBaseModelProvider extends
 	}
 
 	/**
-	 * Given some IResource in the filesystem, return the representation for it
+	 * Given some IResource in the file system, return the representation for it
 	 * in the pilar model or the resource itself if it could not be found in the
 	 * pilar model.
 	 *
@@ -371,14 +408,16 @@ public abstract class PilarBaseModelProvider extends
 	 */
 	protected Object getResourceInPilarModel(IResource object,
 			boolean removeFoundResource, boolean returnNullIfNotFound) {
-		if (DEBUG) {
-			System.out.println("Getting resource in pilar model:" + object);
-		}
+		// if (DEBUG) {
+		System.out.println("Getting resource in pilar model:" + object);
+		// }
 		Set<PilarSourceFolder> sourceFolders = getProjectSourceFolders(object
 				.getProject());
+		System.out.println("Getting resource in pilar model parent:"
+				+ object.getProject());
+		System.out.println("sourceFolders:" + sourceFolders);
 		Object f = null;
 		PilarSourceFolder sourceFolder = null;
-
 		for (Iterator<PilarSourceFolder> it = sourceFolders.iterator(); f == null
 				&& it.hasNext();) {
 			sourceFolder = it.next();
@@ -413,8 +452,7 @@ public abstract class PilarBaseModelProvider extends
 	 *         contains it
 	 */
 	protected Set<PilarSourceFolder> getProjectSourceFolders(IProject project) {
-		ProjectInfoForPackageExplorer projectInfo = ProjectInfoForPackageExplorer
-				.getProjectInfo(project);
+		ProjectInfoForPackageExplorer projectInfo = getProjectInfo(project);
 		if (projectInfo != null) {
 			return projectInfo.sourceFolders;
 		}
@@ -427,7 +465,7 @@ public abstract class PilarBaseModelProvider extends
 	@Override
 	public Object getParent(Object element) {
 		if (DEBUG) {
-			System.out.println("getParent for: " + element);
+			Log.log("getParent for: " + element);
 		}
 
 		Object parent = null;
@@ -456,7 +494,7 @@ public abstract class PilarBaseModelProvider extends
 			parent = super.getParent(element);
 		}
 		if (DEBUG) {
-			System.out.println("getParent RETURN: " + parent);
+			Log.log("getParent RETURN: " + parent);
 		}
 		return parent;
 	}
@@ -474,38 +512,38 @@ public abstract class PilarBaseModelProvider extends
 	public boolean hasChildren(Object element) {
 		if (element instanceof PilarFile) {
 			// If we're not showing nodes, return false.
-			INavigatorContentService contentService = viewer
-					.getNavigatorContentService();
-			INavigatorFilterService filterService = contentService
-					.getFilterService();
-			ViewerFilter[] visibleFilters = filterService
-					.getVisibleFilters(true);
+			// INavigatorContentService contentService = viewer
+			// .getNavigatorContentService();
+			// INavigatorFilterService filterService = contentService
+			// .getFilterService();
+			// ViewerFilter[] visibleFilters = filterService
+			// .getVisibleFilters(true);
 			// for (ViewerFilter viewerFilter : visibleFilters) {
 			// if (viewerFilter instanceof PilarNodeFilter) {
 			// return false;
 			// }
 			// }
 
-			PilarFile f = (PilarFile) element;
-			if (PilarPathHelper.isValidSourceFile(f.getActualObject())) {
-				try {
-					InputStream contents = f.getContents();
-					try {
-						if (contents.read() == -1) {
-							return false; // if there is no content in the file,
-											// it has no children
-						} else {
-							return true; // if it has any content, it has
-											// children (performance reasons)
-						}
-					} finally {
-						contents.close();
-					}
-				} catch (Exception e) {
-					Log.log("Handled error getting contents.", e);
-					return false;
-				}
-			}
+			// PilarFile f = (PilarFile) element;
+			// if (PilarPathHelper.isValidSourceFile(f.getActualObject())) {
+			// try {
+			// InputStream contents = f.getContents();
+			// try {
+			// if (contents.read() == -1) {
+			// return false; // if there is no content in the file,
+			// // it has no children
+			// } else {
+			// return true; // if it has any content, it has
+			// // children (performance reasons)
+			// }
+			// } finally {
+			// contents.close();
+			// }
+			// } catch (Exception e) {
+			// Log.log("Handled error getting contents.", e);
+			// return false;
+			// }
+			// }
 			return false;
 		}
 		if (element instanceof TreeNode<?>) {
@@ -527,11 +565,7 @@ public abstract class PilarBaseModelProvider extends
 	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (DEBUG) {
-			System.out.println("getChildren for: " + parentElement);
-		}
 		Object[] childrenToReturn = null;
-		Log.log("parentElement:" + parentElement);
 		if (parentElement instanceof IWrappedResource) {
 			// we're below some pilar model
 			childrenToReturn = getChildrenForIWrappedResource((IWrappedResource) parentElement);
@@ -565,7 +599,8 @@ public abstract class PilarBaseModelProvider extends
 			childrenToReturn = EMPTY;
 		}
 		if (DEBUG) {
-			System.out.println("getChildren RETURN: " + childrenToReturn);
+			for (Object c : childrenToReturn)
+				Log.log("childrenToReturn: " + c);
 		}
 		return childrenToReturn;
 	}
@@ -595,7 +630,8 @@ public abstract class PilarBaseModelProvider extends
 		// replace folders -> source folders (we should only get here on a path
 		// that's not below a source folder)
 		Object[] childrenToReturn = super.getChildren(parentElement);
-
+		for (Object cr : childrenToReturn)
+			Log.log("childrenToReturn:   :" + cr);
 		// if we don't have a pilar nature in this project, there is no way we
 		// can have a PilarSourceFolder
 		List<Object> ret = new ArrayList<Object>(childrenToReturn.length);
@@ -613,14 +649,14 @@ public abstract class PilarBaseModelProvider extends
 
 			// only add it if it wasn't null
 			ret.add(child);
-
+			System.out.println("child:::" + child);
 			if (!(child instanceof IResource)) {
 				// not an element that we can treat in pydev (but still, it was
 				// already added)
 				continue;
 			}
 			child = getResourceInPilarModel((IResource) child);
-
+			System.out.println("child after:::" + child);
 			if (child == null) {
 				// ok, it was not in the pilar model (but it was already added
 				// with the original representation, so, that's ok)
@@ -658,7 +694,9 @@ public abstract class PilarBaseModelProvider extends
 
 					Set<String> sourcePathSet = localNature
 							.getPilarPathNature().getProjectSourcePathSet(true);
+					Log.log("sourcePathSet:  :" + sourcePathSet);
 					IPath fullPath = container.getFullPath();
+					Log.log("fullPath:  :" + fullPath);
 					if (sourcePathSet.contains(fullPath.toString())) {
 						PilarSourceFolder createdSourceFolder;
 						if (container instanceof IFolder) {
@@ -689,6 +727,7 @@ public abstract class PilarBaseModelProvider extends
 				}
 			}
 		}
+		Log.log("ret:  :" + ret);
 		return ret.toArray();
 	}
 
@@ -876,6 +915,7 @@ public abstract class PilarBaseModelProvider extends
 	@Override
 	public void dispose() {
 		try {
+			this.projectToSourceFolders = null;
 			if (viewer != null) {
 				IWorkspace[] workspace = null;
 				Object obj = viewer.getInput();

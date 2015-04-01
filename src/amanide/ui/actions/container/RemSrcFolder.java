@@ -36,22 +36,21 @@ public class RemSrcFolder extends ContainerAction {
 			IProgressMonitor monitor) {
 		try {
 			IProject project = container.getProject();
-			IPilarPathNature pythonPathNature = PilarNature
+			IPilarPathNature pilarPathNature = PilarNature
 					.getPilarPathNature(project);
-			if (pythonPathNature == null) {
+			if (pilarPathNature == null) {
 				Log.log("Unable to get PilarNature on project: " + project);
 				return 0;
 			}
-			OrderedMap<String, String> projectSourcePathMap = pythonPathNature
+			OrderedMap<String, String> projectSourcePathMap = pilarPathNature
 					.getProjectSourcePathResolvedToUnresolvedMap();
 			String pathToRemove = container.getFullPath().toString();
 
 			if (projectSourcePathMap.remove(pathToRemove) == null) {
 				return 0;
 			}
-			// Set back the map with the variables, not the one with resolved
-			// vars.
-			pythonPathNature.setProjectSourcePath(StringUtils.join("|",
+			// Set back the map with the variables, not the one with resolved.
+			pilarPathNature.setProjectSourcePath(StringUtils.join("|",
 					projectSourcePathMap.values()));
 			PilarNature.getPilarNature(project).rebuildPath();
 			return 1;

@@ -1,9 +1,3 @@
-/**
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the Eclipse Public License (EPL).
- * Please see the license.txt included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
 package amanide.navigator.elements;
 
 import java.io.InputStream;
@@ -24,11 +18,10 @@ import amanide.editors.codecompletion.PilarPathHelper;
 public class PilarFile extends WrappedResource<IFile> {
 
 	public PilarFile(IWrappedResource parentElement, IFile actualObject,
-			PilarSourceFolder pythonSourceFolder) {
-		super(parentElement, actualObject, pythonSourceFolder,
+			PilarSourceFolder pilarSourceFolder) {
+		super(parentElement, actualObject, pilarSourceFolder,
 				IWrappedResource.RANK_PILAR_FILE);
 		PilarPathHelper.markAsAmanIDEFileIfDetected(actualObject);
-		// System.out.println("Created PythonFile:"+this+" - "+actualObject+" parent:"+parentElement);
 	}
 
 	public InputStream getContents() throws CoreException {
@@ -41,4 +34,5 @@ public class PilarFile extends WrappedResource<IFile> {
 			return this.actualObject.getContents();
 		}
 	}
+
 }
