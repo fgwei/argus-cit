@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Argus JDT Weaving
+Bundle-SymbolicName: org.argus-ide.cit.aspects;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin
+Bundle-Vendor: arguslab.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
