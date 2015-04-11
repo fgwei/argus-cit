@@ -1,24 +1,11 @@
-*.class
-*.log
-/bin
-/target
-/.cache
-/.scala_dependencies
-.DS_Store
-*.apk
-*.pilar
-
-# sbt specific
-.cache/
-.history/
-.lib/
-dist/*
+**/.cache
+**/*.tmpBin
 target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-
-# Scala-IDE specific
-.scala_dependencies
-.worksheet
+org.argus-ide.cit.core/META-INF/MANIFEST.MF
+org.argus-ide.cit.debug/META-INF/MANIFEST.MF
+org.argus-ide.cit.feature/feature.xml
+org.argus-ide.cit.source.feature/feature.xml
+.idea
+.metadata
+*~
+**/.settings/
