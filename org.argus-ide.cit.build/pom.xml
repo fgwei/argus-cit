@@ -12,8 +12,14 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <!-- scm configuration is require to extract the github hash-->
-
-
+  <scm>
+    <url>https://github.com/fgwei/argus-ide</url>
+    <connection>scm:git://github.com/fgwei/argus-ide.git</connection>
+  </scm>
+  
+  <modules>
+    <module>../org.argus-ide.cit.aspects</module>
+  </modules>
 
   <repositories>
     <repository>
@@ -217,8 +223,4 @@
       </plugins>
     </pluginManagement>
   </build>
-  <scm>
-  	<url>https://github.com/fgwei/argus-ide</url>
-  	<connection>scm:git://github.com/fgwei/argus-ide.git</connection>
-  </scm>
 </project>

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="cfprovider" name="ClassFile Provider" schema="schema/cfprovider.exsd"/>
+   <extension-point id="cuprovider" name="Compilation Unit Provider" schema="schema/cuprovider.exsd"/>
+   <extension-point id="indexerprovider" name="Indexer Provider" schema="schema/indexerprovider.exsd"/>
+   <extension-point id="imagedescriptorselector" name="Image Descriptor Selector" schema="schema/imagedescriptorselector.exsd"/>
+   <extension-point id="openactionprovider" name="Open Action Provider" schema="schema/openactionprovider.exsd"/>
 
 
 </plugin>

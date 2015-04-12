@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+  <modelVersion>1.0.0</modelVersion>
   <prerequisites>
     <maven>3.0</maven>
   </prerequisites>
 
   <organization>
-    <name>scala-ide.org</name>
-    <url>http://scala-ide.org</url>
+    <name>arguslab.org</name>
+    <url>http://arguslab.org</url>
   </organization>
 
-  <groupId>org.scala-ide</groupId>
-  <artifactId>org.scala-ide.build</artifactId>
-  <version>4.1.0-SNAPSHOT</version>
-  <description>Default config holder (value, profiles, versions, ...) for the build of Scala IDE for Eclipse</description>
+  <groupId>org.argus-ide</groupId>
+  <artifactId>org.argus-ide.build</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <description>Default config holder (value, profiles, versions, ...) for the build of Argus IDE for Eclipse</description>
   <packaging>pom</packaging>
 
   <properties>
@@ -30,7 +30,6 @@
     <repo.ajdt.kepler>http://download.eclipse.org/tools/ajdt/43/update</repo.ajdt.kepler>
     <repo.ajdt.luna>http://download.eclipse.org/tools/ajdt/44/dev/update</repo.ajdt.luna>
     <repo.equinox.launcher>http://download.scala-ide.org/plugins/equinox-weaving-launcher/releases/site</repo.equinox.launcher>
-    <repo.scala-ide.root>http://download.scala-ide.org</repo.scala-ide.root>
     <repo.nebula>http://download.eclipse.org/technology/nebula/snapshot</repo.nebula>
 
     <!-- fixed versions -->
@@ -59,20 +58,6 @@
     <tycho.test.jvmArgs>-Xmx1024m -XX:MaxPermSize=256m -Dsdtcore.headless -Dsdtcore.notimeouts -DretryFlakyTests=${retryFlakyTests} ${tycho.test.weaving} ${tycho.test.OSspecific}</tycho.test.jvmArgs>
 
     <!-- base versions -->
-    <!-- Scala 2.10.x -->
-    <scala210.version>2.10.5</scala210.version>
-    <!-- Scala 2.11.x -->
-    <scala211.version>2.11.7-SNAPSHOT</scala211.version>
-    <scala211.binary.version>2.11</scala211.binary.version>
-    <scala211.scala-xml.version>1.0.3</scala211.scala-xml.version>
-    <scala211.scala-parser-combinators.version>1.0.3</scala211.scala-parser-combinators.version>
-    <scala211.scala-swing.version>1.0.1</scala211.scala-swing.version>
-    <!-- Scala 2.12.x -->
-    <scala212.version>2.12.0-SNAPSHOT</scala212.version>
-    <scala212.binary.version>2.11</scala212.binary.version>
-    <scala212.scala-xml.version>1.0.3</scala212.scala-xml.version>
-    <scala212.scala-parser-combinators.version>1.0.3</scala212.scala-parser-combinators.version>
-    <scala212.scala-swing.version>1.0.1</scala212.scala-swing.version>
 
     <!-- dependencies repos, can be overwritten by profiles -->
     <eclipse.codename>Select an Eclipse profile</eclipse.codename>
@@ -89,9 +74,6 @@
     <sbt.version>0.13.6</sbt.version>
 
     <!-- the repos containing the Scala dependencies -->
-    <repo.scala-refactoring>${repo.scala-ide.root}/scala-refactoring-${scala.short.version}x</repo.scala-refactoring>
-    <repo.scalariform>${repo.scala-ide.root}/scalariform-${scala.short.version}x</repo.scalariform>
-    <repo.typesafe>http://private-repo.typesafe.com/typesafe/ide-${scala.minor.version}</repo.typesafe>
 
   </properties>
 
@@ -100,68 +82,6 @@
       <id>retryFlakyTests</id>
       <properties>
         <retryFlakyTests>true</retryFlakyTests>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>scala-2.10.x</id>
-      <properties>
-        <scala.version>${scala210.version}</scala.version>
-        <scala.short.version>210</scala.short.version>
-        <scala.minor.version>2.10</scala.minor.version>
-        <version.suffix>2_10</version.suffix>
-
-      </properties>
-    </profile>
-
-    <profile>
-      <id>scala-2.11.x</id>
-      <properties>
-        <scala.version>${scala211.version}</scala.version>
-        <scala.short.version>211</scala.short.version>
-        <scala.minor.version>2.11</scala.minor.version>
-        <version.suffix>2_11</version.suffix>
-
-      </properties>
-    </profile>
-
-    <profile>
-      <id>scala-2.12.x</id>
-      <properties>
-        <scala.version>${scala212.version}</scala.version>
-        <scala.short.version>212</scala.short.version>
-        <scala.minor.version>2.12</scala.minor.version>
-        <version.suffix>2_12</version.suffix>
-        <!-- TODO: remove snapshot version when a tag compatible with Scala 2.12 is available -->
-        <sbt.version>0.13.7-SNAPSHOT</sbt.version>
-
-      </properties>
-    </profile>
-
-    <profile>
-      <!-- Eclipse Juno -->
-      <id>eclipse-juno</id>
-      <properties>
-        <eclipse.codename>juno</eclipse.codename>
-        <repo.eclipse>${repo.eclipse.juno}</repo.eclipse>
-        <repo.ajdt>${repo.ajdt.juno}</repo.ajdt>
-        <jdt.core.version.range>[3.8.0,3.10.0)</jdt.core.version.range>
-        <weaving.hook.plugin.version>1.0.200.v20120524-1707</weaving.hook.plugin.version>
-      </properties>
-    </profile>
-
-    <profile>
-      <!-- Eclipse Kepler -->
-      <!-- This profile was created in case it is needed at some point, but the
-           current goal is to use the Juno profile for both Kepler and Juno compatible
-           binaries -->
-      <id>eclipse-kepler</id>
-      <properties>
-        <eclipse.codename>kepler</eclipse.codename>
-        <repo.eclipse>${repo.eclipse.kepler}</repo.eclipse>
-        <repo.ajdt>${repo.ajdt.kepler}</repo.ajdt>
-        <jdt.core.version.range>[3.9.0,3.10.0)</jdt.core.version.range>
-        <weaving.hook.plugin.version>1.0.200.v20130327-1442</weaving.hook.plugin.version>
       </properties>
     </profile>
 
@@ -214,9 +134,9 @@
       <id>set-versions</id>
       <dependencies>
         <dependency>
-          <groupId>org.scala-ide</groupId>
-          <artifactId>build-tools_2.11</artifactId>
-          <version>0.5.1</version>
+          <groupId>org.argus-ide</groupId>
+          <artifactId>build-tools_1.01</artifactId>
+          <version>1.0.0</version>
         </dependency>
       </dependencies>
       <build>
@@ -244,32 +164,19 @@
           </plugin>
         </plugins>
       </build>
-      <repositories>
-        <repository>
-          <!-- extra repository containing the build package -->
-          <id>typesafe-ide</id>
-          <name>Typesafe IDE repository</name>
-          <url>http://private-repo.typesafe.com/typesafe/ide-2.11</url>
-          <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-      </repositories>
     </profile>
 
     <profile>
       <id>set-version-specific-files</id>
       <properties>
-        <sbt.feature.dir>org.scala-ide.sbt.build/org.scala-ide.sbt.feature</sbt.feature.dir>
+        <!-- <sbt.feature.dir>org.scala-ide.sbt.build/org.scala-ide.sbt.feature</sbt.feature.dir>
         <sbt.source.feature.dir>org.scala-ide.sbt.build/org.scala-ide.sbt.source.feature</sbt.source.feature.dir>
-        <scala210.feature.dir>org.scala-ide.scala210.build/org.scala-ide.scala210.feature</scala210.feature.dir>
-        <scala210.source.feature.dir>org.scala-ide.scala210.build/org.scala-ide.scala210.source.feature</scala210.source.feature.dir>
-        <scala211.feature.dir>org.scala-ide.scala211.build/org.scala-ide.scala211.feature</scala211.feature.dir>
-        <scala211.source.feature.dir>org.scala-ide.scala211.build/org.scala-ide.scala211.source.feature</scala211.source.feature.dir>
         <scala212.feature.dir>org.scala-ide.scala212.build/org.scala-ide.scala212.feature</scala212.feature.dir>
         <scala212.source.feature.dir>org.scala-ide.scala212.build/org.scala-ide.scala212.source.feature</scala212.source.feature.dir>
         <sdt.core.dir>org.scala-ide.sdt.core</sdt.core.dir>
         <sdt.debug.dir>org.scala-ide.sdt.debug</sdt.debug.dir>
         <sdt.debug.expression.dir>org.scala-ide.sdt.debug.expression</sdt.debug.expression.dir>
-        <sdt.update-site.dir>org.scala-ide.sdt.update-site</sdt.update-site.dir>
+        <sdt.update-site.dir>org.scala-ide.sdt.update-site</sdt.update-site.dir> -->
       </properties>
       <build>
         <plugins>
@@ -635,15 +542,15 @@
             <includeTestSourceDirectory>false</includeTestSourceDirectory>
             <failOnWarning>false</failOnWarning>
             <sourceDirectories>
-              <dir>org.scala-ide.sdt.core/src</dir>
-              <dir>org.scala-ide.sdt.debug/src</dir>
-              <dir>org.scala-ide.sdt.core.tests/src</dir>
-              <dir>org.scala-ide.sdt.core.tests/test-workspace</dir>
-              <dir>org.scala-ide.sdt.debug.tests/src</dir>
-              <dir>org.scala-ide.sdt.debug.tests/test-workspace</dir>
-              <dir>org.scala-ide.sdt.debug.expression/src</dir>
-              <dir>org.scala-ide.sdt.debug.expression.tests/src</dir>
-              <dir>org.scala-ide.sdt.debug.expression.tests/test-workspace</dir>
+              <dir>org.argus-ide.cit.core/src</dir>
+              <!-- <dir>org.argus-ide.cit.debug/src</dir>
+              <dir>org.argus-ide.cit.core.tests/src</dir>
+              <dir>org.argus-ide.cit.core.tests/test-workspace</dir>
+              <dir>org.argus-ide.cit.debug.tests/src</dir>
+              <dir>org.argus-ide.cit.debug.tests/test-workspace</dir>
+              <dir>org.argus-ide.cit.debug.expression/src</dir>
+              <dir>org.argus-ide.cit.debug.expression.tests/src</dir>
+              <dir>org.argus-ide.cit.debug.expression.tests/test-workspace</dir> -->
             </sourceDirectories>
             <configLocation>org.scala-ide.sdt.core/scala-ide-style-config.xml</configLocation>
           </configuration>
