@@ -13,8 +13,8 @@ import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.core.CompilationUnitProblemFinder;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IPilarElement;
-import argus.tools.eclipse.contribution.weaving.jdt.IPilarSourceFile;;
+import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
+import argus.tools.eclipse.contribution.weaving.jdt.IArgusSourceFile;;
 
 @SuppressWarnings("restriction")
 public privileged aspect CompilationUnitProblemFinderAspect {
@@ -40,11 +40,11 @@ public privileged aspect CompilationUnitProblemFinderAspect {
     IProgressMonitor monitor) :
     process(unitElement, parser, workingCopyOwner, problems, creatingAST, reconcileFlags, monitor) {
     CompilationUnit original = unitElement.originalFromClone(); 
-    if (!(original instanceof IPilarElement))
+    if (!(original instanceof IArgusElement))
       return proceed(unitElement, parser, workingCopyOwner, problems, creatingAST, reconcileFlags, monitor);
     
-    if (original instanceof IPilarSourceFile) {
-      IProblem[] unitProblems = ((IPilarSourceFile)original).getProblems();
+    if (original instanceof IArgusSourceFile) {
+      IProblem[] unitProblems = ((IArgusSourceFile)original).getProblems();
       int length = unitProblems == null ? 0 : unitProblems.length;
       if (length > 0) {
         CategorizedProblem[] categorizedProblems = new CategorizedProblem[length];

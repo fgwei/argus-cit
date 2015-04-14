@@ -14,7 +14,7 @@ import org.eclipse.jdt.internal.corext.refactoring.RefactoringAvailabilityTester
 import org.eclipse.jdt.internal.corext.refactoring.reorg.ReorgUtils;
 import org.eclipse.jdt.internal.ui.refactoring.actions.RenameResourceAction;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IPilarElement;
+import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
 
 @SuppressWarnings("restriction")
 public aspect RefactoringAvailabilityAspect {
@@ -48,11 +48,11 @@ public aspect RefactoringAvailabilityAspect {
 
   boolean around(Object arg) :
     isAvailable(arg) {
-    if (arg instanceof IPilarElement)
+    if (arg instanceof IArgusElement)
       return false;
     else if (arg instanceof IStructuredSelection)
       for(Iterator i = ((IStructuredSelection)arg).iterator(); i.hasNext();)
-        if (i.next() instanceof IPilarElement)
+        if (i.next() instanceof IArgusElement)
           return false;
      
     return proceed(arg);
@@ -66,7 +66,7 @@ public aspect RefactoringAvailabilityAspect {
     int numElements = elements.length;
     boolean hasPilarElement = false;
     for (int i = 0; i < numElements; ++i)
-      if (elements[i] instanceof IPilarElement) {
+      if (elements[i] instanceof IArgusElement) {
         hasPilarElement = true;
         break;
       }
@@ -82,7 +82,7 @@ public aspect RefactoringAvailabilityAspect {
     
     for (int i = 0; i < numElements; ++i) {
       IJavaElement elem = elements[i];
-      if (elem instanceof IPilarElement) {
+      if (elem instanceof IArgusElement) {
         try {
           IResource resource = elem.getCorrespondingResource();
           if (resource != null)
@@ -106,7 +106,7 @@ public aspect RefactoringAvailabilityAspect {
       Object elem = elements[index]; 
       if (elem instanceof IResource)
         result.add(elem);
-      else if (elem instanceof IPilarElement) {
+      else if (elem instanceof IArgusElement) {
         try {
           IResource resource = ((IJavaElement)elem).getCorrespondingResource();
           if (resource != null)
@@ -124,7 +124,7 @@ public aspect RefactoringAvailabilityAspect {
     List result= new ArrayList();
     for (int index= 0; index < elements.length; index++) {
       Object elem = elements[index]; 
-      if ((elem instanceof IJavaElement) && !(elem instanceof IPilarElement))
+      if ((elem instanceof IJavaElement) && !(elem instanceof IArgusElement))
         result.add(elem);
     }
     return (IJavaElement[]) result.toArray(new IJavaElement[result.size()]);
@@ -137,7 +137,7 @@ public aspect RefactoringAvailabilityAspect {
       Object elem = i.next(); 
       if (elem instanceof IResource)
         result.add(elem);
-      else if (elem instanceof IPilarElement) {
+      else if (elem instanceof IArgusElement) {
         try {
           IResource resource = ((IJavaElement)elem).getCorrespondingResource();
           if (resource != null)
@@ -155,7 +155,7 @@ public aspect RefactoringAvailabilityAspect {
     List result= new ArrayList();
     for (Iterator i = elements.iterator(); i.hasNext(); ) {
       Object elem = i.next(); 
-      if ((elem instanceof IJavaElement) && !(elem instanceof IPilarElement))
+      if ((elem instanceof IJavaElement) && !(elem instanceof IArgusElement))
         result.add(elem);
     }
     return (IJavaElement[]) result.toArray(new IJavaElement[result.size()]);
@@ -166,7 +166,7 @@ public aspect RefactoringAvailabilityAspect {
     if (selection.size() != 1)
       return null;
     Object first= selection.getFirstElement();
-    if (first instanceof IPilarElement) {
+    if (first instanceof IArgusElement) {
       try {
         return ((IJavaElement)first).getCorrespondingResource();
       } catch (JavaModelException ex) {

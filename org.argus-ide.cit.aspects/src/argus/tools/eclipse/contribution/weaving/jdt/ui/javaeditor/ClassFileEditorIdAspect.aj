@@ -5,7 +5,7 @@ import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput;
 import org.eclipse.ui.IEditorInput;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IPilarClassFile;
+import argus.tools.eclipse.contribution.weaving.jdt.IArgusClassFile;
 
 @SuppressWarnings("restriction")
 public aspect ClassFileEditorIdAspect {
@@ -17,7 +17,7 @@ public aspect ClassFileEditorIdAspect {
     getEditorID(input) {
     if (input instanceof IClassFileEditorInput) {
       IClassFile cf = ((IClassFileEditorInput)input).getClassFile();
-      if (cf instanceof IPilarClassFile)
+      if (cf instanceof IArgusClassFile)
         return "argus.tools.eclipse.PilarClassFileEditor";
     }
     

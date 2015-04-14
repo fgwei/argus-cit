@@ -19,6 +19,7 @@
   
   <modules>
     <module>../org.argus-ide.cit.aspects</module>
+    <module>../org.argus-ide.cit.core</module>
   </modules>
 
   <repositories>

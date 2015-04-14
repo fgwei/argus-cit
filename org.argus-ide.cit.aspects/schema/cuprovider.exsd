@@ -64,6 +64,13 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="file_extension" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

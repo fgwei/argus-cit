@@ -60,7 +60,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":argus.tools.eclipse.contribution.weaving.jdt.IRecordFileProvider"/>
+                  <meta.attribute kind="java" basedOn=":argus.tools.eclipse.contribution.weaving.jdt.cfprovider.IClassFileProvider"/>
                </appinfo>
             </annotation>
          </attribute>

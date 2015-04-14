@@ -4,8 +4,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.core.search.matching.MatchLocator;
 import org.eclipse.jdt.internal.core.search.matching.PossibleMatch;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IPilarClassFile;
-import argus.tools.eclipse.contribution.weaving.jdt.IPilarCompilationUnit;
+import argus.tools.eclipse.contribution.weaving.jdt.IArgusClassFile;
+import argus.tools.eclipse.contribution.weaving.jdt.IArgusCompilationUnit;
 
 @SuppressWarnings("restriction")
 public privileged aspect SearchAspect {
@@ -25,7 +25,7 @@ public privileged aspect SearchAspect {
     
   boolean around(MatchLocator ml, PossibleMatch possibleMatch, boolean mustResolve) throws CoreException :
     parseAndBuildBindings(ml, possibleMatch, mustResolve) {
-    if (!(possibleMatch.openable instanceof IPilarCompilationUnit))
+    if (!(possibleMatch.openable instanceof IArgusCompilationUnit))
       return proceed(ml, possibleMatch, mustResolve);
 
     possibleMatch.parsedUnit = null;
@@ -38,19 +38,19 @@ public privileged aspect SearchAspect {
   
   void around(MatchLocator ml, PossibleMatch possibleMatch, boolean bindingsWereCreated) throws CoreException :
     process(ml, possibleMatch, bindingsWereCreated) {
-    if (possibleMatch.openable instanceof IPilarCompilationUnit)
-      ((IPilarCompilationUnit)possibleMatch.openable).reportMatches(ml, possibleMatch);
+    if (possibleMatch.openable instanceof IArgusCompilationUnit)
+      ((IArgusCompilationUnit)possibleMatch.openable).reportMatches(ml, possibleMatch);
     else
       proceed(ml, possibleMatch, bindingsWereCreated);
   }
 
   String around(PossibleMatch pm) :
     getSourceFileName(pm) {
-    if (pm.sourceFileName != null || !(pm.openable instanceof IPilarClassFile))
+    if (pm.sourceFileName != null || !(pm.openable instanceof IArgusClassFile))
       return proceed(pm);
 
     pm.sourceFileName = PossibleMatch.NO_SOURCE_FILE_NAME;
-    String fileName = ((IPilarClassFile)pm.openable).getSourceFileName();
+    String fileName = ((IArgusClassFile)pm.openable).getSourceFileName();
     if (fileName != null)
       pm.sourceFileName = fileName;
     return pm.sourceFileName;

@@ -8,8 +8,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.IJavaElementRequestor;
 import org.eclipse.jdt.internal.core.NameLookup;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IPilarCompilationUnit;
-import argus.tools.eclipse.contribution.weaving.jdt.IPilarElement;
+import argus.tools.eclipse.contribution.weaving.jdt.IArgusCompilationUnit;
+import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
 
 @SuppressWarnings("restriction")
 public privileged aspect NameLookupAspect {
@@ -72,12 +72,12 @@ public privileged aspect NameLookupAspect {
             IJavaElement cu = compilationUnits[i];
             String cuName = cu.getElementName();
             int lastDot = cuName.lastIndexOf('.');
-            boolean isPilar = cu instanceof IPilarCompilationUnit;
+            boolean isPilar = cu instanceof IArgusCompilationUnit;
             if (!isPilar && (lastDot != topLevelTypeName.length() || !topLevelTypeName.regionMatches(0, cuName, 0, lastDot)))
               continue;
             IType type = ((ICompilationUnit) cu).getType(topLevelTypeName);
             type = nl.getMemberType(type, name, firstDot);
-            if ((isPilar && (type instanceof IPilarElement) && type.exists()) || 
+            if ((isPilar && (type instanceof IArgusElement) && type.exists()) || 
                 (!isPilar && nl.acceptType(type, acceptFlags, true/*a source type*/))) { // accept type checks for existence unless cu is pilar
               requestor.acceptType(type);
               break;  // since an exact match was requested, no other matching type can exist
@@ -94,7 +94,7 @@ public privileged aspect NameLookupAspect {
             if (requestor.isCanceled())
               return;
             IJavaElement cu = compilationUnits[i];
-            if (!(cu instanceof IPilarCompilationUnit) && !cu.getElementName().toLowerCase().startsWith(cuPrefix))
+            if (!(cu instanceof IArgusCompilationUnit) && !cu.getElementName().toLowerCase().startsWith(cuPrefix))
               continue;
             try {
               IType[] types = ((ICompilationUnit) cu).getTypes();

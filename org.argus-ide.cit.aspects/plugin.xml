@@ -6,6 +6,7 @@
    <extension-point id="indexerprovider" name="Indexer Provider" schema="schema/indexerprovider.exsd"/>
    <extension-point id="imagedescriptorselector" name="Image Descriptor Selector" schema="schema/imagedescriptorselector.exsd"/>
    <extension-point id="openactionprovider" name="Open Action Provider" schema="schema/openactionprovider.exsd"/>
+   <extension-point id="formatterCleanUp" name="Formatter Clean Up" schema="schema/formatterCleanUp.exsd"/>
 
 
 </plugin>
