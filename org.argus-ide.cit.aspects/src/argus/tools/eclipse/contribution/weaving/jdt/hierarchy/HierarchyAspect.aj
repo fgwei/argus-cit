@@ -23,9 +23,9 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.VerticalRulerEvent;
 import org.eclipse.swt.widgets.Event;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusCompilationUnit;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaCompilationUnit;
 import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusOverrideIndicator;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaOverrideIndicator;
 
 @SuppressWarnings("restriction")
 public privileged aspect HierarchyAspect {
@@ -100,13 +100,13 @@ public privileged aspect HierarchyAspect {
   
   void around(org.eclipse.jdt.internal.ui.javaeditor.OverrideIndicatorManager oim, CompilationUnit ast, IProgressMonitor progressMonitor) :
     updateAnnotations(oim, ast, progressMonitor) {
-    if (!(oim.fJavaElement instanceof IArgusCompilationUnit)) {
+    if (!(oim.fJavaElement instanceof IJawaCompilationUnit)) {
       proceed(oim, ast, progressMonitor);
       return;
     }
     
     HashMap annotationMap = new HashMap();
-    ((IArgusCompilationUnit)oim.fJavaElement).createOverrideIndicators(annotationMap);
+    ((IJawaCompilationUnit)oim.fJavaElement).createOverrideIndicators(annotationMap);
     
     if (progressMonitor.isCanceled())
       return;
@@ -129,8 +129,8 @@ public privileged aspect HierarchyAspect {
   
   boolean around(Annotation a) :
     isOverwriting(a) {
-    if (a instanceof IArgusOverrideIndicator)
-      return ((IArgusOverrideIndicator)a).isOverwrite();
+    if (a instanceof IJawaOverrideIndicator)
+      return ((IJawaOverrideIndicator)a).isOverwrite();
     else
       return proceed(a);
   }
@@ -138,8 +138,8 @@ public privileged aspect HierarchyAspect {
   void around(VerticalRulerEvent event) :
     annotationDefaultSelected(event) {
     Annotation annotation = event.getSelectedAnnotation();
-    if(annotation instanceof IArgusOverrideIndicator) 
-      ((IArgusOverrideIndicator)annotation).open();
+    if(annotation instanceof IJawaOverrideIndicator) 
+      ((IJawaOverrideIndicator)annotation).open();
     else
       proceed(event);
   }
@@ -149,7 +149,7 @@ public privileged aspect HierarchyAspect {
     jsara.findJavaAnnotation();
     jsara.setEnabled(true);
 
-    if (jsara.fAnnotation instanceof IArgusOverrideIndicator) {
+    if (jsara.fAnnotation instanceof IJawaOverrideIndicator) {
       JavaSelectAnnotationRulerActionUtils.initialize(jsara, jsara.fBundle, "JavaSelectAnnotationRulerAction.OpenSuperImplementation.");
       //JavaSelectAnnotationRulerActionUtils.setEnabled(jsara, JavaSelectAnnotationRulerActionUtils.hasMarkers(jsara));
     }
@@ -159,8 +159,8 @@ public privileged aspect HierarchyAspect {
   
   void around(JavaSelectAnnotationRulerAction jsara, Event event) :
     runWithEvent(jsara, event) {
-    if (jsara.fAnnotation instanceof IArgusOverrideIndicator)
-      ((IArgusOverrideIndicator)jsara.fAnnotation).open();
+    if (jsara.fAnnotation instanceof IJawaOverrideIndicator)
+      ((IJawaOverrideIndicator)jsara.fAnnotation).open();
     else
       proceed(jsara, event);
   }

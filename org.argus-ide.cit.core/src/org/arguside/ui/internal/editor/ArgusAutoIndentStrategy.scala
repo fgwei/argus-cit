@@ -32,7 +32,7 @@ import org.eclipse.jface.text.Region
 import org.eclipse.jface.text.TextUtilities
 import org.eclipse.jface.text.source.ISourceViewer
 import org.eclipse.ui.texteditor.ITextEditorExtension3
-import org.arguside.core.lexical.ArgusCodePartitioner
+import org.arguside.core.lexical.JawaCodePartitioner
 
 
 /**
@@ -575,7 +575,7 @@ class ArgusAutoIndentStrategy(
    * @param document the document
    */
   private def installJavaStuff(document : Document) : Unit = {
-    val partitioner = ArgusCodePartitioner.documentPartitioner()
+    val partitioner = JawaCodePartitioner.documentPartitioner()
     partitioner.connect(document)
     document.setDocumentPartitioner(IJavaPartitions.JAVA_PARTITIONING, partitioner)
   }
@@ -902,7 +902,7 @@ class ArgusAutoIndentStrategy(
    * @return the number of spaces displayed for a tabulator in the editor
    */
   private def getVisualTabLengthPreference: Int =
-    preferencesProvider.getInt(ScalaIndenter.TAB_SIZE)
+    preferencesProvider.getInt(JawaIndenter.TAB_SIZE)
 
   /**
    * The preference setting that tells whether to insert spaces when pressing the Tab key.
@@ -911,7 +911,7 @@ class ArgusAutoIndentStrategy(
    * @since 3.5
    */
   private def isInsertingSpacesForTab: Boolean =
-    preferencesProvider.getBoolean(ScalaIndenter.INDENT_WITH_TABS)
+    preferencesProvider.getBoolean(JawaIndenter.INDENT_WITH_TABS)
 
   /**
    * Returns the possibly <code>project</code>-specific core preference defined under

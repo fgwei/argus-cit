@@ -5,17 +5,17 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 
 @SuppressWarnings("restriction")
-public privileged aspect ArgusCloseStringsAspect {
+public privileged aspect JawaCloseStringsAspect {
   pointcut setCloseStringsEnabled(boolean enabled) :
     args(enabled) &&
     execution(void CompilationUnitEditor.BracketInserter.setCloseStringsEnabled(boolean));
   
-  pointcut invocations(IArgusEditor editor) :
+  pointcut invocations(IJawaEditor editor) :
     target(editor) &&
     (execution(void CompilationUnitEditor.createPartControl(Composite)) ||
      execution(void CompilationUnitEditor.handlePreferenceStoreChanged(PropertyChangeEvent)));
   
-  void around(IArgusEditor editor, boolean enabled) :
+  void around(IJawaEditor editor, boolean enabled) :
     setCloseStringsEnabled(enabled) && cflow(invocations(editor)) {
     proceed(editor, false);
   }

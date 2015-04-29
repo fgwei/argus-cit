@@ -39,9 +39,9 @@ import org.eclipse.ui.IEditorPart
 import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.plugin.AbstractUIPlugin
 import org.osgi.framework.BundleContext
-import org.arguside.core.internal.jdt.model.ScalaSourceFile
+import org.arguside.core.internal.jdt.model.ArgusSourceFile
 import org.arguside.util.eclipse.OSGiUtils
-import org.arguside.ui.internal.templates.ScalaTemplateManager
+import org.arguside.ui.internal.templates.ArgusTemplateManager
 import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.core.resources.IResourceDelta
 import org.arguside.logging.HasLogger
@@ -54,17 +54,17 @@ import org.arguside.ui.internal.diagnostic
 import org.arguside.util.internal.CompilerUtils
 import org.arguside.core.internal.builder.zinc.CompilerInterfaceStore
 import org.arguside.util.internal.FixedSizeCache
-import org.arguside.core.IScalaInstallation
-import org.arguside.core.internal.project.ScalaInstallation.platformInstallation
+import org.arguside.core.IArgusInstallation
+import org.arguside.core.internal.project.ArgusInstallation.platformInstallation
 import org.eclipse.core.runtime.content.IContentType
 import org.arguside.core.CitConstants
 import org.arguside.ui.internal.migration.RegistryExtender
 import org.arguside.core.IArgusPlugin
 import org.eclipse.core.resources.IResourceDeltaVisitor
 import org.arguside.util.Utils._
-import org.arguside.core.internal.jdt.model.ScalaCompilationUnit
-import org.arguside.ui.internal.editor.ScalaDocumentProvider
-import org.arguside.core.internal.jdt.model.ScalaClassFile
+import org.arguside.core.internal.jdt.model.ArgusCompilationUnit
+import org.arguside.ui.internal.editor.ArgusDocumentProvider
+import org.arguside.core.internal.jdt.model.ArgusClassFile
 import org.eclipse.jdt.core.IClassFile
 import org.arguside.util.Utils.WithAsInstanceOfOpt
 
@@ -77,7 +77,7 @@ object ArgusPlugin {
 }
 
 class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResourceChangeListener with IElementChangedListener with HasLogger {
-//  import CompilerUtils.{ ShortScalaVersion, isBinaryPrevious, isBinarySame }
+//  import CompilerUtils.{ ShortArgusVersion, isBinaryPrevious, isBinarySame }
 
   import org.arguside.core.CitConstants._
 
@@ -87,11 +87,11 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
    *  For example 2.9.1 and 2.9.2-SNAPSHOT are compatible versions whereas
    *  2.8.1 and 2.9.0 aren't.
    */
-//  def isCompatibleVersion(version: ScalaVersion, project: ScalaProject): Boolean = {
+//  def isCompatibleVersion(version: ArgusVersion, project: ArgusProject): Boolean = {
 //    if (project.isUsingCompatibilityMode())
-//      isBinaryPrevious(ScalaVersion.current, version)
+//      isBinaryPrevious(ArgusVersion.current, version)
 //    else
-//      isBinarySame(ScalaVersion.current, version)// don't treat 2 unknown versions as equal
+//      isBinarySame(ArgusVersion.current, version)// don't treat 2 unknown versions as equal
 //  }
 
   private lazy val citCoreBundle = getBundle()
@@ -113,7 +113,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
    * compilation units (their working copies). Each `PilarSourceFileEditor` is
    * associated with this document provider.
    */
-  private[arguside] lazy val documentProvider = new PilarDocumentProvider
+  private[arguside] lazy val documentProvider = new ArgusDocumentProvider
 
   override def start(context: BundleContext) = {
     ArgusPlugin.plugin = this
@@ -128,7 +128,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     }
     ResourcesPlugin.getWorkspace.addResourceChangeListener(this, IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.POST_CHANGE)
     JavaCore.addElementChangedListener(this)
-    logger.info("Scala compiler bundle: " + platformInstallation.compiler.classJar.toOSString() )
+    logger.info("Argus compiler bundle: " + platformInstallation.compiler.classJar.toOSString() )
   }
 
   override def stop(context: BundleContext) = {
@@ -145,17 +145,17 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
   /** The compiler-interface store, located in this plugin configuration area (usually inside the metadata directory */
   lazy val compilerInterfaceStore: CompilerInterfaceStore = new CompilerInterfaceStore(Platform.getStateLocation(sdtCoreBundle), this)
 
-  /** A LRU cache of class loaders for Scala builders */
-  lazy val classLoaderStore: FixedSizeCache[IScalaInstallation,ClassLoader] = new FixedSizeCache(initSize = 2, maxSize = 3)
+  /** A LRU cache of class loaders for Argus builders */
+  lazy val classLoaderStore: FixedSizeCache[IArgusInstallation,ClassLoader] = new FixedSizeCache(initSize = 2, maxSize = 3)
 
-  // Scala project instances
-  private val projects = new mutable.HashMap[IProject, ScalaProject]
+  // Argus project instances
+  private val projects = new mutable.HashMap[IProject, ArgusProject]
 
-  override def scalaCompilationUnit(input: IEditorInput): Option[ScalaCompilationUnit] = {
-    def unitOfSourceFile = Option(documentProvider.getWorkingCopy(input).asInstanceOf[ScalaCompilationUnit])
+  override def scalaCompilationUnit(input: IEditorInput): Option[ArgusCompilationUnit] = {
+    def unitOfSourceFile = Option(documentProvider.getWorkingCopy(input).asInstanceOf[ArgusCompilationUnit])
 
     def unitOfClassFile = input.getAdapter(classOf[IClassFile]) match {
-      case tr: ScalaClassFile => Some(tr)
+      case tr: ArgusClassFile => Some(tr)
       case _                  => None
     }
 
@@ -166,7 +166,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
 
   override def getArgusProject(project: IProject): ArgusProject = projects.synchronized {
     projects.get(project) getOrElse {
-      val scalaProject = ScalaProject(project)
+      val scalaProject = ArgusProject(project)
       projects(project) = scalaProject
       scalaProject
     }
@@ -196,7 +196,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     for {
       iProject <- ResourcesPlugin.getWorkspace.getRoot.getProjects
       if iProject.isOpen
-      scalaProject <- asScalaProject(iProject)
+      scalaProject <- asArgusProject(iProject)
     } scalaProject.presentationCompiler.askRestart()
   }
 
@@ -214,7 +214,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
           resource foreach {(r) =>
             // that particular classpath check can set the Installation (used, e.g., for sbt-eclipse imports)
             // setting the Installation triggers a recursive check
-            asScalaProject(r) foreach { (p) =>
+            asArgusProject(r) foreach { (p) =>
               try {
                 // It's important to save this /before/ checking classpath : classpath
                 // checks create their own preference modifications under some conditions.
@@ -257,9 +257,9 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     }
 
     // process deleted files
-    val buff = new ListBuffer[ScalaSourceFile]
+    val buff = new ListBuffer[ArgusSourceFile]
     val changed = new ListBuffer[ICompilationUnit]
-    val projectsToReset = new mutable.HashSet[ScalaProject]
+    val projectsToReset = new mutable.HashSet[ArgusProject]
 
     def findRemovedSources(delta: IJavaElementDelta) {
       val isChanged = delta.getKind == CHANGED
@@ -285,7 +285,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
           val hasContentChanged = isRemoved || hasFlag(F_REMOVED_FROM_CLASSPATH | F_ADDED_TO_CLASSPATH | F_ARCHIVE_CONTENT_CHANGED)
           if (hasContentChanged) {
             logger.info("package fragment root changed (resetting presentation compiler): " + elem.getElementName())
-            asScalaProject(elem.getJavaProject().getProject).foreach(projectsToReset += _)
+            asArgusProject(elem.getJavaProject().getProject).foreach(projectsToReset += _)
           }
           !hasContentChanged
 
@@ -293,27 +293,27 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
           val hasContentChanged = isAdded || isRemoved
           if (hasContentChanged) {
             logger.debug("package fragment added or removed: " + elem.getElementName())
-            asScalaProject(elem.getJavaProject().getProject).foreach(projectsToReset += _)
+            asArgusProject(elem.getJavaProject().getProject).foreach(projectsToReset += _)
           }
           // stop recursion here, we need to reset the PC anyway
           !hasContentChanged
 
-        // TODO: the check should be done with isInstanceOf[ScalaSourceFile] instead of
+        // TODO: the check should be done with isInstanceOf[ArgusSourceFile] instead of
         // endsWith(scalaFileExtn), but it is not working for Play 2.0 because of #1000434
         case COMPILATION_UNIT if isChanged && elem.getResource != null && (elem.getResource.getName.endsWith(PilarFileExtn) || elem.getResource.getName.endsWith(PilarFileExtnShort)) =>
           val hasContentChanged = hasFlag(IJavaElementDelta.F_CONTENT)
           if (hasContentChanged)
-            // mark the changed Scala files to be refreshed in the presentation compiler if needed
+            // mark the changed Argus files to be refreshed in the presentation compiler if needed
             changed += elem.asInstanceOf[ICompilationUnit]
           false
 
-        case COMPILATION_UNIT if elem.isInstanceOf[ScalaSourceFile] && isRemoved =>
-          buff += elem.asInstanceOf[ScalaSourceFile]
+        case COMPILATION_UNIT if elem.isInstanceOf[ArgusSourceFile] && isRemoved =>
+          buff += elem.asInstanceOf[ArgusSourceFile]
           false
 
         case COMPILATION_UNIT if isAdded =>
           logger.debug("added compilation unit " + elem.getElementName())
-          asScalaProject(elem.getJavaProject().getProject).foreach(projectsToReset += _)
+          asArgusProject(elem.getJavaProject().getProject).foreach(projectsToReset += _)
           false
 
         case _ =>
@@ -329,7 +329,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     if (changed.nonEmpty) {
       changed.toList groupBy (_.getJavaProject.getProject) foreach {
         case (project, units) =>
-          asScalaProject(project) foreach { p =>
+          asArgusProject(project) foreach { p =>
             if (project.isOpen && !projectsToReset(p)) {
               p.presentationCompiler(_.refreshChangedFiles(units.map(_.getResource.asInstanceOf[IFile])))
             }
@@ -341,7 +341,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     if (buff.nonEmpty) {
       buff.toList groupBy (_.getJavaProject.getProject) foreach {
         case (project, srcs) =>
-          asScalaProject(project) foreach { p =>
+          asArgusProject(project) foreach { p =>
             if (project.isOpen && !projectsToReset(p))
               p.presentationCompiler.internal (_.filesDeleted(srcs))
           }

@@ -4,7 +4,7 @@ import org.eclipse.core.resources.IProject
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.core.resources.IContainer
 import org.eclipse.core.resources.IFile
-import org.arguside.core.internal.builder.EclipseBuildManager
+//import org.arguside.core.internal.builder.EclipseBuildManager
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.core.runtime.SubMonitor
 import org.eclipse.core.runtime.IProgressMonitor
@@ -150,7 +150,7 @@ trait IArgusProject extends Publisher[IArgusProjectEvent] {
    * Initialization for the build manager associated to this project
    * @return an initialized EclipseBuildManager
    */
-  def buildManager(): EclipseBuildManager
+//  def buildManager(): EclipseBuildManager
 
   /**
    * It true, it means all source Files have to be reloaded

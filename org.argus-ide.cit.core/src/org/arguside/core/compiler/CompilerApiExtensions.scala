@@ -110,7 +110,7 @@ trait CompilerApiExtensions extends Global { self =>
   }
 }
 
-/** A Scala token covering [start, end)
+/** A Jawa token covering [start, end)
  *
  *  @param tokenId one of scala.tools.nsc.ast.parser.Tokens identifiers
  *  @param start   the offset of the first character in this token

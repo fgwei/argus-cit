@@ -18,9 +18,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage
 import org.eclipse.ui.dialogs.PreferencesUtil
 import org.arguside.core.CitConstants
 import org.arguside.ui.internal.preferences.SyntaxColoringTreeContentAndLabelProvider
-import org.arguside.ui.syntax.ArgusSyntaxClass
-import org.arguside.ui.syntax.ArgusSyntaxClass.Category
-import org.arguside.ui.syntax.ArgusSyntaxClasses
+import org.arguside.ui.syntax.JawaSyntaxClass
+import org.arguside.ui.syntax.JawaSyntaxClass.Category
+import org.arguside.ui.syntax.JawaSyntaxClasses
 import org.arguside.util.eclipse.EclipseUtils._
 import org.arguside.util.eclipse.SWTUtils._
 import org.arguside.ui.internal.preferences.PreviewerFactory
@@ -36,7 +36,7 @@ import org.arguside.ui.internal.preferences.PreviewerFactory
  *  @param previewText the text to display in the previewer
  *  @param previewerFactory the factory for the previewer, a text area showing the `previewText`
  */
-abstract class BaseSyntaxColoringPreferencePage(categories: List[ArgusSyntaxClass.Category], defaultCategory: Category, preferenceStore: IPreferenceStore, previewText: String, previewerFactoryConfiguration: PreviewerFactoryConfiguration) extends PreferencePage with IWorkbenchPreferencePage {
+abstract class BaseSyntaxColoringPreferencePage(categories: List[JawaSyntaxClass.Category], defaultCategory: Category, preferenceStore: IPreferenceStore, previewText: String, previewerFactoryConfiguration: PreviewerFactoryConfiguration) extends PreferencePage with IWorkbenchPreferencePage {
 
   /** Creates the additional UI elements to configure the additional preferences.
    *
@@ -80,7 +80,7 @@ abstract class BaseSyntaxColoringPreferencePage(categories: List[ArgusSyntaxClas
   }
 
   import OverlayPreferenceStore._
-  private def makeOverlayKeys(syntaxClass: ArgusSyntaxClass): List[OverlayKey] = {
+  private def makeOverlayKeys(syntaxClass: JawaSyntaxClass): List[OverlayKey] = {
     List(
       new OverlayKey(BOOLEAN, syntaxClass.enabledKey),
       new OverlayKey(STRING, syntaxClass.foregroundColorKey),
@@ -282,8 +282,8 @@ abstract class BaseSyntaxColoringPreferencePage(categories: List[ArgusSyntaxClas
     previewerFactory.createPreviewer(parent, overlayStore, previewText)
   }
 
-  private def selectedSyntaxClass: Option[ArgusSyntaxClass] = condOpt(treeViewer.getSelection) {
-    case SelectedItems(syntaxClass: ArgusSyntaxClass) => syntaxClass
+  private def selectedSyntaxClass: Option[JawaSyntaxClass] = condOpt(treeViewer.getSelection) {
+    case SelectedItems(syntaxClass: JawaSyntaxClass) => syntaxClass
   }
 
   private def massSetEnablement(enabled: Boolean) = {
@@ -297,8 +297,8 @@ abstract class BaseSyntaxColoringPreferencePage(categories: List[ArgusSyntaxClas
     case None =>
       massSetEnablement(false)
     case Some(syntaxClass) =>
-      val isSemanticClass = ArgusSyntaxClasses.argusSemanticCategory.children contains syntaxClass
-      if (isSemanticClass && !(overlayStore getBoolean ArgusSyntaxClasses.ENABLE_SEMANTIC_HIGHLIGHTING))
+      val isSemanticClass = JawaSyntaxClasses.jawaSemanticCategory.children contains syntaxClass
+      if (isSemanticClass && !(overlayStore getBoolean JawaSyntaxClasses.ENABLE_SEMANTIC_HIGHLIGHTING))
         massSetEnablement(false)
       else {
         import syntaxClass._

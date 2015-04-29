@@ -7,6 +7,6 @@ package argus.tools.eclipse.contribution.weaving.jdt;
 
 import org.eclipse.jdt.core.compiler.IProblem;
 
-public interface IArgusSourceFile extends IArgusCompilationUnit {
+public interface IJawaSourceFile extends IJawaCompilationUnit {
   public IProblem[] getProblems();
 }

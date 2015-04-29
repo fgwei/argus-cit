@@ -3,16 +3,17 @@ package org.arguside.core.compiler
 import org.eclipse.core.resources.IFile
 import org.eclipse.jdt.core.compiler.IProblem
 import scala.reflect.internal.util.SourceFile
-import scala.tools.nsc.interactive.Response
 import org.arguside.core.IArgusProject
 import org.arguside.io.AbstractFile
+import org.arguside.core.internal
+import org.arguside.core.interactive.Response
 
 /** This trait represents a possibly translated Argus source. In the default case,
  *  the original and Argus sources and positions are the same.
  *
  *  This trait allows implementers to specify on-the-fly translations from any source ('original')
- *  to Argus source. For example, Play templates are an HTML-based format with Scala snippets that
- *  are translated to Scala source. If this trait is correctly implemented, the corresponding
+ *  to Argus source. For example, Play templates are an HTML-based format with Argus snippets that
+ *  are translated to Argus source. If this trait is correctly implemented, the corresponding
  *  compilation unit can perform 'errors-as-you-type', hyperlinking, completions, hovers.
  *
  *  The presentation compiler will rely on this trait to translate offsets or regions to and from
@@ -24,22 +25,22 @@ trait ISourceMap {
   /** The original source contents, for example the Play HTML template source */
   def originalSource: Array[Char]
 
-  /** The translated Scala source code, for example the translation of a Play HTML template. */
-  def scalaSource: Array[Char] = originalSource
+  /** The translated Argus source code, for example the translation of a Play HTML template. */
+  def argusSource: Array[Char] = originalSource
 
-  /** Map from the original source into the corresponding position in the Scala translation. */
-  def scalaPos: IPositionInformation
+  /** Map from the original source into the corresponding position in the Argus translation. */
+  def argusPos: IPositionInformation
 
-  /** Map from Scala source to its equivalent in the original source. */
+  /** Map from Argus source to its equivalent in the original source. */
   def originalPos: IPositionInformation
 
   /** Translate the line number from original to target line. Lines are 0-based. */
-  def scalaLine(line: Int): Int =
-    scalaPos.offsetToLine(scalaPos(originalPos.lineToOffset(line)))
+  def argusLine(line: Int): Int =
+    argusPos.offsetToLine(argusPos(originalPos.lineToOffset(line)))
 
-  /** Translate the line number from Scala to original line. Lines are 0-based. */
+  /** Translate the line number from Argus to original line. Lines are 0-based. */
   def originalLine(line: Int): Int =
-    originalPos.offsetToLine(originalPos(scalaPos.lineToOffset(line)))
+    originalPos.offsetToLine(originalPos(argusPos.lineToOffset(line)))
 
   /** Return a compiler `SourceFile` implementation with the given contents. The implementation decides
    *  if this is a batch file or a script/other kind of source file.
@@ -48,12 +49,12 @@ trait ISourceMap {
 }
 
 object ISourceMap {
-  /** A plain Scala source map implementation based on the given file and contents.
+  /** A plain Argus source map implementation based on the given file and contents.
    *
    *  This implementation performs no transformation on the given source code.
    */
-  def plainScala(file: AbstractFile, contents: Array[Char]): ISourceMap =
-    new internal.compiler.PlainScalaInfo(file, contents)
+  def plainArgus(file: AbstractFile, contents: Array[Char]): ISourceMap =
+    new internal.compiler.PlainArgusInfo(file, contents)
 }
 
 /** Position information relative to a source transformation.
@@ -76,29 +77,29 @@ trait IPositionInformation extends (Int => Int) {
 
 object IPositionInformation {
 
-  /** A plain Scala implementation based on the given source file.
+  /** A plain Argus implementation based on the given source file.
    *
    *  This performs no transformation on positions.
    */
-  def plainScala(sourceFile: SourceFile): IPositionInformation =
-    new internal.compiler.PlainScalaPosition(sourceFile)
+  def plainArgus(sourceFile: SourceFile): IPositionInformation =
+    new internal.compiler.PlainArgusPosition(sourceFile)
 }
 
-/** A Scala compilation unit. It can be backed up by a `ScalaCompilationUnit` in usual
- *  Scala projects, or any other implementation (such as a specialized Scala DSL, a
+/** A Argus compilation unit. It can be backed up by a `ArgusCompilationUnit` in usual
+ *  Argus projects, or any other implementation (such as a specialized Argus DSL, a
  *  Script file, an Sbt build file, etc.).
  *
  *  This class is a stable representation of a compilation unit. Its contents may change over time, but
  *  *snapshots* can be obtained through `sourceMap`.
  *
  *  An `ISourceMap` is a translation from any surface language (for example, Play HTML templates) to a
- *  Scala source that can be type-checked by the Scala presentation compiler.
+ *  Argus source that can be type-checked by the Argus presentation compiler.
  *
  *  Implementations are expected to be thread-safe.
  */
 trait InteractiveCompilationUnit {
 
-  /** The `AbstractFile` that the Scala compiler uses to read this compilation unit. It should not change through the lifetime of this unit. */
+  /** The `AbstractFile` that the Argus compiler uses to read this compilation unit. It should not change through the lifetime of this unit. */
   def file: AbstractFile
 
   /** Return the source info for the given contents. */
@@ -108,10 +109,10 @@ trait InteractiveCompilationUnit {
   def lastSourceMap(): ISourceMap
 
   /** Return the current contents of this compilation unit. This is the 'original' contents, that may be
-   *  translated to a Scala source using `sourceMap`.
+   *  translated to a Argus source using `sourceMap`.
    *
-   *  If we take Play templates as an example, this method would return HTML interspersed with Scala snippets. If
-   *  one wanted the translated Scala source, he'd have to call `lastSourceMap().scalaSource`
+   *  If we take Play templates as an example, this method would return HTML interspersed with Argus snippets. If
+   *  one wanted the translated Argus source, he'd have to call `lastSourceMap().argusSource`
    */
   def getContents(): Array[Char]
 
@@ -121,8 +122,8 @@ trait InteractiveCompilationUnit {
   /** Does this unit exist in the workspace? */
   def exists(): Boolean
 
-  /** The Scala project to which this compilation unit belongs. */
-  def scalaProject: IArgusProject
+  /** The Argus project to which this compilation unit belongs. */
+  def argusProject: IArgusProject
 
   /** Schedule this unit for reconciliation with the new contents. This by itself won't start
    *  a new type-checking round, instead marks the current unit as *dirty*. At the next reconciliation
@@ -133,7 +134,7 @@ trait InteractiveCompilationUnit {
    *                     may not be Argus. This method takes care of translating the contents to Argus
    */
   def scheduleReconcile(newContents: Array[Char]): Unit = {
-    scalaProject.presentationCompiler { pc =>
+    argusProject.presentationCompiler { pc =>
       pc.scheduleReload(this, sourceMap(newContents).sourceFile)
     }
   }
@@ -147,12 +148,12 @@ trait InteractiveCompilationUnit {
    *        reconciliation strategy.
    */
   def forceReconcile(): List[ArgusCompilationProblem] = {
-    scalaProject.presentationCompiler(_.flushScheduledReloads())
+    argusProject.presentationCompiler(_.flushScheduledReloads())
     currentProblems()
   }
 
   /** Schedule the unit for reconciliation and add it to the presentation compiler managed units. This should
-   *  be called before any other calls to {{{IScalaPresentationCompiler.scheduleReload}}}
+   *  be called before any other calls to {{{IArgusPresentationCompiler.scheduleReload}}}
    *
    *  This method is the entry-point to the managed units in the presentation compiler: it should perform an initial
    *  askReload and add the unit to the managed set, so from now on `scheduleReload` can be used instead.
@@ -160,7 +161,7 @@ trait InteractiveCompilationUnit {
    *  This method should not block.
    */
   def initialReconcile(): Response[Unit] = {
-    val reloaded = scalaProject.presentationCompiler { compiler =>
+    val reloaded = argusProject.presentationCompiler { compiler =>
       compiler.askReload(this, sourceMap(getContents).sourceFile)
     } getOrElse {
       val dummy = new Response[Unit]
@@ -180,7 +181,7 @@ trait InteractiveCompilationUnit {
   def currentProblems(): List[ArgusCompilationProblem] = {
     import scala.util.control.Exception.failAsValue
 
-    scalaProject.presentationCompiler { pc =>
+    argusProject.presentationCompiler { pc =>
       val info = lastSourceMap()
       import info._
 
@@ -198,6 +199,6 @@ trait InteractiveCompilationUnit {
    *  @param op The operation to be performed
    */
   def withSourceFile[T](op: (SourceFile, IArgusPresentationCompiler) => T): Option[T] = {
-    scalaProject.presentationCompiler(op(lastSourceMap().sourceFile, _))
+    argusProject.presentationCompiler(op(lastSourceMap().sourceFile, _))
   }
 }

@@ -1,25 +1,25 @@
 package org.arguside.ui.internal.editor
 
-import argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.IArgusEditor
+import argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.IJawaEditor
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.ui.IEditorReference
 import org.eclipse.ui.IFileEditorInput
 import org.eclipse.ui.IWorkbenchPage
 import org.arguside.core.IArgusProject
-import org.arguside.core.lexical.ArgusPartitions
+import org.arguside.core.lexical.JawaPartitions
 import org.arguside.util.Utils.WithAsInstanceOfOpt
 import org.arguside.util.eclipse.EclipseUtils
-import org.arguside.core.lexical.ArgusCodePartitioner
+import org.arguside.core.lexical.JawaCodePartitioner
 import org.arguside.ui.editor.ISourceViewerEditor
 import org.arguside.ui.editor.InteractiveCompilationUnitEditor
 
-trait ArgusEditor extends IArgusEditor with ISourceViewerEditor with InteractiveCompilationUnitEditor {
+trait JawaEditor extends IJawaEditor with ISourceViewerEditor with InteractiveCompilationUnitEditor {
 
-  override def createDocumentPartitioner = ArgusCodePartitioner.documentPartitioner()
+  override def createDocumentPartitioner = JawaCodePartitioner.documentPartitioner()
 
 }
 
-object ArgusEditor {
+object JawaEditor {
 
   val LEGAL_CONTENT_TYPES = Array[String](
     IJavaPartitions.JAVA_DOC,
@@ -27,7 +27,7 @@ object ArgusEditor {
     IJavaPartitions.JAVA_SINGLE_LINE_COMMENT,
     IJavaPartitions.JAVA_STRING,
     IJavaPartitions.JAVA_CHARACTER,
-    ArgusPartitions.SCALA_MULTI_LINE_STRING)
+    JawaPartitions.JAWA_MULTI_LINE_STRING)
 
   import org.arguside.util.Utils.WithAsInstanceOfOpt
 

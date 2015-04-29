@@ -53,18 +53,18 @@ import org.arguside.ui.internal.editor.spelling.ArgusSpellingEngine
 import org.arguside.ui.internal.editor.spelling.SpellingReconcileStrategy
 import org.arguside.ui.internal.editor.spelling.SpellingService
 import org.arguside.ui.internal.reconciliation.ArgusReconcilingStrategy
-import org.arguside.ui.syntax.{ArgusSyntaxClasses => SSC}
+import org.arguside.ui.syntax.{JawaSyntaxClasses => SSC}
 import org.arguside.core.internal.ArgusPlugin
 import org.eclipse.jface.util.IPropertyChangeListener
-import org.arguside.core.lexical.ArgusCodeScanners
-import org.arguside.core.lexical.ArgusPartitions
+import org.arguside.core.lexical.JawaCodeScanners
+import org.arguside.core.lexical.JawaPartitions
 import org.arguside.ui.editor.hover.IArgusHover
 import org.arguside.ui.internal.reconciliation.ArgusReconciler
 
-class ArgusSourceViewerConfiguration(
+class JawaSourceViewerConfiguration(
   javaPreferenceStore: IPreferenceStore,
   argusPreferenceStore: IPreferenceStore,
-  editor: ArgusEditor)
+  editor: JawaEditor)
     extends JavaSourceViewerConfiguration(
       JavaPlugin.getDefault.getJavaTextTools.getColorManager,
       javaPreferenceStore,
@@ -74,7 +74,7 @@ class ArgusSourceViewerConfiguration(
   private val combinedPrefStore = new ChainedPreferenceStore(
       Array(argusPreferenceStore, javaPreferenceStore))
 
-  private val codeHighlightingScanners = ArgusCodeScanners.codeHighlightingScanners(argusPreferenceStore, javaPreferenceStore)
+  private val codeHighlightingScanners = JawaCodeScanners.codeHighlightingScanners(argusPreferenceStore, javaPreferenceStore)
 
   override def getTabWidth(sourceViewer: ISourceViewer): Int =
     argusPreferenceStore.getInt(IndentSpaces.eclipseKey)

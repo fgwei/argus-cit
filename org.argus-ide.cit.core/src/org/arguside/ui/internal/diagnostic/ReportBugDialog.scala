@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Platform
 import org.arguside.ui.internal.actions.OpenExternalFile
 import org.arguside.core.internal.logging.LogManager
 import org.arguside.core.IArgusPlugin
-import org.arguside.core.internal.project.ArgusInstallation.platformInstallation
+//import org.arguside.core.internal.project.ArgusInstallation.platformInstallation
 import org.arguside.core.CitConstants
 import org.arguside.core.internal.ArgusPlugin
 
@@ -51,9 +51,9 @@ class ReportBugDialog(shell: Shell) extends Dialog(shell) {
         s"""|Argus IDE version:
             |        ${IArgusPlugin().getBundle.getVersion}
             |Argus compiler version:
-            |        ${IArgusPlugin().argusVersion.unparse}
+            |        {IArgusPlugin().argusVersion.unparse}
             |Argus library version:
-            |        ${platformInstallation.version.unparse}
+            |        {platformInstallation.version.unparse}
             |Eclipse version:
             |        ${Platform.getBundle("org.eclipse.platform").getVersion}
             |Class loader store: ${cacheEntries.size} entries

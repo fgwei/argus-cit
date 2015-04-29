@@ -1,6 +1,5 @@
 package org.arguside.core.compiler
 
-import scala.tools.nsc.Settings
 import org.arguside.core.internal.compiler.PresentationCompilerProxy
 
 /** A handle to the presentation compiler that abstracts compiler lifecycle management.

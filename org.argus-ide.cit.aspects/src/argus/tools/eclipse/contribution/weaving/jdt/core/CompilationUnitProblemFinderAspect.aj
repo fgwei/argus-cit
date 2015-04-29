@@ -14,7 +14,7 @@ import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.core.CompilationUnitProblemFinder;
 
 import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusSourceFile;;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaSourceFile;;
 
 @SuppressWarnings("restriction")
 public privileged aspect CompilationUnitProblemFinderAspect {
@@ -43,8 +43,8 @@ public privileged aspect CompilationUnitProblemFinderAspect {
     if (!(original instanceof IArgusElement))
       return proceed(unitElement, parser, workingCopyOwner, problems, creatingAST, reconcileFlags, monitor);
     
-    if (original instanceof IArgusSourceFile) {
-      IProblem[] unitProblems = ((IArgusSourceFile)original).getProblems();
+    if (original instanceof IJawaSourceFile) {
+      IProblem[] unitProblems = ((IJawaSourceFile)original).getProblems();
       int length = unitProblems == null ? 0 : unitProblems.length;
       if (length > 0) {
         CategorizedProblem[] categorizedProblems = new CategorizedProblem[length];

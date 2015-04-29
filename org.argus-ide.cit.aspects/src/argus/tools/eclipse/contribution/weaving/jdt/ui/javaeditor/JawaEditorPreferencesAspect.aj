@@ -7,10 +7,10 @@ import org.eclipse.jdt.ui.text.java.IInvocationContext;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusCompilationUnit;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaCompilationUnit;
 
 @SuppressWarnings("restriction")
-public privileged aspect ArgusEditorPreferencesAspect {
+public privileged aspect JawaEditorPreferencesAspect {
 
   pointcut getAssists(IInvocationContext context, IProblemLocation[] locations):
     execution(IJavaCompletionProposal[] QuickAssistProcessor.getAssists(IInvocationContext, IProblemLocation[])) && args(context, locations) ||
@@ -22,7 +22,7 @@ public privileged aspect ArgusEditorPreferencesAspect {
    */
   IJavaCompletionProposal[] around(IInvocationContext context, IProblemLocation[] locations):
     getAssists(context, locations) {
-      if (context.getCompilationUnit() instanceof IArgusCompilationUnit)
+      if (context.getCompilationUnit() instanceof IJawaCompilationUnit)
         return null;
       else
         return proceed(context, locations);

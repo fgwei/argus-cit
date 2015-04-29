@@ -8,7 +8,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.IJavaElementRequestor;
 import org.eclipse.jdt.internal.core.NameLookup;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusCompilationUnit;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaCompilationUnit;
 import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
 
 @SuppressWarnings("restriction")
@@ -72,7 +72,7 @@ public privileged aspect NameLookupAspect {
             IJavaElement cu = compilationUnits[i];
             String cuName = cu.getElementName();
             int lastDot = cuName.lastIndexOf('.');
-            boolean isPilar = cu instanceof IArgusCompilationUnit;
+            boolean isPilar = cu instanceof IJawaCompilationUnit;
             if (!isPilar && (lastDot != topLevelTypeName.length() || !topLevelTypeName.regionMatches(0, cuName, 0, lastDot)))
               continue;
             IType type = ((ICompilationUnit) cu).getType(topLevelTypeName);
@@ -94,7 +94,7 @@ public privileged aspect NameLookupAspect {
             if (requestor.isCanceled())
               return;
             IJavaElement cu = compilationUnits[i];
-            if (!(cu instanceof IArgusCompilationUnit) && !cu.getElementName().toLowerCase().startsWith(cuPrefix))
+            if (!(cu instanceof IJawaCompilationUnit) && !cu.getElementName().toLowerCase().startsWith(cuPrefix))
               continue;
             try {
               IType[] types = ((ICompilationUnit) cu).getTypes();

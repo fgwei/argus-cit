@@ -38,7 +38,7 @@ import argus.tools.eclipse.contribution.weaving.jdt.IArgusCompilationUnit
 import org.arguside.ui.ArgusImages
 import org.arguside.core.IArgusPlugin
 import org.arguside.core.internal.jdt.search.ArgusSourceIndexer
-import org.arguside.util.ArgusWordFinder
+import org.arguside.util.PilarWordFinder
 import org.arguside.util.internal.ReflectionUtils
 import org.eclipse.jdt.core._
 import org.eclipse.jdt.internal.core.JavaElement
@@ -50,7 +50,7 @@ import org.eclipse.ui.texteditor.ITextEditor
 import org.arguside.core.internal.hyperlink.BaseHyperlinkDetector
 import org.arguside.util.eclipse.EditorUtils
 import org.arguside.core.compiler.InteractiveCompilationUnit
-import org.arguside.core.compiler.IScalaPresentationCompiler.Implicits._
+import org.arguside.core.compiler.IArgusPresentationCompiler.Implicits._
 import org.arguside.core.internal
 import org.arguside.core.internal.ArgusPlugin
 import org.arguside.core.compiler.ISourceMap
@@ -61,18 +61,18 @@ import org.arguside.io.AbstractFile
 trait ArgusCompilationUnit extends Openable
   with env.ICompilationUnit
   with ArgusElement
-  with IArgusCompilationUnit
+  with IJawaCompilationUnit
   with IBufferChangedListener
   with InteractiveCompilationUnit
   with HasLogger {
 
-  override def scalaProject: internal.project.ArgusProject =
+  override def argusProject: internal.project.ArgusProject =
     ArgusPlugin().getArgusProject(getJavaProject.getProject)
 
   override val file : AbstractFile
 
   override def sourceMap(contents: Array[Char]): ISourceMap = sourceFileLock.synchronized {
-    cachedSourceInfo = ISourceMap.plainScala(file, contents)
+    cachedSourceInfo = ISourceMap.plainArgus(file, contents)
     cachedSourceInfo
   }
 
@@ -91,7 +91,7 @@ trait ArgusCompilationUnit extends Openable
 
   override def bufferChanged(e : BufferChangedEvent) {
     if (!e.getBuffer.isClosed)
-      scalaProject.presentationCompiler(_.scheduleReload(this, sourceMap(getContents).sourceFile))
+      argusProject.presentationCompiler(_.scheduleReload(this, sourceMap(getContents).sourceFile))
 
     super.bufferChanged(e)
   }
@@ -112,14 +112,14 @@ trait ArgusCompilationUnit extends Openable
   override def buildStructure(info: OpenableElementInfo, pm: IProgressMonitor, newElements: JMap[_, _], underlyingResource: IResource): Boolean = {
     ensureBufferOpen(info, pm)
 
-    scalaProject.presentationCompiler.internal { compiler =>
+    argusProject.presentationCompiler.internal { compiler =>
       val unsafeElements = newElements.asInstanceOf[JMap[AnyRef, AnyRef]]
       val tmpMap = new java.util.HashMap[AnyRef, AnyRef]
       val sourceFile = lastSourceMap().sourceFile
       val sourceLength = sourceFile.length
 
       try {
-        logger.info("[%s] buildStructure for %s (%s)".format(scalaProject.underlying.getName(), this.getResource(), sourceFile.file))
+        logger.info("[%s] buildStructure for %s (%s)".format(argusProject.underlying.getName(), this.getResource(), sourceFile.file))
 
         val tree = compiler.askStructure(sourceFile).getOrElse(compiler.EmptyTree)()
         compiler.asyncExec {
@@ -154,8 +154,8 @@ trait ArgusCompilationUnit extends Openable
    *  but no Scala library on the classpath.
    */
   def addToIndexer(indexer : ArgusSourceIndexer) {
-    if (scalaProject.hasScalaNature) {
-      try scalaProject.presentationCompiler.internal { compiler =>
+    if (argusProject.hasScalaNature) {
+      try argusProject.presentationCompiler.internal { compiler =>
         val tree = compiler.parseTree(lastSourceMap().sourceFile)
         new compiler.IndexBuilderTraverser(indexer).traverse(tree)
       } catch {
@@ -230,7 +230,7 @@ trait ArgusCompilationUnit extends Openable
   }
 
   override def reportMatches(matchLocator : MatchLocator, possibleMatch : PossibleMatch) {
-    scalaProject.presentationCompiler.internal { compiler =>
+    argusProject.presentationCompiler.internal { compiler =>
       compiler.askLoadedTyped(lastSourceMap().sourceFile, false).get match {
         case Left(tree) =>
           compiler.asyncExec {
@@ -243,8 +243,8 @@ trait ArgusCompilationUnit extends Openable
   }
 
   override def createOverrideIndicators(annotationMap : JMap[_, _]) {
-    if (scalaProject.hasScalaNature)
-      scalaProject.presentationCompiler.internal { compiler =>
+    if (argusProject.hasScalaNature)
+      argusProject.presentationCompiler.internal { compiler =>
         try {
           val tree = compiler.askStructure(lastSourceMap().sourceFile, keepLoaded = true).getOrElse(compiler.EmptyTree)()
 
@@ -262,7 +262,7 @@ trait ArgusCompilationUnit extends Openable
     import scala.util.control.Exception
 
     val descriptor = Exception.catching(classOf[JavaModelException]).opt(getCorrespondingResource) map { file =>
-      val javaProject = JavaCore.create(scalaProject.underlying)
+      val javaProject = JavaCore.create(argusProject.underlying)
       if (javaProject.isOnClasspath(file)) ArgusImages.ARGUS_FILE else ArgusImages.EXCLUDED_ARGUS_FILE
     }
     descriptor.orNull

@@ -9,16 +9,13 @@ import org.eclipse.jface.util.PropertyChangeEvent
 import org.eclipse.swt.widgets.Composite
 import org.arguside.core.IArgusPlugin
 import org.arguside.core.compiler.InteractiveCompilationUnit
-import org.arguside.ui.internal.actions.ArgusCopyQualifiedNameAction
-import org.arguside.ui.internal.editor.decorators.indentguide.IndentGuidePainter
 import org.arguside.ui.internal.editor.decorators.semantichighlighting
-import org.arguside.ui.internal.editor.decorators.semicolon.InferredSemicolonPainter
-import org.arguside.ui.syntax.ArgusSyntaxClasses
 import org.arguside.util.eclipse.SWTUtils.fnToPropertyChangeListener
 import org.arguside.util.ui.DisplayThread
+import org.arguside.ui.syntax.JawaSyntaxClasses
 
 /** Trait containing common logic used by both the `ArgusSourceFileEditor` and `ArgusClassFileEditor`.*/
-trait ArgusCompilationUnitEditor extends JavaEditor with ArgusEditor {
+trait JawaCompilationUnitEditor extends JavaEditor with JawaEditor {
   /**@note Current implementation assumes that all accesses to this member should be confined to the UI Thread */
   private var semanticHighlightingPresenter: semantichighlighting.Presenter = _
   protected def semanticHighlightingPreferences = semantichighlighting.Preferences(argusPrefStore)
@@ -64,7 +61,7 @@ trait ArgusCompilationUnitEditor extends JavaEditor with ArgusEditor {
   protected def installArgusSemanticHighlighting(forceRefresh: Boolean): Unit = {
     if (semanticHighlightingPresenter == null) {
       val presentationHighlighter = createSemanticHighlighter
-      semanticHighlightingPresenter = new semantichighlighting.Presenter(ArgusCompilationUnitEditor.this, presentationHighlighter, semanticHighlightingPreferences, DisplayThread)
+      semanticHighlightingPresenter = new semantichighlighting.Presenter(JawaCompilationUnitEditor.this, presentationHighlighter, semanticHighlightingPreferences, DisplayThread)
       semanticHighlightingPresenter.initialize(forceRefresh)
     }
   }
@@ -92,7 +89,7 @@ trait ArgusCompilationUnitEditor extends JavaEditor with ArgusEditor {
 
   override protected def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
     event.getProperty match {
-      case ArgusSyntaxClasses.ENABLE_SEMANTIC_HIGHLIGHTING =>
+      case JawaSyntaxClasses.ENABLE_SEMANTIC_HIGHLIGHTING =>
         // This preference can be changed only via the preference dialog, hence the below block
         // is ensured to be always run within the UI Thread. Check the JavaDoc of `handlePreferenceStoreChanged`
         if (isArgusSemanticHighlightingEnabled) installArgusSemanticHighlighting(forceRefresh = true)

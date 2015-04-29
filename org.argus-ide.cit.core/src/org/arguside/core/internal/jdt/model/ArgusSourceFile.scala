@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.CoreException
 import org.arguside.core.compiler.ArgusCompilationProblem
 import org.arguside.io.AbstractFile
 import org.arguside.io.VirtualFile
+import org.arguside.core.interactive.Response
 
 class ArgusSourceFileProvider extends SourceFileProvider {
   override def createFrom(path: IPath): Option[InteractiveCompilationUnit] =
@@ -47,22 +48,22 @@ object ArgusSourceFile {
     override protected def initialValue(): HandleFactory = new HandleFactory
   }
 
-  /** Creates a Scala source file handle if the given resource path points to a scala source.
-   *  The resource path is a path to a Scala source file in the workbench (e.g. /Proj/a/b/c/Foo.scala).
+  /** Creates a argus source file handle if the given resource path points to a pilar source.
+   *  The resource path is a path to a Scala source file in the workbench (e.g. /Proj/a/b/c/Foo.pilar).
    *
    *  @note This assumes that the resource path is the toString() of an `IPath`.
    *
    *  @param path Is a path to a Scala source file in the workbench.
    */
-  def createFromPath(path: String) : Option[ScalaSourceFile] = {
-    if (!path.endsWith(".scala"))
+  def createFromPath(path: String) : Option[ArgusSourceFile] = {
+    if (!path.endsWith(".pilar") && !path.endsWith(".plr"))
       None
     else {
       // Always `null` because `handleFactory.createOpenable` is only called to open source files, and the `scope` is not needed for this.
       val unusedScope = null
       val source = handleFactory.get().createOpenable(path, unusedScope)
       source match {
-        case ssf : ScalaSourceFile => Some(ssf)
+        case ssf : ArgusSourceFile => Some(ssf)
         case _ => None
       }
     }
@@ -70,7 +71,7 @@ object ArgusSourceFile {
 }
 
 class ArgusSourceFile(fragment : PackageFragment, elementName: String, workingCopyOwner : WorkingCopyOwner)
-  extends JDTCompilationUnit(fragment, elementName, workingCopyOwner) with ArgusCompilationUnit with IArgusSourceFile {
+  extends JDTCompilationUnit(fragment, elementName, workingCopyOwner) with ArgusCompilationUnit with IJawaSourceFile {
 
   override def getMainTypeName : Array[Char] =
     getElementName.substring(0, getElementName.length - ".scala".length).toCharArray()
@@ -148,14 +149,14 @@ class ArgusSourceFile(fragment : PackageFragment, elementName: String, workingCo
   }
 
   /** Makes sure {{{this}}} source is not in the ignore buffer of the compiler and ask the compiler to reload it. */
-  final def forceReload(): Unit = scalaProject.presentationCompiler { compiler =>
+  final def forceReload(): Unit = argusProject.presentationCompiler { compiler =>
     compiler.askToDoFirst(this)
     reload()
   }
 
   /** Ask the compiler to reload {{{this}}} source. */
-  final def reload(): Unit = scalaProject.presentationCompiler { _.askReload(this, lastSourceMap().sourceFile) }
+  final def reload(): Unit = argusProject.presentationCompiler { _.askReload(this, lastSourceMap().sourceFile) }
 
   /** Ask the compiler to discard {{{this}}} source. */
-  final def discard(): Unit = scalaProject.presentationCompiler { _.discardCompilationUnit(this) }
+  final def discard(): Unit = argusProject.presentationCompiler { _.discardCompilationUnit(this) }
 }

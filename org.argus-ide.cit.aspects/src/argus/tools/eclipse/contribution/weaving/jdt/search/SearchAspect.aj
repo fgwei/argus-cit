@@ -5,7 +5,7 @@ import org.eclipse.jdt.internal.core.search.matching.MatchLocator;
 import org.eclipse.jdt.internal.core.search.matching.PossibleMatch;
 
 import argus.tools.eclipse.contribution.weaving.jdt.IArgusClassFile;
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusCompilationUnit;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaCompilationUnit;
 
 @SuppressWarnings("restriction")
 public privileged aspect SearchAspect {
@@ -25,7 +25,7 @@ public privileged aspect SearchAspect {
     
   boolean around(MatchLocator ml, PossibleMatch possibleMatch, boolean mustResolve) throws CoreException :
     parseAndBuildBindings(ml, possibleMatch, mustResolve) {
-    if (!(possibleMatch.openable instanceof IArgusCompilationUnit))
+    if (!(possibleMatch.openable instanceof IJawaCompilationUnit))
       return proceed(ml, possibleMatch, mustResolve);
 
     possibleMatch.parsedUnit = null;
@@ -38,8 +38,8 @@ public privileged aspect SearchAspect {
   
   void around(MatchLocator ml, PossibleMatch possibleMatch, boolean bindingsWereCreated) throws CoreException :
     process(ml, possibleMatch, bindingsWereCreated) {
-    if (possibleMatch.openable instanceof IArgusCompilationUnit)
-      ((IArgusCompilationUnit)possibleMatch.openable).reportMatches(ml, possibleMatch);
+    if (possibleMatch.openable instanceof IJawaCompilationUnit)
+      ((IJawaCompilationUnit)possibleMatch.openable).reportMatches(ml, possibleMatch);
     else
       proceed(ml, possibleMatch, bindingsWereCreated);
   }

@@ -7,4 +7,4 @@ import org.eclipse.jface.text.source.Annotation
  * Features of the argus editor like quick assists can search for  annotations
  * of this type to operate on them.
  */
-trait ScalaEditorAnnotation extends Annotation
+trait ArgusEditorAnnotation extends Annotation

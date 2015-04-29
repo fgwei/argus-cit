@@ -17,9 +17,9 @@ import org.eclipse.jdt.internal.core.JavaModelStatus
 import org.eclipse.jdt.internal.core.PackageFragment
 import org.eclipse.jdt.internal.core.util.Util
 import org.arguside.core.compiler.ISourceMap
-import org.arguside.core.compiler.ScalaCompilationProblem
 import org.arguside.io.AbstractFile
 import org.arguside.io.VirtualFile
+import org.arguside.core.compiler.ArgusCompilationProblem
 
 class ArgusClassFile(parent : PackageFragment, name : String, sourceFile : String)
   extends ClassFile(parent, name) with ArgusCompilationUnit with IArgusClassFile {
@@ -131,7 +131,7 @@ class ArgusClassFile(parent : PackageFragment, name : String, sourceFile : Strin
   if ((underlyingResource ne null) && !underlyingResource.isAccessible) newDoesNotExistStatus() else JavaModelStatus.VERIFIED_OK
   }
 
-  override def currentProblems: List[ScalaCompilationProblem] = Nil
+  override def currentProblems: List[ArgusCompilationProblem] = Nil
 
   def closeBuffer0() = super.closeBuffer()
   def closing0(info : AnyRef) = super.closing(info)

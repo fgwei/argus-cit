@@ -1,5 +1,8 @@
 package org.arguside.util
 
+import scala.tools.nsc.util.Chars.isIdentifierPart
+import scala.tools.nsc.util.Chars.isOperatorPart
+
 import org.eclipse.jdt.core.IBuffer
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.IRegion

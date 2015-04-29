@@ -5,7 +5,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.jface.text.IDocumentPartitioner;
 
-public aspect ArgusPartitionerAspect {
+public aspect JawaPartitionerAspect {
   
   pointcut doSetInput(AbstractTextEditor editor) :
     execution(void AbstractTextEditor.doSetInput(IEditorInput)) &&
@@ -17,8 +17,8 @@ public aspect ArgusPartitionerAspect {
   IDocumentPartitioner around(AbstractTextEditor editor) :
            createDocumentPartitioner() &&
    cflow(doSetInput(editor)) {
-   if (editor instanceof IArgusEditor)
-     return ((IArgusEditor)editor).createDocumentPartitioner();
+   if (editor instanceof IJawaEditor)
+     return ((IJawaEditor)editor).createDocumentPartitioner();
    else
      return proceed(editor);
   }

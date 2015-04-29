@@ -6,7 +6,7 @@ import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.ui.actions.OpenAction;
 
 import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin;
-import argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.IArgusEditor;
+import argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.IJawaEditor;
 
 /**
  * When the user right clicks on a element and select "Open Declaration" in the
@@ -24,7 +24,7 @@ public privileged aspect OpenActionProviderAspect {
 		args(editor);
 
   OpenAction around(JavaEditor editor) : newInstance(editor) {
-    if (editor instanceof IArgusEditor) {
+    if (editor instanceof IJawaEditor) {
       List<IOpenActionProvider> providers = OpenActionProviderRegistry
           .getInstance().getProviders();
       if (providers.size() == 1) {

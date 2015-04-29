@@ -2,6 +2,7 @@ package org.arguside.ui.editor
 
 import org.arguside.core.compiler.IArgusPresentationCompiler
 import scala.reflect.internal.util.SourceFile
+import scala.reflect.internal.Trees.Tree
 
 /** A few convenience methods on top of the presentation compiler
  *

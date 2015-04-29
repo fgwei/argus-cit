@@ -3,9 +3,9 @@ package org.arguside.core.compiler
 import scala.reflect.internal.util.SourceFile
 
 import org.eclipse.jface.text.Region
-import org.scalaide.core.compiler.IScalaPresentationCompiler.Implicits.RichResponse
-import org.scalaide.logging.HasLogger
-import org.scalaide.util.eclipse.RegionUtils.RichRegion
+import org.arguside.core.compiler.IArgusPresentationCompiler.Implicits.RichResponse
+import org.arguside.logging.HasLogger
+import org.arguside.util.eclipse.RegionUtils.RichRegion
 
 private object NamePrinter {
   private case class Location(src: SourceFile, offset: Int)
@@ -30,10 +30,10 @@ class NamePrinter(cu: InteractiveCompilationUnit) extends HasLogger {
    */
   def qualifiedNameAt(offset: Int): Option[String] = {
     cu.withSourceFile { (src, compiler) =>
-      val scalaRegion = new Region(cu.sourceMap(cu.getContents()).scalaPos(offset), 1)
+      val argusRegion = new Region(cu.sourceMap(cu.getContents()).argusPos(offset), 1)
 
       for {
-        tree <-  handleCompilerResponse(compiler.askTypeAt(scalaRegion.toRangePos(src)).get)
+        tree <-  handleCompilerResponse(compiler.askTypeAt(argusRegion.toRangePos(src)).get)
         fullTree <- handleCompilerResponse(compiler.askLoadedTyped(src, true).get)
         qname <- handleCompilerResponse(compiler.asyncExec(qualifiedName(Location(src, offset), compiler)(fullTree, tree)).get)
       } yield qname
@@ -48,7 +48,7 @@ class NamePrinter(cu: InteractiveCompilationUnit) extends HasLogger {
       None
   }
 
-  private def qualifiedName(loc: Location, comp: IScalaPresentationCompiler)(fullTree: comp.Tree, t: comp.Tree): Option[String] = {
+  private def qualifiedName(loc: Location, comp: IArgusPresentationCompiler)(fullTree: comp.Tree, t: comp.Tree): Option[String] = {
     def enclosingDefinition(currentTree: comp.Tree, loc: Location) = {
       def isEnclosingDefinition(t: comp.Tree) = t match {
         case _: comp.DefDef | _: comp.ClassDef | _: comp.ModuleDef | _: comp.PackageDef =>

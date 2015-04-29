@@ -11,7 +11,7 @@ import org.arguside.ui.internal.editor.decorators.implicits.ImplicitHighlighting
 import org.arguside.ui.internal.editor.decorators.semantichighlighting.TextPresentationEditorHighlighter
 import org.arguside.ui.internal.editor.decorators.semantichighlighting.TextPresentationHighlighter
 
-class ArgusClassFileEditor extends ClassFileEditor with ArgusCompilationUnitEditor {
+class ArgusClassFileEditor extends ClassFileEditor with JawaCompilationUnitEditor {
 
   private lazy val implicitHighlighter = new ImplicitHighlightingPresenter(sourceViewer)
 

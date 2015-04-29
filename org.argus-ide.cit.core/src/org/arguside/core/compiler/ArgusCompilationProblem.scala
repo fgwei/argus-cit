@@ -1,11 +1,11 @@
-package org.scalaide.core.compiler
+package org.arguside.core.compiler
 
 import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.core.resources.IFile
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblem
 
-/** A Scala error or warning.
+/** A Argus error or warning.
  *
  *  @param fileName   The corresponding file name
  *  @param severity   One of ProblemSeverities.{Error, Warning, Ignore}
@@ -15,7 +15,7 @@ import org.eclipse.jdt.internal.compiler.problem.DefaultProblem
  *  @param lineNumber The line number of this problem
  *  @param column     The column number of this problem
  */
-case class ScalaCompilationProblem(fileName: String, severity: Int, message: String, start: Int, end: Int, lineNumber: Int, columnNumber: Int)
+case class ArgusCompilationProblem(fileName: String, severity: Int, message: String, start: Int, end: Int, lineNumber: Int, columnNumber: Int)
   extends DefaultProblem(fileName.toCharArray(),
     message,
     0,

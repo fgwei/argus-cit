@@ -5,7 +5,7 @@ import org.eclipse.jdt.ui.JavaUI
 import org.eclipse.jdt.internal.core.Openable
 import org.eclipse.jface.text.{ Position => JFacePosition }
 import org.eclipse.jface.text.source
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusOverrideIndicator
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaOverrideIndicator
 import org.eclipse.ui.texteditor.ITextEditor
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility
 import org.arguside.core.internal.compiler.ArgusPresentationCompiler
@@ -25,7 +25,7 @@ case class JavaIndicator(scu: ArgusCompilationUnit,
   methodName: String,
   methodTypeSignatures: List[String],
   text: String,
-  val isOverwrite: Boolean) extends source.Annotation(ScalaOverrideIndicatorBuilder.OVERRIDE_ANNOTATION_TYPE, false, text) with IArgusOverrideIndicator {
+  val isOverwrite: Boolean) extends source.Annotation(ScalaOverrideIndicatorBuilder.OVERRIDE_ANNOTATION_TYPE, false, text) with IJawaOverrideIndicator {
 
   def open() {
     val tpe0 = JDTUtils.resolveType(scu.scalaProject.newSearchableEnvironment().nameLookup, packageName, typeNames, 0)
@@ -41,7 +41,7 @@ trait ScalaOverrideIndicatorBuilder { self : ArgusPresentationCompiler =>
   import ScalaOverrideIndicatorBuilder.OVERRIDE_ANNOTATION_TYPE
 
   case class ScalaIndicator(scu: ArgusCompilationUnit, text: String, base: Symbol, val isOverwrite: Boolean)
-    extends source.Annotation(OVERRIDE_ANNOTATION_TYPE, false, text) with IArgusOverrideIndicator {
+    extends source.Annotation(OVERRIDE_ANNOTATION_TYPE, false, text) with IJawaOverrideIndicator {
     def open = {
       asyncExec{ findDeclaration(base, scu.scalaProject.javaProject) }.getOption().flatten map {
         case (file, pos) =>

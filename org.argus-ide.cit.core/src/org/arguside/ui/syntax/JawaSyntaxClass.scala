@@ -10,12 +10,12 @@ import org.arguside.util.eclipse.EclipseUtils.RichPreferenceStore
 
 import org.arguside.util.ui.DisplayThread
 
-/** Represent a class of element in the Argus syntax coloring support.
- *  [[ArgusSyntaxClasses]] contains the list of classes of element recognized by the IDE.
+/** Represent a class of element in the Jawa syntax coloring support.
+ *  [[JawaSyntaxClasses]] contains the list of classes of element recognized by the IDE.
  */
-case class ArgusSyntaxClass(displayName: String, baseName: String, canBeDisabled: Boolean = false, hasForegroundColor: Boolean = true) {
+case class JawaSyntaxClass(displayName: String, baseName: String, canBeDisabled: Boolean = false, hasForegroundColor: Boolean = true) {
 
-  import ArgusSyntaxClass._
+  import JawaSyntaxClass._
 
   /** The preference key for enabling syntax coloring for this class.
    */
@@ -107,7 +107,7 @@ case class ArgusSyntaxClass(displayName: String, baseName: String, canBeDisabled
 
 }
 
-object ArgusSyntaxClass {
+object JawaSyntaxClass {
 
   private val ENABLED_SUFFIX = ".enabled"
   private val FOREGROUND_COLOUR_SUFFIX = ".colour"
@@ -120,6 +120,6 @@ object ArgusSyntaxClass {
   /** Syntax category, to order syntax classes.
    *  Used when displaying the classes in the preference pages.
    */
-  case class Category(name: String, children: List[ArgusSyntaxClass])
+  case class Category(name: String, children: List[JawaSyntaxClass])
 
 }
