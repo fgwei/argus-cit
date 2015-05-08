@@ -74,4 +74,8 @@
       </plugin>
     </plugins>
   </build>
+  <scm>
+  	<url>https://github.com/fgwei/argus-ide/org.argus-ide.cit.aspects</url>
+  	<connection>scm:git://github.com/fgwei/argus-ide/org.argus-ide.cit.aspects</connection>
+  </scm>
 </project>

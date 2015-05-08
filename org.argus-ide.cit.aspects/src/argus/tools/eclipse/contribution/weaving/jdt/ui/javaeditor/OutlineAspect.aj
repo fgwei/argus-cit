@@ -6,7 +6,7 @@ import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaElement;
 
 /** Tweaks the labels in the outline, to display pilar native syntax
  * 
@@ -20,7 +20,7 @@ public privileged aspect OutlineAspect {
   
   void around(JavaElementLabelComposer jelc, IJavaElement element, long flags) :
     appendElementLabel(jelc, element, flags) {
-    if (!(element instanceof IArgusElement))
+    if (!(element instanceof IJawaElement))
       proceed(jelc, element, flags);
     else {
       IPackageFragmentRoot root = JavaModelUtil.getPackageFragmentRoot(element);
@@ -29,7 +29,7 @@ public privileged aspect OutlineAspect {
         jelc.fBuffer.append(JavaElementLabels.CONCAT_STRING);
       }
       
-      IArgusElement pilarElement = (IArgusElement)element;
+      IJawaElement pilarElement = (IJawaElement)element;
       jelc.fBuffer.append(pilarElement.getLabelText(flags));
       
       if (JavaElementLabelComposer.getFlag(flags, JavaElementLabels.APPEND_ROOT_PATH)) {

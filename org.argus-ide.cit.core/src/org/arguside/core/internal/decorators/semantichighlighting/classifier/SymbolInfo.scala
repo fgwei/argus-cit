@@ -8,9 +8,6 @@ case class SymbolInfo(symbolType: SymbolTypes.SymbolType, regions: List[IRegion]
 object SymbolTypes extends Enumeration {
   type SymbolType = Value
 
-  val Annotation, CaseClass, CaseObject, Class , LazyLocalVal,
-      LazyTemplateVal , LocalVar, LocalVal, Method, Param, Object,
-      Package, TemplateVar, TemplateVal, Trait, Type, TypeParameter,
-      DynamicSelect, DynamicUpdate, DynamicApply, DynamicApplyNamed,
-      CallByNameParameter = Value
+  val Annotation, Class,
+      LocalVar, Method, Param = Value
 }

@@ -12,7 +12,6 @@ import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.ITextInputListener
 import org.arguside.core.internal.decorators.semantichighlighting.Position
 import org.arguside.core.internal.decorators.semantichighlighting.PositionsTracker
-import org.arguside.core.internal.decorators.semantichighlighting.classifier.SymbolClassification
 import org.arguside.logging.HasLogger
 import org.arguside.ui.editor.InteractiveCompilationUnitEditor
 import org.arguside.util.internal.ui.UIThread
@@ -116,34 +115,35 @@ class Presenter(
     }
 
     private def performSemanticHighlighting(monitor: IProgressMonitor): IStatus = {
-      Option(editor.getInteractiveCompilationUnit).flatMap(_.withSourceFile { (sourceFile, compiler) =>
-        logger.debug("performing semantic highlighting on " + sourceFile.file.name)
-        positionsTracker.startComputingNewPositions()
-        val symbolInfos =
-          try new SymbolClassification(sourceFile, compiler, preferences.isUseSyntacticHintsEnabled()).classifySymbols(monitor)
-          catch {
-            case e: Exception =>
-              logger.error("Error while performing semantic highlighting", e)
-              Nil
-          }
-        val newPositions = Position.from(symbolInfos)
-        val positionsChange = positionsTracker.createPositionsChange(newPositions)
-        val damagedRegion = positionsChange.affectedRegion()
-
-        if (damagedRegion.getLength > 0) {
-          val sortedPositions = newPositions.sorted.toArray
-          /* if the positions held by the `positionsTracker` have changed, then
-           * it's useless to proceed because the `newPositions` have computed on a
-           * not up-to-date compilation unit. Let the next reconciler run take care
-           * of re-computing the correct positions with the up-to-date content.
-           */
-          if (!positionsTracker.isDirty) {
-            runPositionsUpdateInUiThread(sortedPositions, damagedRegion)
-            Job.ASYNC_FINISH
-          } else Status.OK_STATUS
-        }
-        else Status.OK_STATUS
-      }) getOrElse (Status.OK_STATUS)
+//      Option(editor.getInteractiveCompilationUnit).flatMap(_.withSourceFile { sourceFile =>
+//        logger.debug("performing semantic highlighting on " + sourceFile.file.name)
+//        positionsTracker.startComputingNewPositions()
+//        val symbolInfos =
+//          try new SymbolClassification(sourceFile, preferences.isUseSyntacticHintsEnabled()).classifySymbols(monitor)
+//          catch {
+//            case e: Exception =>
+//              logger.error("Error while performing semantic highlighting", e)
+//              Nil
+//          }
+//        val newPositions = Position.from(symbolInfos)
+//        val positionsChange = positionsTracker.createPositionsChange(newPositions)
+//        val damagedRegion = positionsChange.affectedRegion()
+//
+//        if (damagedRegion.getLength > 0) {
+//          val sortedPositions = newPositions.sorted.toArray
+//          /* if the positions held by the `positionsTracker` have changed, then
+//           * it's useless to proceed because the `newPositions` have computed on a
+//           * not up-to-date compilation unit. Let the next reconciler run take care
+//           * of re-computing the correct positions with the up-to-date content.
+//           */
+//          if (!positionsTracker.isDirty) {
+//            runPositionsUpdateInUiThread(sortedPositions, damagedRegion)
+//            Job.ASYNC_FINISH
+//          } else Status.OK_STATUS
+//        }
+//        else Status.OK_STATUS
+//      }) getOrElse (Status.OK_STATUS)
+      Status.OK_STATUS
     }
 
     private def runPositionsUpdateInUiThread(newPositions: Array[Position], damagedRegion: IRegion): Unit =
@@ -152,7 +152,7 @@ class Presenter(
           setThread(uiThread.get)
           if (!positionsTracker.isDirty) {
             positionsTracker.swapPositions(newPositions)
-            presentationHighlighter.updateTextPresentation(damagedRegion)
+//            presentationHighlighter.updateTextPresentation(damagedRegion)
           }
         }
         catch { case e: Exception => () }

@@ -11,7 +11,6 @@ import org.eclipse.core.runtime.IProgressMonitor
 import scala.collection.mutable.Publisher
 import java.io.File
 import org.eclipse.core.runtime.IPath
-import org.arguside.core.compiler.IPresentationCompilerProxy
 import org.eclipse.jdt.core.WorkingCopyOwner
 import org.eclipse.jdt.internal.core.DefaultWorkingCopyOwner
 import org.eclipse.jdt.internal.core.SearchableEnvironment
@@ -69,33 +68,9 @@ trait IArgusProject extends Publisher[IArgusProjectEvent] {
   val underlying: IProject
 
   /**
-   * The instance of the presentation compiler that runs on this project's source elements.
-   */
-  val presentationCompiler: IPresentationCompilerProxy
-
-  /**
    *  Does this project have the platform's level of a Argus-corresponding Nature ?
    */
   def hasArgusNature: Boolean
-
-  /** The direct dependencies of this project. It only returns opened projects. */
-//  def directDependencies: Seq[IProject]
-
-  /** All direct and indirect dependencies of this project.
-   *
-   *  Indirect dependencies are considered only if that dependency is exported by the dependent project.
-   *  Consider the following dependency graph:
-   *     A -> B -> C
-   *
-   *  transitiveDependencies(C) = {A, B} iff B *exports* the A project in its classpath
-   */
-//  def transitiveDependencies: Seq[IProject]
-
-  /** Return the exported dependencies of this project. An exported dependency is
-   *  another project this project depends on, and which is exported to downstream
-   *  dependencies.
-   */
-//  def exportedDependencies(): Seq[IProject]
 
   /** The JDT-level project corresponding to this (Argus) project. */
   val javaProject: IJavaProject
@@ -131,90 +106,12 @@ trait IArgusProject extends Publisher[IArgusProjectEvent] {
    */
   def allFilesInSourceDirs(): Set[IFile]
 
-  /** All arguments passed to scalac, including classpath as well as custom settings. */
-//  def scalacArguments: Seq[String]
-
-  /**
-   * Initializes compiler settings from an instance of the compiler's scala.tools.nsc.Settings
-   * and a filter for settings that should be taken into account. Has various side-effects.
-   */
-//  def initializeCompilerSettings(settings: Settings, filter:Settings#Setting => Boolean)
-
   /** Return the current project's preference store.
    *  @return A project-specific store if the project is set to use project-specific settings,
    *  a scoped preference store otherwise.
    */
   def storage: IPreferenceStore
 
-  /**
-   * Initialization for the build manager associated to this project
-   * @return an initialized EclipseBuildManager
-   */
-//  def buildManager(): EclipseBuildManager
-
-  /**
-   * It true, it means all source Files have to be reloaded
-   */
-  def prepareBuild(): Boolean
-
-  /**
-   * Builds the project.
-   */
-  def build(addedOrUpdated: Set[IFile], removed: Set[IFile], monitor: SubMonitor): Unit
-
-  /** Reset the presentation compiler of projects that depend on this one.
-   *  This should be done after a successful build, since the output directory
-   *  now contains an up-to-date version of this project.
-   */
-//  def resetDependentProjects(): Unit
-
-  /**
-   *  Cleans metadata on the project, such as error markers and classpath validation status
-   */
-  def clean(implicit monitor: IProgressMonitor): Unit
-
-  /* Classpath Management */
-
-  /** The ScalaClasspath Instance valid for this project */
-//  def scalaClasspath: IPilarClasspath
-
-  /** The result of validation checks performed on classpath */
-//  def isClasspathValid(): Boolean
-
-  /** Inform this project the classpath was just changed. Triggers validation
-   *
-   *  @param queue If true, a classpath validation run will be triggered eventually.
-   *    If false, the validation will yield to any ongoing validation of the classpath.
-   */
-//  def classpathHasChanged(queue: Boolean = true): Unit
-
-  /* Installation Management */
-
-  /** Is this project set (through compiler options) to use a scalac compatibility mode to interpret source
-   *  at a different version than the one embedded in the compiler ?
-   *  @see scalac's `-Xsource` flag
-   */
-//  def isUsingCompatibilityMode(): Boolean
-
-  /**
-   * Get the source level configured for this project.
-   * @returns a scala version in the form <major>.<minor>
-   */
-//  def desiredSourceLevel(): String
-
-  /**
-   * Get the ScalaInstallation Choice configured for this project.
-   * @returns a ScalaInstallationChoice
-   */
-//  def desiredinstallationChoice(): IScalaInstallationChoice
-
-  /**
-   * Get the ScalaInstallation used for building this project.
-   * The IDE will try to match this to the ScalaInstallation Choice above, but may fail to achieve this,
-   * e.g. if the ScalaInstallation Choice points to a version that is no longer on disk.
-   * @returns a usable Scala Installation.
-   */
-//  def effectiveScalaInstallation(): IScalaInstallation
 
   /** Returns a new search name environment for this Scala project.
    *
@@ -223,7 +120,7 @@ trait IArgusProject extends Publisher[IArgusProjectEvent] {
   def newSearchableEnvironment(workingCopyOwner: WorkingCopyOwner = DefaultWorkingCopyOwner.PRIMARY): SearchableEnvironment
 }
 
-object IPilarProject {
+object IArgusProject {
 
   def apply(underlying: IProject): IArgusProject = org.arguside.core.internal.project.ArgusProject(underlying)
 

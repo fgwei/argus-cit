@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.core.search.matching.MatchLocator;
 import org.eclipse.jdt.internal.core.search.matching.PossibleMatch;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusClassFile;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaClassFile;
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaCompilationUnit;
 
 @SuppressWarnings("restriction")
@@ -46,11 +46,11 @@ public privileged aspect SearchAspect {
 
   String around(PossibleMatch pm) :
     getSourceFileName(pm) {
-    if (pm.sourceFileName != null || !(pm.openable instanceof IArgusClassFile))
+    if (pm.sourceFileName != null || !(pm.openable instanceof IJawaClassFile))
       return proceed(pm);
 
     pm.sourceFileName = PossibleMatch.NO_SOURCE_FILE_NAME;
-    String fileName = ((IArgusClassFile)pm.openable).getSourceFileName();
+    String fileName = ((IJawaClassFile)pm.openable).getSourceFileName();
     if (fileName != null)
       pm.sourceFileName = fileName;
     return pm.sourceFileName;

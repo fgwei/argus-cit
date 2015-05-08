@@ -26,7 +26,7 @@ import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.texteditor.ITextEditor
 import org.arguside.core.compiler.InteractiveCompilationUnit
 import org.arguside.core.internal.ArgusPlugin
-import org.arguside.core.internal.jdt.model.ArgusSourceFile
+import org.arguside.core.internal.jdt.model.JawaSourceFile
 import org.arguside.ui.editor.ISourceViewerEditor
 import org.arguside.ui.editor.InteractiveCompilationUnitEditor
 import org.arguside.util.Utils.WithAsInstanceOfOpt
@@ -53,31 +53,6 @@ object EditorUtils {
       case _ =>
         None
     }
-  }
-
-  /** For a given IEditorPart, returns the annotations which position includes the offset
-   *  passed as an argument.
-   */
-  def getAnnotationsAtOffset(part: org.eclipse.ui.IEditorPart, offset: Int): Iterator[(Annotation, Position)] = {
-    import scala.collection.JavaConverters._
-
-    val model = ArgusPlugin().documentProvider.getAnnotationModel(part.getEditorInput)
-
-    val annotations = model match {
-      case null => Iterator.empty
-      case am2: IAnnotationModelExtension2 => am2.getAnnotationIterator(offset, 1, true, true).asArgus
-      case _ => model.getAnnotationIterator.asArgus
-    }
-
-    val annotationsWithPositions = annotations collect {
-      case ann: Annotation => (ann, model.getPosition(ann))
-    }
-
-    val annotationsAtOffset = annotationsWithPositions filter {
-      case (_, pos) => pos.includes(offset)
-    }
-
-    annotationsAtOffset
   }
 
   /** Returns a region matching the given text selection.
@@ -156,19 +131,19 @@ object EditorUtils {
     b <- block(t)
   } yield b
 
-  /** Applies the function passed as an argument monadically to the given Argus source file.
+  /** Applies the function passed as an argument monadically to the given Jawa source file.
    */
-  def withCurrentArgusSourceFile[T](block: ArgusSourceFile => T): Option[T] = {
+  def withCurrentJawaSourceFile[T](block: JawaSourceFile => T): Option[T] = {
     withCurrentEditor { textEditor =>
       file(textEditor) flatMap { file =>
-        ArgusSourceFile.createFromPath(file.getFullPath.toString) map block
+        JawaSourceFile.createFromPath(file.getFullPath.toString) map block
       }
     }
   }
 
-  /** @see [[ withArgusSourceFileAndSelection(ArgusSourceFile, ITextSelection): Option[T] ]]
+  /** @see [[ withJawaSourceFileAndSelection(JawaSourceFile, ITextSelection): Option[T] ]]
    */
-  def withArgusFileAndSelection[T](block: (InteractiveCompilationUnit, ITextSelection) => Option[T]): Option[T] = {
+  def withJawaFileAndSelection[T](block: (InteractiveCompilationUnit, ITextSelection) => Option[T]): Option[T] = {
     withCurrentEditor { textEditor =>
       EditorUtils.getEditorCompilationUnit(textEditor) flatMap { icu =>
         selection(textEditor) flatMap { selection =>
@@ -178,12 +153,12 @@ object EditorUtils {
     }
   }
 
-  /** Applies the function passed as an argument monadically to the given Argus source file and current selection.
+  /** Applies the function passed as an argument monadically to the given Jawa source file and current selection.
    */
-  def withArgusSourceFileAndSelection[T](block: (ArgusSourceFile, ITextSelection) => Option[T]): Option[T] = {
-    withArgusFileAndSelection { (icu, selection) =>
+  def withJawaSourceFileAndSelection[T](block: (JawaSourceFile, ITextSelection) => Option[T]): Option[T] = {
+    withJawaFileAndSelection { (icu, selection) =>
       icu match {
-        case ssf: ArgusSourceFile => block(ssf, selection)
+        case ssf: JawaSourceFile => block(ssf, selection)
         case _ => None
       }
     }

@@ -16,8 +16,8 @@ import org.eclipse.swt.custom.StyleRange
 import org.arguside.core.internal.decorators.semantichighlighting.PositionsTracker
 import org.arguside.core.internal.decorators.semantichighlighting.classifier.SymbolTypes
 import org.arguside.logging.HasLogger
-import org.arguside.ui.internal.editor.ArgusCompilationUnitEditor
-import org.arguside.ui.syntax.ArgusSyntaxClasses
+import org.arguside.ui.internal.editor.JawaCompilationUnitEditor
+import org.arguside.ui.syntax.JawaSyntaxClasses
 import org.arguside.util.eclipse.EditorUtils
 
 /** This class is responsible of:
@@ -29,7 +29,7 @@ import org.arguside.util.eclipse.EditorUtils
   *
   * @note All accesses to this class are confined to the UI Thread.
   */
-private class TextPresentationEditorHighlighter(editor: ArgusCompilationUnitEditor, preferences: Preferences, addReconcilingListener: IJavaReconcilingListener => Unit, removeReconcilingListener: IJavaReconcilingListener => Unit) extends TextPresentationHighlighter {
+private class TextPresentationEditorHighlighter(editor: JawaCompilationUnitEditor, preferences: Preferences, addReconcilingListener: IJavaReconcilingListener => Unit, removeReconcilingListener: IJavaReconcilingListener => Unit) extends TextPresentationHighlighter {
   import TextPresentationEditorHighlighter._
 
   @volatile private var highlightingOnReconciliation: IJavaReconcilingListener = _
@@ -54,25 +54,11 @@ private class TextPresentationEditorHighlighter(editor: ArgusCompilationUnitEdit
 
   override def sourceViewer: JavaSourceViewer = editor.sourceViewer
 
-  override def updateTextPresentation(damage: IRegion): Unit = {
-    val textPresentation = createRepairDescription(damage)
-    textPresentation match {
-      case None     => sourceViewer.invalidateTextPresentation() // invalidate the whole editor's text presentation
-      case Some(tp) => sourceViewer.changeTextPresentation(tp, /*controlRedraw=*/ false)
-    }
-  }
-
-  private def createRepairDescription(damage: IRegion): Option[TextPresentation] =
-    EditorUtils.withDocument(sourceViewer) { document =>
-      val configuration = editor.createJavaSourceViewerConfiguration()
-      val presentationReconciler = configuration.getPresentationReconciler(sourceViewer)
-      presentationReconciler.createRepairDescription(damage, document)
-    }
 }
 
 object TextPresentationEditorHighlighter {
 
-  def apply(editor: ArgusCompilationUnitEditor, preferences: Preferences, addReconcilingListener: IJavaReconcilingListener => Unit, removeReconcilingListener: IJavaReconcilingListener => Unit): TextPresentationHighlighter =
+  def apply(editor: JawaCompilationUnitEditor, preferences: Preferences, addReconcilingListener: IJavaReconcilingListener => Unit, removeReconcilingListener: IJavaReconcilingListener => Unit): TextPresentationHighlighter =
     new TextPresentationEditorHighlighter(editor, preferences, addReconcilingListener, removeReconcilingListener)
 
   private class PerformSemanticHighlightingOnReconcilation(semanticHighlightingJob: Job) extends IJavaReconcilingListener {
@@ -108,16 +94,11 @@ object TextPresentationEditorHighlighter {
     }
 
     override def propertyChange(event: PropertyChangeEvent): Unit = {
-      if (event.getProperty().startsWith(ArgusSyntaxClasses.IDENTIFIER_IN_INTERPOLATED_STRING.baseName + ".")) {
-        val syms: Set[SymbolTypes.SymbolType] = positionsTracker.identifiersInInterpolatedStrings.map(_.kind)(collection.breakOut)
-        invalidateSymTypes(syms.toSeq: _*)
-      } else {
-        for {
-          semanticCategory <- ArgusSyntaxClasses.scalaSemanticCategory.children
-          if event.getProperty().startsWith(semanticCategory.baseName)
-          symType: SymbolTypes.SymbolType <- SymbolTypes.values.find(HighlightingStyle.symbolTypeToSyntaxClass(_) == semanticCategory)
-        } invalidateSymTypes(symType)
-      }
+      for {
+        semanticCategory <- JawaSyntaxClasses.jawaSemanticCategory.children
+        if event.getProperty().startsWith(semanticCategory.baseName)
+        symType: SymbolTypes.SymbolType <- SymbolTypes.values.find(HighlightingStyle.symbolTypeToSyntaxClass(_) == semanticCategory)
+      } invalidateSymTypes(symType)
     }
 
     private def invalidateSymTypes(symTypes: SymbolTypes.SymbolType*) {

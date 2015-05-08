@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sireum Plugin Root
+Bundle-SymbolicName: org.sireum;singleton:=true
+Bundle-Version: 2.0
+Bundle-Vendor: sireum.org
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Eclipse-ExtensibleAPI: true
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/

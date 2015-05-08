@@ -6,19 +6,19 @@ import org.eclipse.swt.SWT
 import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Composite
 import org.arguside.core.IArgusPlugin
-import org.arguside.ui.syntax.ArgusSyntaxClasses
-import org.arguside.ui.syntax.ArgusSyntaxClasses._
+import org.arguside.ui.syntax.JawaSyntaxClasses
+import org.arguside.ui.syntax.JawaSyntaxClasses._
 import org.arguside.ui.syntax.preferences.BaseSyntaxColoringPreferencePage
 import org.arguside.util.eclipse.SWTUtils._
 import org.arguside.core.internal.decorators.semantichighlighting.Position
-import argusriform.lexer.ArgusLexer
+import org.sireum.jawa.lexer.JawaLexer
 import org.arguside.core.internal.decorators.semantichighlighting.classifier.SymbolTypes
 
-/** Syntax Coloring preference page for the Argus editors.
+/** Syntax Coloring preference page for the Jawa editors.
  */
 class SyntaxColoringPreferencePage extends BaseSyntaxColoringPreferencePage(
-  ArgusSyntaxClasses.categories,
-  argusSyntacticCategory,
+  JawaSyntaxClasses.categories,
+  jawaSyntacticCategory,
   IArgusPlugin().getPreferenceStore,
   SyntaxColoringPreferencePage.PreviewText,
   SemanticPreviewerFactoryConfiguration) {
@@ -127,40 +127,19 @@ object SyntaxColoringPreferencePage {
 
   import SymbolTypes._
   private val identifierToSyntaxClass: Map[String, ColoringInfo] = Map(
-    "foo" -> ColoringInfo(Package),
-    "bar" -> ColoringInfo(Package),
-    "baz" -> ColoringInfo(Package),
     "Annotation" -> ColoringInfo(Annotation),
-    "Class" -> ColoringInfo(Class),
-    "CaseClass" -> ColoringInfo(CaseClass),
-    "CaseObject" -> ColoringInfo(CaseObject),
-    "Trait" -> ColoringInfo(Trait),
-    "Int" -> ColoringInfo(Class),
-    "method" -> ColoringInfo(Method),
+    "Record" -> ColoringInfo(Class),
+    "Procedure" -> ColoringInfo(Method),
     "param" -> ColoringInfo(Param),
-    "lazyLocalVal" -> ColoringInfo(LazyLocalVal),
-    "localVal" -> ColoringInfo(LocalVal),
     "localVar" -> ColoringInfo(LocalVar),
-    "lazyTemplateVal" -> ColoringInfo(LazyTemplateVal),
-    "templateVal" -> ColoringInfo(TemplateVal),
-    "templateVar" -> ColoringInfo(TemplateVar),
-    "T" -> ColoringInfo(TypeParameter),
-    "Type" -> ColoringInfo(Type),
-    "Object" -> ColoringInfo(Object),
-    "sym" -> ColoringInfo(LocalVal),
     "deprecated" -> ColoringInfo(Annotation),
     "deprecatedMethod" -> ColoringInfo(Method, deprecated = true),
-    "str" -> ColoringInfo(TemplateVal),
-    "p\u0430ram" -> ColoringInfo(Param, inInterpolatedString = true),
-    "templateV\u0430l" -> ColoringInfo(TemplateVal, inInterpolatedString = true),
-    "templateV\u0430r" -> ColoringInfo(TemplateVar, inInterpolatedString = true),
-    "byNameParam" -> ColoringInfo(Param),
-    "byNamePar\u0430m" -> ColoringInfo(CallByNameParameter)
+    "p\u0430ram" -> ColoringInfo(Param, inInterpolatedString = true)
     )
 
   val semanticLocations: List[Position] =
     for {
-      token <- ArgusLexer.rawTokenise(PreviewText, forgiveErrors = true)
+      token <- JawaLexer.rawTokenise(Left(PreviewText))
       if token.tokenType.isId
       ColoringInfo(symbolType, deprecated, inStringInterpolation) <- identifierToSyntaxClass get token.text
     } yield new Position(token.offset, token.length, symbolType, deprecated, inStringInterpolation)

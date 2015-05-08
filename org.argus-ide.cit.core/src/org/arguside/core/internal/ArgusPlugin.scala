@@ -39,9 +39,8 @@ import org.eclipse.ui.IEditorPart
 import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.plugin.AbstractUIPlugin
 import org.osgi.framework.BundleContext
-import org.arguside.core.internal.jdt.model.ArgusSourceFile
+import org.arguside.core.internal.jdt.model.JawaSourceFile
 import org.arguside.util.eclipse.OSGiUtils
-import org.arguside.ui.internal.templates.ArgusTemplateManager
 import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.core.resources.IResourceDelta
 import org.arguside.logging.HasLogger
@@ -51,22 +50,18 @@ import org.arguside.core.resources.EclipseResource
 import org.arguside.logging.PluginLogConfigurator
 import org.arguside.core.internal.project.ArgusProject
 import org.arguside.ui.internal.diagnostic
-import org.arguside.util.internal.CompilerUtils
-import org.arguside.core.internal.builder.zinc.CompilerInterfaceStore
 import org.arguside.util.internal.FixedSizeCache
-import org.arguside.core.IArgusInstallation
-import org.arguside.core.internal.project.ArgusInstallation.platformInstallation
 import org.eclipse.core.runtime.content.IContentType
 import org.arguside.core.CitConstants
-import org.arguside.ui.internal.migration.RegistryExtender
 import org.arguside.core.IArgusPlugin
 import org.eclipse.core.resources.IResourceDeltaVisitor
 import org.arguside.util.Utils._
-import org.arguside.core.internal.jdt.model.ArgusCompilationUnit
-import org.arguside.ui.internal.editor.ArgusDocumentProvider
-import org.arguside.core.internal.jdt.model.ArgusClassFile
+import org.arguside.core.internal.jdt.model.JawaCompilationUnit
+import org.arguside.ui.internal.editor.JawaDocumentProvider
+import org.arguside.core.internal.jdt.model.JawaClassFile
 import org.eclipse.jdt.core.IClassFile
 import org.arguside.util.Utils.WithAsInstanceOfOpt
+import org.arguside.core.internal.jdt.model.JawaCompilationUnit
 
 object ArgusPlugin {
 
@@ -81,39 +76,20 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
 
   import org.arguside.core.CitConstants._
 
-   /** Check if the given version is compatible with the current plug-in version.
-   *  Check on the major/minor number, discard the maintenance number.
-   *
-   *  For example 2.9.1 and 2.9.2-SNAPSHOT are compatible versions whereas
-   *  2.8.1 and 2.9.0 aren't.
-   */
-//  def isCompatibleVersion(version: ArgusVersion, project: ArgusProject): Boolean = {
-//    if (project.isUsingCompatibilityMode())
-//      isBinaryPrevious(ArgusVersion.current, version)
-//    else
-//      isBinarySame(ArgusVersion.current, version)// don't treat 2 unknown versions as equal
-//  }
-
   private lazy val citCoreBundle = getBundle()
 
-//  lazy val sbtCompilerBundle = Platform.getBundle(SbtPluginId)
-//  lazy val sbtCompilerInterfaceBundle = Platform.getBundle(SbtCompilerInterfacePluginId)
-//  lazy val sbtCompilerInterface = OSGiUtils.pathInBundle(sbtCompilerInterfaceBundle, "/")
+  lazy val jawaSourceFileContentType: IContentType =
+    Platform.getContentTypeManager().getContentType("argus.tools.eclipse.jawaSource")
 
-  lazy val templateManager = new PilarTemplateManager()
-
-  lazy val pilarSourceFileContentType: IContentType =
-    Platform.getContentTypeManager().getContentType("argus.tools.eclipse.pilarSource")
-
-  lazy val pilarClassFileContentType: IContentType =
-    Platform.getContentTypeManager().getContentType("argus.tools.eclipse.pilarClass")
+  lazy val jawaClassFileContentType: IContentType =
+    Platform.getContentTypeManager().getContentType("argus.tools.eclipse.jawaClass")
 
   /**
    * The document provider needs to exist only a single time because it caches
-   * compilation units (their working copies). Each `PilarSourceFileEditor` is
+   * compilation units (their working copies). Each `JawaSourceFileEditor` is
    * associated with this document provider.
    */
-  private[arguside] lazy val documentProvider = new ArgusDocumentProvider
+  private[arguside] lazy val documentProvider = new JawaDocumentProvider
 
   override def start(context: BundleContext) = {
     ArgusPlugin.plugin = this
@@ -123,12 +99,9 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
       PlatformUI.getWorkbench.getEditorRegistry.setDefaultEditor("*.pilar", CitConstants.EditorId)
       PlatformUI.getWorkbench.getEditorRegistry.setDefaultEditor("*.plr", CitConstants.EditorId)
       diagnostic.StartupDiagnostics.run
-
-      new RegistryExtender().perform()
     }
     ResourcesPlugin.getWorkspace.addResourceChangeListener(this, IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.POST_CHANGE)
     JavaCore.addElementChangedListener(this)
-    logger.info("Argus compiler bundle: " + platformInstallation.compiler.classJar.toOSString() )
   }
 
   override def stop(context: BundleContext) = {
@@ -142,20 +115,14 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     ArgusPlugin.plugin = null
   }
 
-  /** The compiler-interface store, located in this plugin configuration area (usually inside the metadata directory */
-  lazy val compilerInterfaceStore: CompilerInterfaceStore = new CompilerInterfaceStore(Platform.getStateLocation(sdtCoreBundle), this)
-
-  /** A LRU cache of class loaders for Argus builders */
-  lazy val classLoaderStore: FixedSizeCache[IArgusInstallation,ClassLoader] = new FixedSizeCache(initSize = 2, maxSize = 3)
-
   // Argus project instances
   private val projects = new mutable.HashMap[IProject, ArgusProject]
 
-  override def scalaCompilationUnit(input: IEditorInput): Option[ArgusCompilationUnit] = {
-    def unitOfSourceFile = Option(documentProvider.getWorkingCopy(input).asInstanceOf[ArgusCompilationUnit])
+  override def jawaCompilationUnit(input: IEditorInput): Option[JawaCompilationUnit] = {
+    def unitOfSourceFile = Option(documentProvider.getWorkingCopy(input).asInstanceOf[JawaCompilationUnit])
 
     def unitOfClassFile = input.getAdapter(classOf[IClassFile]) match {
-      case tr: ArgusClassFile => Some(tr)
+      case tr: JawaClassFile => Some(tr)
       case _                  => None
     }
 
@@ -182,22 +149,11 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
 
   def disposeProject(project: IProject): Unit = {
     projects.synchronized {
-      projects.get(project) foreach { (scalaProject) =>
+      projects.get(project) foreach { (argusProject) =>
         projects.remove(project)
-        scalaProject.dispose()
+//        argusProject.dispose()
       }
     }
-  }
-
-  /** Restart all presentation compilers in the workspace. Need to do it in order
-   *  for them to pick up the new std out/err streams.
-   */
-  def resetAllPresentationCompilers() {
-    for {
-      iProject <- ResourcesPlugin.getWorkspace.getRoot.getProjects
-      if iProject.isOpen
-      scalaProject <- asArgusProject(iProject)
-    } scalaProject.presentationCompiler.askRestart()
   }
 
   override def resourceChanged(event: IResourceChangeEvent) {
@@ -220,8 +176,6 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
                 // checks create their own preference modifications under some conditions.
                 // Doing them concurrently can wreak havoc.
                 p.projectSpecificStorage.save()
-              } finally {
-                p.checkClasspath(true)
               }
             }
           }
@@ -248,7 +202,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
           innerDelta.getElement() match {
             // classpath change should only impact projects
             case javaProject: IJavaProject => {
-              asArgusProject(javaProject.getProject()).foreach{ (p) => p.classpathHasChanged(false) }
+//              asArgusProject(javaProject.getProject()).foreach{ (p) => p.classpathHasChanged(false) }
             }
             case _ =>
           }
@@ -257,7 +211,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     }
 
     // process deleted files
-    val buff = new ListBuffer[ArgusSourceFile]
+    val buff = new ListBuffer[JawaSourceFile]
     val changed = new ListBuffer[ICompilationUnit]
     val projectsToReset = new mutable.HashSet[ArgusProject]
 
@@ -307,8 +261,8 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
             changed += elem.asInstanceOf[ICompilationUnit]
           false
 
-        case COMPILATION_UNIT if elem.isInstanceOf[ArgusSourceFile] && isRemoved =>
-          buff += elem.asInstanceOf[ArgusSourceFile]
+        case COMPILATION_UNIT if elem.isInstanceOf[JawaSourceFile] && isRemoved =>
+          buff += elem.asInstanceOf[JawaSourceFile]
           false
 
         case COMPILATION_UNIT if isAdded =>
@@ -331,22 +285,22 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
         case (project, units) =>
           asArgusProject(project) foreach { p =>
             if (project.isOpen && !projectsToReset(p)) {
-              p.presentationCompiler(_.refreshChangedFiles(units.map(_.getResource.asInstanceOf[IFile])))
+//              p.presentationCompiler(_.refreshChangedFiles(units.map(_.getResource.asInstanceOf[IFile])))
             }
           }
       }
     }
 
-    projectsToReset.foreach(_.presentationCompiler.askRestart())
-    if (buff.nonEmpty) {
-      buff.toList groupBy (_.getJavaProject.getProject) foreach {
-        case (project, srcs) =>
-          asArgusProject(project) foreach { p =>
-            if (project.isOpen && !projectsToReset(p))
-              p.presentationCompiler.internal (_.filesDeleted(srcs))
-          }
-      }
-    }
+//    projectsToReset.foreach(_.presentationCompiler.askRestart())
+//    if (buff.nonEmpty) {
+//      buff.toList groupBy (_.getJavaProject.getProject) foreach {
+//        case (project, srcs) =>
+//          asArgusProject(project) foreach { p =>
+//            if (project.isOpen && !projectsToReset(p))
+//              p.presentationCompiler.internal (_.filesDeleted(srcs))
+//          }
+//      }
+//    }
   }
 
 }

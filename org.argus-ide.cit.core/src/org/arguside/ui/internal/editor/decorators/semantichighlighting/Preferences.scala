@@ -1,24 +1,19 @@
 package org.arguside.ui.internal.editor.decorators.semantichighlighting
 
-import org.arguside.ui.syntax.ArgusSyntaxClasses
+import org.arguside.ui.syntax.JawaSyntaxClasses
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.text.TextAttribute
 
 class Preferences(val store: IPreferenceStore) {
   def isEnabled(): Boolean =
-    store.getBoolean(ArgusSyntaxClasses.ENABLE_SEMANTIC_HIGHLIGHTING)
+    store.getBoolean(JawaSyntaxClasses.ENABLE_SEMANTIC_HIGHLIGHTING)
 
   def isStrikethroughDeprecatedDecorationEnabled(): Boolean =
-    store.getBoolean(ArgusSyntaxClasses.STRIKETHROUGH_DEPRECATED)
+    store.getBoolean(JawaSyntaxClasses.STRIKETHROUGH_DEPRECATED)
 
   def isUseSyntacticHintsEnabled(): Boolean =
-    store.getBoolean(ArgusSyntaxClasses.USE_SYNTACTIC_HINTS)
+    store.getBoolean(JawaSyntaxClasses.USE_SYNTACTIC_HINTS)
 
-  def isInterpolatedStringCodeDecorationEnabled(): Boolean =
-    ArgusSyntaxClasses.IDENTIFIER_IN_INTERPOLATED_STRING.enabled(store)
-
-  def interpolatedStringTextAttribute(): TextAttribute =
-    ArgusSyntaxClasses.IDENTIFIER_IN_INTERPOLATED_STRING.getTextAttribute(store)
 }
 
 object Preferences {

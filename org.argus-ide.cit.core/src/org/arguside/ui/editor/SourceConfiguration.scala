@@ -1,7 +1,5 @@
 package org.arguside.ui.editor
 
-import org.arguside.core.internal.hyperlink.DeclarationHyperlinkDetector
-import org.arguside.core.internal.hyperlink.ArgusHyperlink
 import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.hyperlink.IHyperlink
 import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector
@@ -20,7 +18,7 @@ object SourceConfiguration {
    *          detector.setContext(editor)
    *        }}}
    */
-  def argusDeclarationDetector: AbstractHyperlinkDetector = DeclarationHyperlinkDetector()
+//  def argusDeclarationDetector: AbstractHyperlinkDetector = DeclarationHyperlinkDetector()
 
   /** Create a hyperlink that can open a Scala editor.
    *
@@ -31,6 +29,6 @@ object SourceConfiguration {
    * @param text           The name of the hyperlink, to be shown in a menu if there's more than one hyperlink
    * @param wordRegion     The region to underline in the start editor
    */
-  def argusHyperlink(openableOrUnit: AnyRef, region: IRegion, label: String, text: String, wordRegion: IRegion): IHyperlink =
-    new ArgusHyperlink(openableOrUnit, region, label, text, wordRegion)
+//  def argusHyperlink(openableOrUnit: AnyRef, region: IRegion, label: String, text: String, wordRegion: IRegion): IHyperlink =
+//    new ArgusHyperlink(openableOrUnit, region, label, text, wordRegion)
 }

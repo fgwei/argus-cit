@@ -53,7 +53,7 @@ object ISourceMap {
    *
    *  This implementation performs no transformation on the given source code.
    */
-  def plainArgus(file: AbstractFile, contents: Array[Char]): ISourceMap =
+  def plainJawa(file: AbstractFile, contents: Array[Char]): ISourceMap =
     new internal.compiler.PlainArgusInfo(file, contents)
 }
 
@@ -77,23 +77,22 @@ trait IPositionInformation extends (Int => Int) {
 
 object IPositionInformation {
 
-  /** A plain Argus implementation based on the given source file.
+  /** A plain Jawa implementation based on the given source file.
    *
    *  This performs no transformation on positions.
    */
-  def plainArgus(sourceFile: SourceFile): IPositionInformation =
+  def plainJawa(sourceFile: SourceFile): IPositionInformation =
     new internal.compiler.PlainArgusPosition(sourceFile)
 }
 
-/** A Argus compilation unit. It can be backed up by a `ArgusCompilationUnit` in usual
- *  Argus projects, or any other implementation (such as a specialized Argus DSL, a
- *  Script file, an Sbt build file, etc.).
+/** A Jawa compilation unit. It can be backed up by a `JawaCompilationUnit` in usual
+ *  Jawa projects, or any other implementation.
  *
  *  This class is a stable representation of a compilation unit. Its contents may change over time, but
  *  *snapshots* can be obtained through `sourceMap`.
  *
  *  An `ISourceMap` is a translation from any surface language (for example, Play HTML templates) to a
- *  Argus source that can be type-checked by the Argus presentation compiler.
+ *  Jawa source that can be type-checked by the Jawa presentation compiler.
  *
  *  Implementations are expected to be thread-safe.
  */
@@ -133,11 +132,11 @@ trait InteractiveCompilationUnit {
    *  @param newContents The new contents of this compilation unit. This is the original source, and
    *                     may not be Argus. This method takes care of translating the contents to Argus
    */
-  def scheduleReconcile(newContents: Array[Char]): Unit = {
-    argusProject.presentationCompiler { pc =>
-      pc.scheduleReload(this, sourceMap(newContents).sourceFile)
-    }
-  }
+//  def scheduleReconcile(newContents: Array[Char]): Unit = {
+//    argusProject.presentationCompiler { pc =>
+//      pc.scheduleReload(this, sourceMap(newContents).sourceFile)
+//    }
+//  }
 
   /** Force a reconciliation round. This involves flushing all pending (dirty) compilation
    *  units and waiting for this compilation unit to be type-checked. It returns all compilation
@@ -147,10 +146,10 @@ trait InteractiveCompilationUnit {
    *        Other code should prefer calling `currentProblems`, which won't interfere with the
    *        reconciliation strategy.
    */
-  def forceReconcile(): List[ArgusCompilationProblem] = {
-    argusProject.presentationCompiler(_.flushScheduledReloads())
-    currentProblems()
-  }
+//  def forceReconcile(): List[ArgusCompilationProblem] = {
+//    argusProject.presentationCompiler(_.flushScheduledReloads())
+//    currentProblems()
+//  }
 
   /** Schedule the unit for reconciliation and add it to the presentation compiler managed units. This should
    *  be called before any other calls to {{{IArgusPresentationCompiler.scheduleReload}}}
@@ -160,17 +159,17 @@ trait InteractiveCompilationUnit {
    *
    *  This method should not block.
    */
-  def initialReconcile(): Response[Unit] = {
-    val reloaded = argusProject.presentationCompiler { compiler =>
-      compiler.askReload(this, sourceMap(getContents).sourceFile)
-    } getOrElse {
-      val dummy = new Response[Unit]
-      dummy.set(())
-      dummy
-    }
-
-    reloaded
-  }
+//  def initialReconcile(): Response[Unit] = {
+//    val reloaded = argusProject.presentationCompiler { compiler =>
+//      compiler.askReload(this, sourceMap(getContents).sourceFile)
+//    } getOrElse {
+//      val dummy = new Response[Unit]
+//      dummy.set(())
+//      dummy
+//    }
+//
+//    reloaded
+//  }
 
   /** Return all compilation errors from this unit. Waits until the unit is type-checked.
    *  It may be long running, but it won't force retype-checking. If the unit was already typed,
@@ -178,27 +177,27 @@ trait InteractiveCompilationUnit {
    *
    *  Compilation errors and warnings are positioned relative to the original source.
    */
-  def currentProblems(): List[ArgusCompilationProblem] = {
-    import scala.util.control.Exception.failAsValue
-
-    argusProject.presentationCompiler { pc =>
-      val info = lastSourceMap()
-      import info._
-
-      val probs = pc.problemsOf(this)
-      for (p <- probs) yield {
-        p.copy(start = failAsValue(classOf[IndexOutOfBoundsException])(0)(originalPos(p.start)),
-          end = failAsValue(classOf[IndexOutOfBoundsException])(1)(originalPos(p.end)),
-          lineNumber = failAsValue(classOf[IndexOutOfBoundsException])(1)(originalLine(p.lineNumber - 1)) + 1)
-      }
-    }.getOrElse(Nil)
-  }
+//  def currentProblems(): List[ArgusCompilationProblem] = {
+//    import scala.util.control.Exception.failAsValue
+//
+//    argusProject.presentationCompiler { pc =>
+//      val info = lastSourceMap()
+//      import info._
+//
+//      val probs = pc.problemsOf(this)
+//      for (p <- probs) yield {
+//        p.copy(start = failAsValue(classOf[IndexOutOfBoundsException])(0)(originalPos(p.start)),
+//          end = failAsValue(classOf[IndexOutOfBoundsException])(1)(originalPos(p.end)),
+//          lineNumber = failAsValue(classOf[IndexOutOfBoundsException])(1)(originalLine(p.lineNumber - 1)) + 1)
+//      }
+//    }.getOrElse(Nil)
+//  }
 
   /** Perform an operation on the source file, with the current presentation compiler.
    *
    *  @param op The operation to be performed
    */
-  def withSourceFile[T](op: (SourceFile, IArgusPresentationCompiler) => T): Option[T] = {
-    argusProject.presentationCompiler(op(lastSourceMap().sourceFile, _))
-  }
+//  def withSourceFile[T](op: (SourceFile, IArgusPresentationCompiler) => T): Option[T] = {
+//    argusProject.presentationCompiler(op(lastSourceMap().sourceFile, _))
+//  }
 }

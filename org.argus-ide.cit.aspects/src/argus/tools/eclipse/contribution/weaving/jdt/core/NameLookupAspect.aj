@@ -9,7 +9,7 @@ import org.eclipse.jdt.internal.core.IJavaElementRequestor;
 import org.eclipse.jdt.internal.core.NameLookup;
 
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaCompilationUnit;
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaElement;
 
 @SuppressWarnings("restriction")
 public privileged aspect NameLookupAspect {
@@ -77,7 +77,7 @@ public privileged aspect NameLookupAspect {
               continue;
             IType type = ((ICompilationUnit) cu).getType(topLevelTypeName);
             type = nl.getMemberType(type, name, firstDot);
-            if ((isPilar && (type instanceof IArgusElement) && type.exists()) || 
+            if ((isPilar && (type instanceof IJawaElement) && type.exists()) || 
                 (!isPilar && nl.acceptType(type, acceptFlags, true/*a source type*/))) { // accept type checks for existence unless cu is pilar
               requestor.acceptType(type);
               break;  // since an exact match was requested, no other matching type can exist

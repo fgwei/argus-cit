@@ -1,8 +1,6 @@
 package org.arguside.util.internal.eclipse
 
 import scala.reflect.io.AbstractFile
-import scala.tools.refactoring.common.TextChange
-
 import org.eclipse.core.resources.IFile
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.IRegion
@@ -17,11 +15,12 @@ import org.eclipse.text.edits.UndoEdit
 import org.eclipse.ui.texteditor.ITextEditor
 import org.arguside.util.eclipse.FileUtils
 import org.arguside.util.eclipse.RegionUtils
+import org.arguside.core.text.TextChange
 
 object TextEditUtils {
 
   def applyRefactoringChangeToEditor(change: TextChange, editor: ITextEditor): UndoEdit = {
-    val edit = new ReplaceEdit(change.from, change.to - change.from, change.text)
+    val edit = new ReplaceEdit(change.start, change.end - change.start, change.text)
     val document = editor.getDocumentProvider.getDocument(editor.getEditorInput)
     edit.apply(document)
   }
@@ -33,7 +32,7 @@ object TextEditUtils {
       val fileChangeRootEdit = new MultiTextEdit
 
       fileChanges map { change =>
-        new ReplaceEdit(change.from, change.to - change.from, change.text)
+        new ReplaceEdit(change.start, change.end - change.start, change.text)
       } foreach fileChangeRootEdit.addChild
 
       if (saveAfter) setSaveMode(TextFileChange.LEAVE_DIRTY)

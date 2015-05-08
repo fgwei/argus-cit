@@ -13,7 +13,7 @@ import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.core.CompilationUnitProblemFinder;
 
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaElement;
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaSourceFile;;
 
 @SuppressWarnings("restriction")
@@ -40,7 +40,7 @@ public privileged aspect CompilationUnitProblemFinderAspect {
     IProgressMonitor monitor) :
     process(unitElement, parser, workingCopyOwner, problems, creatingAST, reconcileFlags, monitor) {
     CompilationUnit original = unitElement.originalFromClone(); 
-    if (!(original instanceof IArgusElement))
+    if (!(original instanceof IJawaElement))
       return proceed(unitElement, parser, workingCopyOwner, problems, creatingAST, reconcileFlags, monitor);
     
     if (original instanceof IJawaSourceFile) {

@@ -12,12 +12,6 @@
             name="Logging">
       </page>
       <page
-            category="org.arguside.ui.preferences.editor"
-            class="org.arguside.ui.internal.preferences.FormatterPreferencePage"
-            id="org.arguside.ui.preferences.editor.formatter"
-            name="Formatter">
-      </page>
-      <page
             category="org.arguside.ui.preferences"
             class="org.arguside.ui.internal.preferences.EditorPreferencePage"
             id="org.arguside.ui.preferences.editor"
@@ -34,12 +28,6 @@
             id="org.arguside.ui.preferences.editor.highlighting"
             name="Syntax Coloring">
       </page>
-      <page
-            category="org.arguside.ui.preferences.editor"
-            class="org.arguside.ui.internal.preferences.SaveActionsPreferencePage"
-            id="org.arguside.ui.preferences.editor.saveactions"
-            name="Save Actions">
-      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -47,19 +35,10 @@
             class="org.arguside.ui.internal.logging.LoggingPreferencePageInitializer">
       </initializer>
       <initializer
-            class="org.arguside.ui.internal.migration.MigrationPreferenceInitializer">
-      </initializer>
-      <initializer
             class="org.arguside.ui.internal.preferences.ColorPreferenceInitializer">
       </initializer>
       <initializer
             class="org.arguside.ui.internal.preferences.EditorPreferenceInitializer">
-      </initializer>
-      <initializer
-            class="org.arguside.ui.internal.preferences.SaveActionsPreferenceInitializer">
-      </initializer>
-      <initializer
-            class="org.arguside.core.internal.formatter.ArgusFormatterPreferenceInitializer">
       </initializer>
    </extension>
    <extension
@@ -109,8 +88,8 @@
             objectClass="org.eclipse.core.resources.IProject">
          <enablement>
             <test
-              property="org.eclipse.core.resources.projectNature"
-              value="org.eclipse.jdt.core.javanature">
+                  property="org.eclipse.core.resources.projectNature"
+                  value="org.eclipse.jdt.core.javanature">
             </test>
          </enablement>
          <visibility>
@@ -120,7 +99,7 @@
             </objectState>
          </visibility>
          <action
-               class="org.arguside.ui.internal.actions.ToggleScalaNatureAction"
+               class="org.arguside.ui.internal.actions.ToggleArgusNatureAction"
                enablesFor="+"
                id="org.argus-ide.cit.core.natures.ToggleNatureAction"
                label="Remove Argus Nature"
@@ -148,7 +127,7 @@
             </not>
          </visibility>
          <action
-               class="org.arguside.ui.internal.actions.ToggleScalaNatureAction"
+               class="org.arguside.ui.internal.actions.ToggleArgusNatureAction"
                enablesFor="+"
                icon="icons/full/etool16/newsprj_wiz.gif"
                id="org.argus-ide.cit.core.natures.ToggleNatureAction"
@@ -163,15 +142,15 @@
       <content-type
             base-type="org.eclipse.jdt.core.javaSource"
             file-extensions="pilar,plr"
-            id="argus.tools.eclipse.argusSource"
-            name="Argus Source File"
+            id="argus.tools.eclipse.jawaSource"
+            name="Jawa Source File"
             priority="high">
       </content-type>
       <content-type
             base-type="org.eclipse.jdt.core.javaClass"
             file-extensions="class"
-            id="argus.tools.eclipse.argusClass"
-            name="Argus Class File"
+            id="argus.tools.eclipse.jawaClass"
+            name="Jawa Class File"
             priority="high">
          <describer
                class="org.arguside.core.internal.jdt.model.ArgusClassFileDescriber">
@@ -181,38 +160,26 @@
    <extension
          point="org.argus-ide.cit.aspects.cfprovider">
       <provider
-            class="org.arguside.core.internal.jdt.model.ArgusClassFileProvider">
+            class="org.arguside.core.internal.jdt.model.JawaClassFileProvider">
       </provider>
    </extension>
    <extension
          point="org.argus-ide.cit.aspects.cuprovider">
       <provider
-            class="org.arguside.core.internal.jdt.model.ArgusCompilationUnitProvider"
+            class="org.arguside.core.internal.jdt.model.JawaCompilationUnitProvider"
             file_extension="pilar,plr">
       </provider>
    </extension>
    <extension
          point="org.argus-ide.cit.aspects.imagedescriptorselector">
       <selector
-            class="org.arguside.ui.internal.jdt.model.ArgusImageDescriptorSelector">
+            class="org.arguside.ui.internal.jdt.model.JawaImageDescriptorSelector">
       </selector>
-   </extension>
-   <extension
-         point="org.argus-ide.cit.aspects.indexerprovider">
-      <provider
-            class="org.arguside.core.internal.jdt.search.ArgusSourceIndexerFactory">
-      </provider>
-   </extension>
-   <extension
-         point="org.argus-ide.cit.aspects.openactionprovider">
-      <provider
-            class="org.arguside.ui.internal.actions.hyperlinks.OpenActionProvider">
-      </provider>
    </extension>
    <extension
          point="org.argus-ide.cit.core.sourcefileprovider">
       <provider
-            class="org.arguside.core.internal.jdt.model.ArgusSourceFileProvider"
+            class="org.arguside.core.internal.jdt.model.JawaSourceFileProvider"
             file_extension="pilar,plr">
       </provider>
    </extension>
@@ -234,52 +201,24 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.arguside.ui.internal.editor.ArgusSourceFileEditor"
+            class="org.arguside.ui.internal.editor.JawaSourceFileEditor"
             contributorClass="org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditorActionContributor"
             default="false"
             extensions="pilar,plr"
             icon="icons/full/obj16/scu_obj.gif"
-            id="argus.tools.eclipse.ArgusSourceFileEditor"
-            name="Argus Editor"
+            id="argus.tools.eclipse.JawaSourceFileEditor"
+            name="Jawa Editor"
             symbolicFontName="org.eclipse.jdt.ui.editors.textfont">
       </editor>
       <editor
-            class="org.arguside.ui.internal.editor.ArgusClassFileEditor"
+            class="org.arguside.ui.internal.editor.JawaClassFileEditor"
             contributorClass="org.eclipse.jdt.internal.ui.javaeditor.ClassFileEditorActionContributor"
             default="true"
             icon="icons/full/obj16/sclassf_obj.gif"
-            id="argus.tools.eclipse.ArgusClassFileEditor"
-            name="Argus Class File Viewer"
+            id="argus.tools.eclipse.JawaClassFileEditor"
+            name="Jawa Class File Viewer"
             symbolicFontName="org.eclipse.jdt.ui.editors.textfont">
       </editor>
-   </extension>
-   <extension
-         point="org.argus-ide.cit.aspects.formatterCleanUp">
-      <provider
-            class="org.arguside.core.internal.formatter.ArgusFormatterCleanUpProvider">
-      </provider>
-   </extension>
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="org.arguside.ui.internal.preferences.FormatterPreferencePage"
-            id="org.arguside.ui.preferences.editor.formatter"
-            name="Argus Formatter">
-         <enabledWhen>
-            <or>
-               <instanceof
-                     value="org.eclipse.core.resources.IProject">
-               </instanceof>
-               <instanceof
-                     value="org.eclipse.jdt.core.IJavaProject">
-               </instanceof>
-            </or>
-         </enabledWhen>
-         <filter
-               name="nature"
-               value="org.argus-ide.cit.core.argusnature">
-         </filter>
-      </page>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
@@ -302,13 +241,6 @@
                label="Report a Bug"
                menubarPath="org_argus-ide_cit_ui_menu/additions"
                tooltip="Report a bug in the Argus Code Inspection Tools">
-         </action>
-         <action
-               id="org.argus-ide.cit.ui.runDiag.action"
-               label="Run Setup Diagnostics"
-               menubarPath="org_argus-ide_cit_ui_menu/diagnostics"
-               style="push"
-               tooltip="Verify that Argus configuration is correct">
          </action>
          <menu
                id="org_argus-ide_cit_ui_menu"

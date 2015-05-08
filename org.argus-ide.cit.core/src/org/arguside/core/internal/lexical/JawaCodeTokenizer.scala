@@ -15,7 +15,7 @@ class JawaCodeTokenizer() extends IJawaCodeTokenizer {
   import IJawaCodeTokenizer.Token
 
   def tokenize(contents: String, offset: Int = 0): IndexedSeq[Token] = {
-    val token = JawaLexer.createRawLexer(contents).toIndexedSeq.init
+    val token = JawaLexer.createRawLexer(Left(contents)).toIndexedSeq.init
 
     /**
      * Heuristic to distinguish the macro keyword from uses as an identifier. To be 100% accurate requires a full parse,

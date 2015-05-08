@@ -31,11 +31,6 @@ object LogManager extends Log4JFacade with HasLogger {
       val enable = event.getNewValue.asInstanceOf[Boolean]
       if (enable) redirectStdOutAndStdErr()
       else disableRedirectStdOutAndStdErr()
-
-      // we need to restart the presentation compilers so that
-      // the std out/err streams are refreshed by Console.in/out
-      if (enable != event.getOldValue.asInstanceOf[Boolean])
-        ArgusPlugin().resetAllPresentationCompilers()
     }
   }
 
@@ -53,7 +48,6 @@ object LogManager extends Log4JFacade with HasLogger {
 
     if (prefStore.getBoolean(RedirectStdErrOut)) {
       redirectStdOutAndStdErr()
-      ArgusPlugin().resetAllPresentationCompilers()
     }
   }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>1.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
   <prerequisites>
     <maven>3.0</maven>
   </prerequisites>
@@ -21,17 +21,10 @@
     <encoding>UTF-8</encoding>
     <retryFlakyTests>true</retryFlakyTests>
     <!-- p2 repositories location -->
-    <repo.eclipse.indigo>http://download.eclipse.org/releases/indigo/</repo.eclipse.indigo>
-    <repo.eclipse.juno>http://download.eclipse.org/releases/juno</repo.eclipse.juno>
-    <repo.eclipse.kepler>http://download.eclipse.org/releases/kepler</repo.eclipse.kepler>
-    <repo.eclipse.luna>http://download.eclipse.org/releases/luna</repo.eclipse.luna>
-    <repo.ajdt.indigo>http://download.eclipse.org/tools/ajdt/37/update</repo.ajdt.indigo>
-    <repo.ajdt.juno>http://download.eclipse.org/tools/ajdt/42/update</repo.ajdt.juno>
-    <repo.ajdt.kepler>http://download.eclipse.org/tools/ajdt/43/update</repo.ajdt.kepler>
     <repo.ajdt.luna>http://download.eclipse.org/tools/ajdt/44/dev/update</repo.ajdt.luna>
     <repo.equinox.launcher>http://download.scala-ide.org/plugins/equinox-weaving-launcher/releases/site</repo.equinox.launcher>
     <repo.nebula>http://download.eclipse.org/technology/nebula/snapshot</repo.nebula>
-
+    <repo.eclipse.luna>http://download.eclipse.org/releases/luna</repo.eclipse.luna>
     <!-- fixed versions -->
     <miglayout.version>3.7.4</miglayout.version>
     <log4j.version>1.2.17</log4j.version>
@@ -82,6 +75,17 @@
       <id>retryFlakyTests</id>
       <properties>
         <retryFlakyTests>true</retryFlakyTests>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>scala-2.11.x</id>
+      <properties>
+        <scala.version>${scala211.version}</scala.version>
+        <scala.short.version>211</scala.short.version>
+        <scala.minor.version>2.11</scala.minor.version>
+        <version.suffix>2_11</version.suffix>
+
       </properties>
     </profile>
 
@@ -166,206 +170,6 @@
       </build>
     </profile>
 
-    <profile>
-      <id>set-version-specific-files</id>
-      <properties>
-        <!-- <sbt.feature.dir>org.scala-ide.sbt.build/org.scala-ide.sbt.feature</sbt.feature.dir>
-        <sbt.source.feature.dir>org.scala-ide.sbt.build/org.scala-ide.sbt.source.feature</sbt.source.feature.dir>
-        <scala212.feature.dir>org.scala-ide.scala212.build/org.scala-ide.scala212.feature</scala212.feature.dir>
-        <scala212.source.feature.dir>org.scala-ide.scala212.build/org.scala-ide.scala212.source.feature</scala212.source.feature.dir>
-        <sdt.core.dir>org.scala-ide.sdt.core</sdt.core.dir>
-        <sdt.debug.dir>org.scala-ide.sdt.debug</sdt.debug.dir>
-        <sdt.debug.expression.dir>org.scala-ide.sdt.debug.expression</sdt.debug.expression.dir>
-        <sdt.update-site.dir>org.scala-ide.sdt.update-site</sdt.update-site.dir> -->
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>2.6</version>
-            <executions>
-              <execution>
-                <id>copy-resources-sbt-feature</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${sbt.feature.dir}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${sbt.feature.dir}/resources</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-resources-sbt-source-feature</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${sbt.source.feature.dir}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${sbt.source.feature.dir}/resources</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-resources-scala210-feature</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${scala210.feature.dir}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${scala210.feature.dir}/resources</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-resources-scala210-source-feature</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${scala210.source.feature.dir}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${scala210.source.feature.dir}/resources</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-resources-scala211-feature</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${scala211.feature.dir}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${scala211.feature.dir}/resources/${scala.short.version}</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-resources-scala211-source-feature</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${scala211.source.feature.dir}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${scala211.source.feature.dir}/resources</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-resources-scala212-feature</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${scala212.feature.dir}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${scala212.feature.dir}/resources</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-resources-scala212-source-feature</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${scala212.source.feature.dir}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${scala212.source.feature.dir}/resources</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.7</version>
-            <executions>
-              <execution>
-                <id>default-cli</id>
-                <configuration>
-                  <target>
-                    <copy file="${sdt.core.dir}/resources/META-INF/MANIFEST-${version.suffix}.MF"
-                        tofile="${sdt.core.dir}/META-INF/MANIFEST.MF"
-                        overwrite="true">
-                        <filterset>
-                          <filter token="JDTCORE_RANGE" value="${jdt.core.version.range}"/>
-                        </filterset>
-                    </copy>
-                    <copy file="${sdt.debug.dir}/resources/META-INF/MANIFEST-${version.suffix}.MF"
-                        tofile="${sdt.debug.dir}/META-INF/MANIFEST.MF"
-                        overwrite="true">
-                        <filterset>
-                          <filter token="JDTCORE_RANGE" value="${jdt.core.version.range}"/>
-                        </filterset>
-                    </copy>
-                    <copy file="${sdt.debug.expression.dir}/resources/META-INF/MANIFEST-${version.suffix}.MF"
-                        tofile="${sdt.debug.expression.dir}/META-INF/MANIFEST.MF"
-                        overwrite="true">
-                        <filterset>
-                          <filter token="JDTCORE_RANGE" value="${jdt.core.version.range}"/>
-                        </filterset>
-                    </copy>
-                    <copy file="${sdt.update-site.dir}/resources/site-${version.suffix}.xml"
-                        tofile="${sdt.update-site.dir}/site.xml"
-                        overwrite="true" />
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 
   <repositories>
@@ -388,23 +192,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- toolchain, sbt -->
-<!--      <dependency>
-        <groupId>com.typesafe.sbt</groupId>
-        <artifactId>sbt-interface</artifactId>
-        <version>${sbt.ide.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.typesafe.sbt</groupId>
-        <artifactId>compiler-interface-precompiled</artifactId>
-        <version>${sbt.ide.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.typesafe.sbt</groupId>
-        <artifactId>incremental-compiler</artifactId>
-        <version>${sbt.ide.version}</version>
-      </dependency> -->
-      <!-- sdt.core dependencies -->
       <dependency>
         <groupId>com.miglayout</groupId>
         <artifactId>miglayout</artifactId>
@@ -519,12 +306,6 @@
           <artifactId>buildnumber-maven-plugin</artifactId>
           <version>${buildnumber-maven.plugin.version}</version>
         </plugin>
-        <!-- creating maven source artefact -->
-<!--        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>${maven-source.plugin.version}</version>
-        </plugin> -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
@@ -543,16 +324,8 @@
             <failOnWarning>false</failOnWarning>
             <sourceDirectories>
               <dir>org.argus-ide.cit.core/src</dir>
-              <!-- <dir>org.argus-ide.cit.debug/src</dir>
-              <dir>org.argus-ide.cit.core.tests/src</dir>
-              <dir>org.argus-ide.cit.core.tests/test-workspace</dir>
-              <dir>org.argus-ide.cit.debug.tests/src</dir>
-              <dir>org.argus-ide.cit.debug.tests/test-workspace</dir>
-              <dir>org.argus-ide.cit.debug.expression/src</dir>
-              <dir>org.argus-ide.cit.debug.expression.tests/src</dir>
-              <dir>org.argus-ide.cit.debug.expression.tests/test-workspace</dir> -->
             </sourceDirectories>
-            <configLocation>org.scala-ide.sdt.core/scala-ide-style-config.xml</configLocation>
+            <configLocation>org.argis-ide.cit.core/argus-ide-style-config.xml</configLocation>
           </configuration>
           <executions>
             <execution>

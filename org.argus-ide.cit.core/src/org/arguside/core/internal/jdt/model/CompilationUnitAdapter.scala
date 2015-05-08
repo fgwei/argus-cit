@@ -42,7 +42,7 @@ import org.eclipse.text.edits.TextEdit
 import org.eclipse.text.edits.UndoEdit
 import org.eclipse.jdt.internal.core.PackageDeclaration
 
-class CompilationUnitAdapter(classFile : ArgusClassFile) extends Openable(classFile.getParent.asInstanceOf[JavaElement]) with ICompilationUnit with env.ICompilationUnit {
+class CompilationUnitAdapter(classFile : JawaClassFile) extends Openable(classFile.getParent.asInstanceOf[JavaElement]) with ICompilationUnit with env.ICompilationUnit {
   override def getAdapter(adapter : Class[_]) : AnyRef = (classFile : IAdaptable).getAdapter(adapter)
 
   override def equals(o : Any) = classFile.equals(o)

@@ -13,8 +13,7 @@ import org.eclipse.swt.SWT
 import org.arguside.logging.HasLogger
 import org.arguside.core.IArgusPlugin
 
-class ArgusPreferences extends PropertyPage with IWorkbenchPreferencePage with EclipseSettings
-  with ArgusPluginPreferencePage with HasLogger {
+class ArgusPreferences extends PropertyPage with IWorkbenchPreferencePage with HasLogger {
 
   /** Pulls the preference store associated with this plugin */
   override def doGetPreferenceStore(): IPreferenceStore = {
@@ -22,9 +21,6 @@ class ArgusPreferences extends PropertyPage with IWorkbenchPreferencePage with E
   }
 
   override def init(wb: IWorkbench) {}
-
-  /** Returns the id of what preference page we use */
-  override val eclipseBoxes: List[EclipseSetting.EclipseBox] = Nil
 
   def createContents(parent: Composite): Control = {
     val composite = {
@@ -39,22 +35,10 @@ class ArgusPreferences extends PropertyPage with IWorkbenchPreferencePage with E
       tmp
     }
 
-    eclipseBoxes.foreach(eBox => {
-      val group = new Group(composite, SWT.SHADOW_ETCHED_IN)
-      group.setText(eBox.name)
-      val layout = new GridLayout(3, false)
-      group.setLayout(layout)
-      val data = new GridData(GridData.FILL)
-      data.grabExcessHorizontalSpace = true
-      data.horizontalAlignment = GridData.FILL
-      group.setLayoutData(data)
-      eBox.eSettings.foreach(_.addTo(group))
-    })
     composite
   }
 
   override def performOk = try {
-    eclipseBoxes.foreach(_.eSettings.foreach(_.apply()))
     save()
     true
   } catch {
@@ -63,17 +47,6 @@ class ArgusPreferences extends PropertyPage with IWorkbenchPreferencePage with E
 
   def updateApply() {
     updateApplyButton
-  }
-
-  /** Updates the apply button with the appropriate enablement. */
-  protected override def updateApplyButton(): Unit = {
-    if (getApplyButton != null) {
-      if (isValid) {
-        getApplyButton.setEnabled(isChanged)
-      } else {
-        getApplyButton.setEnabled(false)
-      }
-    }
   }
 
   def save(): Unit = {

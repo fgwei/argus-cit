@@ -1,8 +1,8 @@
 package org.arguside.ui.internal.preferences
 
-import org.arguside.ui.syntax.ArgusSyntaxClass.Category
+import org.arguside.ui.syntax.JawaSyntaxClass.Category
 import org.eclipse.jface.viewers._
-import org.arguside.ui.syntax.ArgusSyntaxClass
+import org.arguside.ui.syntax.JawaSyntaxClass
 
 /** Content and label provider for the tree of syntax element in the syntax coloring
  *  preference pages.
@@ -24,6 +24,6 @@ class SyntaxColoringTreeContentAndLabelProvider(categories: List[Category]) exte
 
   override def getText(element: AnyRef) = element match {
     case Category(name, _) => name
-    case ArgusSyntaxClass(displayName, _, _, _) => displayName
+    case JawaSyntaxClass(displayName, _, _, _) => displayName
   }
 }

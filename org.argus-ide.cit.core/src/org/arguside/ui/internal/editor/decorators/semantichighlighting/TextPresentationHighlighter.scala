@@ -17,5 +17,5 @@ private[arguside] trait TextPresentationHighlighter {
   def dispose(): Unit
 
   /** Triggers an update of the editor's `TextPresentation` based on the passed `damage` region.*/
-  def updateTextPresentation(damage: IRegion): Unit
+//  def updateTextPresentation(damage: IRegion): Unit
 }

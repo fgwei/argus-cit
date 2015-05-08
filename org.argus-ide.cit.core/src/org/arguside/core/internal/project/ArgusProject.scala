@@ -38,20 +38,11 @@ import org.arguside.core.ScalaInstallationChange
 import org.arguside.core.BuildSuccess
 import org.arguside.core.IArgusPlugin
 import org.arguside.core.internal.ArgusPlugin.plugin
-import org.arguside.core.internal.compiler.ScalaPresentationCompiler
-import org.arguside.core.internal.compiler.PresentationCompilerProxy
-import org.arguside.core.internal.builder
-import org.arguside.core.internal.builder.EclipseBuildManager
-import org.arguside.core.internal.jdt.model.ScalaSourceFile
+import org.arguside.core.internal.jdt.model.JawaSourceFile
 import org.arguside.core.resources.EclipseResource
 import org.arguside.core.resources.MarkerFactory
 import org.arguside.logging.HasLogger
 import org.arguside.ui.internal.actions.PartAdapter
-import org.arguside.ui.internal.preferences.CompilerSettings
-import org.arguside.ui.internal.preferences.IDESettings
-import org.arguside.ui.internal.preferences.PropertyStore
-import org.arguside.ui.internal.preferences.ArgusPluginSettings
-import org.arguside.util.internal.CompilerUtils
 import org.arguside.util.internal.SettingConverterUtil
 import org.arguside.util.Utils.WithAsInstanceOfOpt
 import org.arguside.util.eclipse.SWTUtils.fnToPropertyChangeListener
@@ -62,14 +53,13 @@ import org.arguside.core.CitConstants
 import org.arguside.util.eclipse.SWTUtils
 import org.arguside.util.eclipse.EclipseUtils
 import org.arguside.util.eclipse.FileUtils
-import org.arguside.core.compiler.IScalaPresentationCompiler
 import org.eclipse.jdt.core.WorkingCopyOwner
 import org.eclipse.jdt.internal.core.DefaultWorkingCopyOwner
 import org.eclipse.jdt.internal.core.SearchableEnvironment
 import org.eclipse.jdt.internal.core.JavaProject
-import org.arguside.core.internal.compiler.PresentationCompilerActivityListener
-import org.arguside.ui.internal.editor.ScalaEditor
+import org.arguside.ui.internal.editor.JawaEditor
 import java.io.IOException
+import org.arguside.ui.internal.preferences.PropertyStore
 
 object ArgusProject {
   def apply(underlying: IProject): ArgusProject = {
@@ -78,39 +68,39 @@ object ArgusProject {
     project
   }
 
-  /** Listen for [[IWorkbenchPart]] event and takes care of loading/discarding scala compilation units.*/
+  /** Listen for [[IWorkbenchPart]] event and takes care of loading/discarding jawa compilation units.*/
   private class ProjectPartListener(project: ArgusProject) extends PartAdapter with HasLogger {
     override def partOpened(part: IWorkbenchPart) {
-      doWithCompilerAndFile(part) { (compiler, ssf) =>
-        logger.debug("open " + part.getTitle)
-        ssf.forceReload()
-      }
+//      doWithCompilerAndFile(part) { (compiler, ssf) =>
+//        logger.debug("open " + part.getTitle)
+//        ssf.forceReload()
+//      }
     }
 
     override def partClosed(part: IWorkbenchPart) {
-      doWithCompilerAndFile(part) { (compiler, ssf) =>
-        logger.debug("close " + part.getTitle)
-        ssf.discard()
-      }
+//      doWithCompilerAndFile(part) { (compiler, ssf) =>
+//        logger.debug("close " + part.getTitle)
+//        ssf.discard()
+//      }
     }
 
-    private def doWithCompilerAndFile(part: IWorkbenchPart)(op: (IScalaPresentationCompiler, ScalaSourceFile) => Unit) {
-      part match {
-        case editor: IEditorPart =>
-          editor.getEditorInput match {
-            case fei: FileEditorInput =>
-              val f = fei.getFile
-              if (f.getProject == project.underlying && (f.getName.endsWith(CitConstants.PilarFileExtn) || f.getName.endsWith(CitConstants.PilarFileExtn))) {
-                for (ssf <- ScalaSourceFile.createFromPath(f.getFullPath.toString)) {
-                  if (project.underlying.isOpen)
-                    project.presentationCompiler(op(_, ssf))
-                }
-              }
-            case _ =>
-          }
-        case _ =>
-      }
-    }
+//    private def doWithCompilerAndFile(part: IWorkbenchPart)(op: (IScalaPresentationCompiler, JawaSourceFile) => Unit) {
+//      part match {
+//        case editor: IEditorPart =>
+//          editor.getEditorInput match {
+//            case fei: FileEditorInput =>
+//              val f = fei.getFile
+//              if (f.getProject == project.underlying && (f.getName.endsWith(CitConstants.PilarFileExtn) || f.getName.endsWith(CitConstants.PilarFileExtn))) {
+//                for (ssf <- JawaSourceFile.createFromPath(f.getFullPath.toString)) {
+//                  if (project.underlying.isOpen)
+//                    project.presentationCompiler(op(_, ssf))
+//                }
+//              }
+//            case _ =>
+//          }
+//        case _ =>
+//      }
+//    }
   }
 
   /**
@@ -131,65 +121,44 @@ object ArgusProject {
     }
 }
 
-class ArgusProject private (val underlying: IProject) extends ClasspathManagement with InstallationManagement with Publisher[IArgusProjectEvent] with HasLogger with IArgusProject {
-
-  private var buildManager0: EclipseBuildManager = null
-  private var hasBeenBuilt = false
+class ArgusProject private (val underlying: IProject) extends HasLogger with IArgusProject {
 
   private val worbenchPartListener: IPartListener = new ArgusProject.ProjectPartListener(this)
-
-  override val presentationCompiler = new PresentationCompilerProxy(underlying.getName, prepareCompilerSettings _)
-  private val watchdog = new PresentationCompilerActivityListener(underlying.getName, ScalaEditor.projectHasOpenEditors(this), presentationCompiler.shutdown _)
-
+  
   /** To avoid letting 'this' reference escape during initialization, this method is called right after a
-   *  [[ScalaPlugin]] instance has been fully initialized.
+   *  [[ArgusPlugin]] instance has been fully initialized.
    */
   private def init(): Unit = {
-    presentationCompiler.subscribe(watchdog)
-
     if (!IArgusPlugin().headlessMode)
       SWTUtils.getWorkbenchWindow map (_.getPartService().addPartListener(worbenchPartListener))
   }
 
-  /** Does this project have the Scala nature? */
-  def hasScalaNature: Boolean = ArgusProject.isArgusProject(underlying)
+  /** Does this project have the Argus nature? */
+  def hasArgusNature: Boolean = ArgusProject.isArgusProject(underlying)
 
-  private def settingsError(severity: Int, msg: String, monitor: IProgressMonitor): Unit = {
-    val mrk = underlying.createMarker(CitConstants.SettingProblemMarkerId)
-    mrk.setAttribute(IMarker.SEVERITY, severity)
-    mrk.setAttribute(IMarker.MESSAGE, msg)
-  }
+//  private def settingsError(severity: Int, msg: String, monitor: IProgressMonitor): Unit = {
+//    val mrk = underlying.createMarker(CitConstants.SettingProblemMarkerId)
+//    mrk.setAttribute(IMarker.SEVERITY, severity)
+//    mrk.setAttribute(IMarker.MESSAGE, msg)
+//  }
+//
+//  private def clearSettingsErrors(): Unit =
+//    if (isUnderlyingValid) {
+//      underlying.deleteMarkers(CitConstants.SettingProblemMarkerId, true, IResource.DEPTH_ZERO)
+//    }
 
-  /** Deletes the build problem marker associated to {{{this}}} Scala project. */
-  private def clearBuildProblemMarker(): Unit =
-    if (isUnderlyingValid) {
-      underlying.deleteMarkers(CitConstants.ProblemMarkerId, true, IResource.DEPTH_ZERO)
-    }
+//  def directDependencies: Seq[IProject] =
+//    underlying.getReferencedProjects.filter(_.isOpen)
+//
+//  def transitiveDependencies: Seq[IProject] =
+//    directDependencies ++ (directDependencies flatMap (p => IArgusPlugin().getArgusProject(p).exportedDependencies))
 
-  /** Deletes all build problem markers for all resources in {{{this}}} Scala project. */
-  private def clearAllBuildProblemMarkers(): Unit = {
-    if (isUnderlyingValid) {
-      underlying.deleteMarkers(CitConstants.ProblemMarkerId, true, IResource.DEPTH_INFINITE)
-    }
-  }
-
-  private def clearSettingsErrors(): Unit =
-    if (isUnderlyingValid) {
-      underlying.deleteMarkers(CitConstants.SettingProblemMarkerId, true, IResource.DEPTH_ZERO)
-    }
-
-  def directDependencies: Seq[IProject] =
-    underlying.getReferencedProjects.filter(_.isOpen)
-
-  def transitiveDependencies: Seq[IProject] =
-    directDependencies ++ (directDependencies flatMap (p => IScalaPlugin().getScalaProject(p).exportedDependencies))
-
-  def exportedDependencies: Seq[IProject] = {
-    for {
-      entry <- resolvedClasspath
-      if entry.getEntryKind == IClasspathEntry.CPE_PROJECT && entry.isExported
-    } yield EclipseUtils.workspaceRoot.getProject(entry.getPath().toString)
-  }
+//  def exportedDependencies: Seq[IProject] = {
+//    for {
+//      entry <- resolvedClasspath
+//      if entry.getEntryKind == IClasspathEntry.CPE_PROJECT && entry.isExported
+//    } yield EclipseUtils.workspaceRoot.getProject(entry.getPath().toString)
+//  }
 
   lazy val javaProject: IJavaProject = JavaCore.create(underlying)
 
@@ -241,7 +210,7 @@ class ArgusProject private (val underlying: IProject) extends ClasspathManagemen
     } catch {
       case e: JavaModelException => logger.error(e); Nil
     }
-
+  
   def allSourceFiles(): Set[IFile] = {
     allFilesInSourceDirs() filter (f => FileUtils.isBuildable(f.getName))
   }
@@ -379,120 +348,29 @@ class ArgusProject private (val underlying: IProject) extends ClasspathManagemen
       }
     }
 
-  protected def shownSettings(settings: Settings, filter: Settings#Setting => Boolean): Seq[(Settings#Setting, String)] = {
-    // save the current preferences state, so we don't go through the logic of the workspace
-    // or project-specific settings for each setting in turn.
-    val currentStorage = storage
-    for {
-      box <- IDESettings.shownSettings(settings)
-      setting <- box.userSettings if filter(setting)
-      value = currentStorage.getString(SettingConverterUtil.convertNameToProperty(setting.name))
-      if (value.nonEmpty)
-    } yield (setting, value)
-  }
-
-  def scalacArguments: Seq[String] = {
-    import ScalaPresentationCompiler.defaultScalaSettings
-    val encArgs = encoding.toSeq flatMap (Seq("-encoding", _))
-
-    val shownArgs = {
-      val defaultSettings = defaultScalaSettings()
-      setupCompilerClasspath(defaultSettings)
-      val userSettings = for ((setting, value) <- shownSettings(defaultSettings, _ => true)) yield {
-        initializeSetting(setting, value)
-        setting
-      }
-
-      val classpathSettings = List(defaultSettings.javabootclasspath, defaultSettings.javaextdirs, defaultSettings.bootclasspath)
-
-      (classpathSettings ++ userSettings) map (_.unparse)
-    }
-    val extraArgs = defaultScalaSettings().splitParams(storage.getString(CompilerSettings.ADDITIONAL_PARAMS))
-    shownArgs.flatten ++ encArgs ++ extraArgs
-  }
-
-  private def prepareCompilerSettings(): Settings = {
-     val settings = ScalaPresentationCompiler.defaultScalaSettings()
-     initializeCompilerSettings(settings, isPCSetting(settings))
-     settings
-  }
-
-  /** Compiler settings that are honored by the presentation compiler. */
-  private def isPCSetting(settings: Settings): Set[Settings#Setting] = {
-    import settings.{ plugin => pluginSetting, _ }
-    Set(deprecation,
-      unchecked,
-      pluginOptions,
-      verbose,
-      Xexperimental,
-      future,
-      Ylogcp,
-      pluginSetting,
-      pluginsDir,
-      YpresentationDebug,
-      YpresentationVerbose,
-      YpresentationLog,
-      YpresentationReplay,
-      YpresentationDelay)
-  }
-
-  private def initializeSetting(setting: Settings#Setting, propValue: String) {
-    try {
-      setting.tryToSetFromPropertyValue(propValue)
-      logger.debug("[%s] initializing %s to %s (%s)".format(underlying.getName(), setting.name, setting.value.toString, storage.getString(SettingConverterUtil.convertNameToProperty(setting.name))))
-    } catch {
-      case t: Throwable => eclipseLog.error("Unable to set setting '" + setting.name + "' to '" + propValue + "'", t)
-    }
-  }
-
-  def initializeCompilerSettings(settings: Settings, filter: Settings#Setting => Boolean): Unit = {
-    // if the workspace project doesn't exist, it is a virtual project used by Eclipse.
-    // As such the source folders don't exist.
-    if (underlying.exists())
-      for ((src, dst) <- sourceOutputFolders) {
-        logger.debug("Added output folder: " + src + ": " + dst)
-        settings.outputDirs.add(EclipseResource(src), EclipseResource(dst))
-      }
-
-    for (enc <- encoding)
-      settings.encoding.value = enc
-
-    setupCompilerClasspath(settings)
-    settings.sourcepath.value = sourceFolders.map(_.toOSString).mkString(pathSeparator)
-
-    for ((setting, value) <- shownSettings(settings, filter)) {
-      initializeSetting(setting, value)
-    }
-
-    // handle additional parameters
-    val additional = storage.getString(CompilerSettings.ADDITIONAL_PARAMS)
-    logger.info("setting additional parameters: " + additional)
-    settings.processArgumentString(additional)
-  }
-
-  private def setupCompilerClasspath(settings: Settings) {
-    val scalaCp = scalaClasspath // don't need to recompute it each time we use it
-
-    settings.javabootclasspath.value = scalaCp.jdkPaths.map(_.toOSString).mkString(pathSeparator)
-    // extdirs are already included in Platform JDK paths
-    // here we disable Scala's default that would pick up the running JVM extdir, resulting in
-    // a mix of classes from the running JVM and configured JDK
-    // (we use a space because an empty string is considered as 'value not set by user')
-    settings.javaextdirs.value = " "
-    settings.classpath.value = (scalaCp.userCp ++ scalaCp.scalaLibrary.toSeq).map(_.toOSString).mkString(pathSeparator)
-    scalaCp.scalaLibrary.foreach(scalaLib => settings.bootclasspath.value = scalaLib.toOSString)
-
-    logger.debug("javabootclasspath: " + settings.javabootclasspath.value)
-    logger.debug("javaextdirs: " + settings.javaextdirs.value)
-    logger.debug("scalabootclasspath: " + settings.bootclasspath.value)
-    logger.debug("user classpath: " + settings.classpath.value)
-  }
+//  protected def shownSettings(settings: Settings, filter: Settings#Setting => Boolean): Seq[(Settings#Setting, String)] = {
+//    // save the current preferences state, so we don't go through the logic of the workspace
+//    // or project-specific settings for each setting in turn.
+//    val currentStorage = storage
+//    for {
+//      box <- IDESettings.shownSettings(settings)
+//      setting <- box.userSettings if filter(setting)
+//      value = currentStorage.getString(SettingConverterUtil.convertNameToProperty(setting.name))
+//      if (value.nonEmpty)
+//    } yield (setting, value)
+//  }
+//
+//  private def initializeSetting(setting: Settings#Setting, propValue: String) {
+//    try {
+//      setting.tryToSetFromPropertyValue(propValue)
+//      logger.debug("[%s] initializing %s to %s (%s)".format(underlying.getName(), setting.name, setting.value.toString, storage.getString(SettingConverterUtil.convertNameToProperty(setting.name))))
+//    } catch {
+//      case t: Throwable => eclipseLog.error("Unable to set setting '" + setting.name + "' to '" + propValue + "'", t)
+//    }
+//  }
 
   /** Return a the project-specific preference store. This does not take into account the
    *  user-preference whether to use project-specific compiler settings or not.
-   *
-   *  @see  #1001241.
-   *  @see `storage` for a method that decides based on user preference
    */
   lazy val projectSpecificStorage: IPersistentPreferenceStore = {
     val p = new PropertyStore(new ProjectScope(underlying), CitConstants.PluginId) {
@@ -507,7 +385,7 @@ class ArgusProject private (val underlying: IProject) extends ClasspathManagemen
         }
 
       }
-    p.addPropertyChangeListener(compilerSettingsListener)
+//    p.addPropertyChangeListener(compilerSettingsListener)
     p
   }
 
@@ -515,95 +393,8 @@ class ArgusProject private (val underlying: IProject) extends ClasspathManagemen
    *  Return the current project preference store.
    */
   def storage: IPreferenceStore = {
-    if (usesProjectSettings) projectSpecificStorage else IArgusPlugin().getPreferenceStore()
-  }
-
-  def buildManager: EclipseBuildManager = {
-    if (buildManager0 == null) {
-      val settings = ScalaPresentationCompiler.defaultScalaSettings(msg => settingsError(IMarker.SEVERITY_ERROR, msg, null))
-      clearSettingsErrors()
-      initializeCompilerSettings(settings, _ => true)
-      // source path should be emtpy. The build manager decides what files get recompiled when.
-      // if scalac finds a source file newer than its corresponding classfile, it will 'compileLate'
-      // that file, using an AbstractFile/PlainFile instead of the EclipseResource instance. This later
-      // causes problems if errors are reported against that file. Anyway, it's wrong to have a sourcepath
-      // when using the build manager.
-      settings.sourcepath.value = ""
-
-      logger.info("BM: SBT enhanced Build Manager for " + IArgusPlugin().scalaVersion + " Scala library")
-      buildManager0 = new builder.zinc.EclipseSbtBuildManager(this, settings)
-    }
-    buildManager0
-  }
-
-  /* If true, then it means that all source files have to be reloaded */
-  def prepareBuild(): Boolean = if (!hasBeenBuilt) buildManager.invalidateAfterLoad else false
-
-  def build(addedOrUpdated: Set[IFile], removed: Set[IFile], monitor: SubMonitor) {
-    hasBeenBuilt = true
-
-    clearBuildProblemMarker()
-    buildManager.build(addedOrUpdated, removed, monitor)
-    refreshOutputFolders()
-
-    // Already performs saving the dependencies
-
-    if (!buildManager.hasErrors) {
-      // reset presentation compilers of projects that depend on this one
-      // since the output directory now contains the up-to-date version of this project
-      // note: ScalaBuilder resets the presentation compiler when a referred project
-      // is built, but only when it has changes! this call makes sure that a rebuild,
-      // even when there are no changes, propagates the classpath to dependent projects
-      resetDependentProjects()
-      publish(BuildSuccess())
-    }
-  }
-
-  def resetDependentProjects() {
-    for {
-      prj <- underlying.getReferencingProjects()
-      if prj.isOpen() && ArgusProject.isArgusProject(prj)
-      dependentScalaProject <- IArgusPlugin().asScalaProject(prj)
-    } {
-      logger.debug("[%s] Reset PC of referring project %s".format(this, dependentScalaProject))
-      dependentScalaProject.presentationCompiler.askRestart()
-    }
-  }
-
-  def clean(implicit monitor: IProgressMonitor) = {
-    clearAllBuildProblemMarkers()
-    resetClasspathCheck()
-
-    if (buildManager0 != null)
-      buildManager0.clean(monitor)
-    cleanOutputFolders
-    logger.info("Resetting compilers due to Project.clean")
-    resetCompilers // reset them only after the output directory is emptied
-  }
-
-  private def resetBuildCompiler() {
-    buildManager0 = null
-    hasBeenBuilt = false
-  }
-
-  protected def resetCompilers(implicit monitor: IProgressMonitor = null) = {
-    logger.info("resetting compilers!  project: " + this.toString)
-    resetBuildCompiler()
-    presentationCompiler.askRestart()
-  }
-
-  /** Should only be called when `this` project is being deleted or closed from the workspace. */
-  private[core] def dispose(): Unit = {
-    def shutDownCompilers() {
-      logger.info("shutting down compilers for " + this)
-      resetBuildCompiler()
-      presentationCompiler.shutdown()
-    }
-
-    if (!IArgusPlugin().headlessMode)
-      SWTUtils.getWorkbenchWindow map (_.getPartService().removePartListener(worbenchPartListener))
-    projectSpecificStorage.removePropertyChangeListener(compilerSettingsListener)
-    shutDownCompilers()
+//    if (usesProjectSettings) projectSpecificStorage else 
+      IArgusPlugin().getPreferenceStore()
   }
 
   override def newSearchableEnvironment(workingCopyOwner: WorkingCopyOwner = DefaultWorkingCopyOwner.PRIMARY): SearchableEnvironment = {

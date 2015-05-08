@@ -30,27 +30,15 @@ trait JawaCompilationUnitEditor extends JavaEditor with JawaEditor {
   override def setSourceViewerConfiguration(configuration: SourceViewerConfiguration) {
     super.setSourceViewerConfiguration(
       configuration match {
-        case svc: ArgusSourceViewerConfiguration => svc
-        case _ => new ArgusSourceViewerConfiguration(javaPrefStore, argusPrefStore, this)
+        case svc: JawaSourceViewerConfiguration => svc
+        case _ => new JawaSourceViewerConfiguration(javaPrefStore, argusPrefStore, this)
       })
-  }
-
-  protected override def createActions() {
-    super.createActions()
-    installArgusAwareCopyQualifiedNameAction()
-  }
-
-  private def installArgusAwareCopyQualifiedNameAction() {
-    setAction(IJavaEditorActionConstants.COPY_QUALIFIED_NAME, new ArgusCopyQualifiedNameAction(this))
   }
 
   override def createPartControl(parent: Composite) {
     super.createPartControl(parent)
 
     val sv = sourceViewer
-    val painter = Seq(new IndentGuidePainter(sv), new InferredSemicolonPainter(sv))
-    painter foreach sv.addPainter
-
     if (isArgusSemanticHighlightingEnabled)
       installArgusSemanticHighlighting(forceSemanticHighlightingOnInstallment)
   }
@@ -100,10 +88,10 @@ trait JawaCompilationUnitEditor extends JavaEditor with JawaEditor {
     }
   }
 
-  override final def createJavaSourceViewerConfiguration: ArgusSourceViewerConfiguration =
-    new ArgusSourceViewerConfiguration(javaPrefStore, argusPrefStore, this)
+  override final def createJavaSourceViewerConfiguration: JawaSourceViewerConfiguration =
+    new JawaSourceViewerConfiguration(javaPrefStore, argusPrefStore, this)
 
   override final def getInteractiveCompilationUnit(): InteractiveCompilationUnit = {
-    IArgusPlugin().argusCompilationUnit(getEditorInput()).orNull
+    IArgusPlugin().jawaCompilationUnit(getEditorInput()).orNull
   }
 }

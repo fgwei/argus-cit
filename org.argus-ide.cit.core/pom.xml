@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>1.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.argus-ide</groupId>
     <artifactId>org.argus-ide.cit.build</artifactId>
@@ -10,6 +10,12 @@
   </parent>
   <artifactId>org.argus-ide.cit.core</artifactId>
   <packaging>eclipse-plugin</packaging>
+
+  <profiles>
+    <profile>
+      <id>scala-2.11.x</id>
+    </profile>
+  </profiles>
 
   <dependencies>
     <dependency>
@@ -74,18 +80,6 @@
         </executions>
       </plugin>
 
-      <!-- Scalastyle -->
-      <plugin>
-        <groupId>org.scalastyle</groupId>
-        <artifactId>scalastyle-maven-plugin</artifactId>
-        <configuration>
-          <sourceDirectories>
-            <dir>src</dir>
-          </sourceDirectories>
-          <configLocation>../org.argus-ide.cit.core/argus-ide-style-config.xml</configLocation>
-        </configuration>
-      </plugin>
-
       <!-- added source folder containing the code specific to the Eclipse version -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -105,4 +99,8 @@
       </plugin>
     </plugins>
   </build>
+  <scm>
+  	<connection>scm:git://github.com/fgwei/argus-ide/org.argus-ide.cit.core</connection>
+  	<url>https://github.com/fgwei/argus-ide/org.argus-ide.cit.core</url>
+  </scm>
 </project>

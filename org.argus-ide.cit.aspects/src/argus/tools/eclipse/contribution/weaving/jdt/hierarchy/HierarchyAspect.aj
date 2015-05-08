@@ -24,7 +24,7 @@ import org.eclipse.jface.text.source.VerticalRulerEvent;
 import org.eclipse.swt.widgets.Event;
 
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaCompilationUnit;
-import argus.tools.eclipse.contribution.weaving.jdt.IArgusElement;
+import argus.tools.eclipse.contribution.weaving.jdt.IJawaElement;
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaOverrideIndicator;
 
 @SuppressWarnings("restriction")
@@ -90,7 +90,7 @@ public privileged aspect HierarchyAspect {
             IType type = (IType)child;
             allTypes.add(type);
             getAllTypesFromElement0(cc, type, allTypes);
-          } else if(child instanceof IArgusElement) {
+          } else if(child instanceof IJawaElement) {
             getAllTypesFromElement0(cc, child, allTypes);
           }
         }

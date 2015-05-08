@@ -15,12 +15,10 @@ import org.eclipse.jface.util.PropertyChangeEvent
 import org.eclipse.swt.SWT
 import org.eclipse.ui.editors.text.EditorsUI
 import org.arguside.core.IArgusPlugin
-import org.arguside.core.internal.compiler.ArgusPresentationCompiler
-import org.arguside.core.internal.jdt.model.ArgusCompilationUnit
+import org.arguside.core.internal.jdt.model.JawaCompilationUnit
 import org.arguside.logging.HasLogger
 import org.arguside.util.internal.eclipse.AnnotationUtils
 import org.arguside.util.eclipse.EclipseUtils
-import org.arguside.core.compiler.IArgusPresentationCompiler
 
 /**
  * Represents basic properties - enabled, bold an italic.
@@ -101,33 +99,7 @@ abstract class BaseSemanticAction(
     p
   }
 
-  protected def findAll(compiler: ArgusPresentationCompiler, scu: ArgusCompilationUnit, sourceFile: SourceFile): Map[Annotation, JFacePosition]
-
-  //TODO monitor P_ACTIVATE to register/unregister update
-  //TODO monitor P_ACTIVATE to remove existings annotation (true => false) or update openning file (false => true)
-  override def apply(scu: ArgusCompilationUnit): Unit = {
-    scu.argusProject.presentationCompiler.internal { compiler =>
-
-      def findAnnotations(): Map[Annotation, JFacePosition] = {
-        val sourceFile = scu.lastSourceMap().sourceFile
-        val response = compiler.askLoadedTyped(sourceFile, false)
-        response.get(200) match {
-          case Some(Left(_)) => findAll(compiler, scu, sourceFile)
-          case Some(Right(exc)) =>
-            logger.error(exc); Map.empty
-          case None => logger.warn("Timeout while waiting for `askLoadedTyped` during semantic highlighting."); Map.empty
-        }
-      }
-
-      val annotationsToAdd: Map[Annotation, JFacePosition] = propertiesOpt match {
-        case Some(properties) if pluginStore.getBoolean(properties.active) => findAnnotations()
-        case None => findAnnotations() // properties disabled, count as active
-        case _ => Map.empty
-      }
-
-      AnnotationUtils.update(sourceViewer, annotationId, annotationsToAdd)
-    }
-  }
+  protected def findAll(scu: JawaCompilationUnit, sourceFile: SourceFile): Map[Annotation, JFacePosition]
 
   private val _listener = new IPropertyChangeListener {
     override def propertyChange(event: PropertyChangeEvent) {
@@ -154,7 +126,7 @@ abstract class BaseSemanticAction(
       page <- EclipseUtils.getWorkbenchPages
       editorReference <- page.getEditorReferences
       editorInput <- Option(editorReference.getEditorInput)
-      scu <- IArgusPlugin().argusCompilationUnit(editorInput)
+      scu <- IArgusPlugin().jawaCompilationUnit(editorInput)
     } apply(scu)
   }
 
