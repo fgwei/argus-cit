@@ -8,5 +8,5 @@ case class SymbolInfo(symbolType: SymbolTypes.SymbolType, regions: List[IRegion]
 object SymbolTypes extends Enumeration {
   type SymbolType = Value
 
-  val Annotation, Class, LocalVar, Method, Param, Location = Value
+  val Annotation, Class, LocalVar, Method, Location = Value
 }

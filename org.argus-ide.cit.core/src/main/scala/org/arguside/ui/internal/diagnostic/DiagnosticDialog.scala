@@ -61,7 +61,7 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
   /* Dialog logic:
      * if current settings do not match default settings:
          2) "Use other settings" is enabled
-     * if user clicks "scala defaults" then values in dialog boxes change
+     * if user clicks "argus defaults" then values in dialog boxes change
          * if the user changes any of the settings
            1) save all values
            2) "use other settings" is enabled.
@@ -75,7 +75,7 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
 
   protected var errorMessageField: Text = null
   protected var weavingButton: Button = null
-  protected var scalaSettingsButton: Button = null // radio button
+  protected var argusSettingsButton: Button = null // radio button
   protected var otherSettingsButton: Button = null // radio button
   protected var autoActivationButton: Button = null
   protected var delayText: Text = null
@@ -83,31 +83,32 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
   protected var boldFont: Font = null
 
   //  protected val markOccurrencesData = new BoolWidgetData(PreferenceConstants.EDITOR_MARK_OCCURRENCES, false)
-  protected val completionData = new BoolWidgetData("", true) {
-    val scalaCompletion = "org.scala-ide.sdt.core.scala_completions"
-    val scalaJavaCompletion = "org.scala-ide.sdt.core.scala_java_completions"
-
-    value = getStoredValue // initialize from preference store
-
-    def getStoredValue: Boolean = {
-      val currentExcluded: Array[String] = PreferenceConstants.getExcludedCompletionProposalCategories
-      !(currentExcluded.contains(scalaCompletion) || currentExcluded.contains(scalaJavaCompletion))
-    }
-
-    override def saveToStore() {
-      updateValue
-      if (value && !getStoredValue) {
-        val currentExcluded: Array[String] = PreferenceConstants.getExcludedCompletionProposalCategories
-        PreferenceConstants.setExcludedCompletionProposalCategories(
-          currentExcluded.filterNot { cat => cat == scalaCompletion || cat == scalaJavaCompletion })
-      }
-    }
-  }
+//  protected val completionData = new BoolWidgetData("", true) {
+//    val scalaCompletion = "org.scala-ide.sdt.core.scala_completions"
+//    val scalaJavaCompletion = "org.scala-ide.sdt.core.scala_java_completions"
+//
+//    value = getStoredValue // initialize from preference store
+//
+//    def getStoredValue: Boolean = {
+//      val currentExcluded: Array[String] = PreferenceConstants.getExcludedCompletionProposalCategories
+//      !(currentExcluded.contains(scalaCompletion) || currentExcluded.contains(scalaJavaCompletion))
+//    }
+//
+//    override def saveToStore() {
+//      updateValue
+//      if (value && !getStoredValue) {
+//        val currentExcluded: Array[String] = PreferenceConstants.getExcludedCompletionProposalCategories
+//        PreferenceConstants.setExcludedCompletionProposalCategories(
+//          currentExcluded.filterNot { cat => cat == scalaCompletion || cat == scalaJavaCompletion })
+//      }
+//    }
+//  }
 
   protected val autoActivationData = new BoolWidgetData(PreferenceConstants.CODEASSIST_AUTOACTIVATION, true)
   protected val activationDelayData = new IntWidgetData(PreferenceConstants.CODEASSIST_AUTOACTIVATION_DELAY, 500)
 
-  protected var widgetDataList: List[WidgetData] = List(completionData, autoActivationData, activationDelayData) // , markOccurrencesData
+//  protected var widgetDataList: List[WidgetData] = List(completionData, autoActivationData, activationDelayData) // , markOccurrencesData
+  protected var widgetDataList: List[WidgetData] = List(autoActivationData, activationDelayData) // , markOccurrencesData
 
   // helper classes for loading and storing widget values
   abstract class WidgetData {
@@ -181,7 +182,7 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
     }
 
     val weavingGroup = newGroup("JDT Weaving", control)
-    this.weavingButton = newCheckboxButton(weavingGroup, "Enable JDT weaving (required for Scala plugin)")
+    this.weavingButton = newCheckboxButton(weavingGroup, "Enable JDT weaving (required for Argus plugin)")
     weavingButton.setSelection(configurer.isWeaving)
     weavingButton.setEnabled(!configurer.isWeaving) // disable the control if weaving is already enabled
     if (!configurer.isWeaving) {
@@ -189,11 +190,11 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
     }
 
     // radio buttons
-    val radioGroup = newGroup("Scala JDT Settings", control)
+    val radioGroup = newGroup("Argus JDT Settings", control)
 
     val radioButtonListener = new SelectionAdapter {
       override def widgetSelected(e: SelectionEvent) {
-        if (scalaSettingsButton.getSelection) {
+        if (argusSettingsButton.getSelection) {
           updating = true
           widgetDataList foreach { _.setToRecommended }
           updating = false
@@ -205,19 +206,15 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
         doEnableDisable()
       }
     }
-    this.scalaSettingsButton = newRadioButton(radioGroup, "Use recommended default settings", radioButtonListener)
+    this.argusSettingsButton = newRadioButton(radioGroup, "Use recommended default settings", radioButtonListener)
     this.otherSettingsButton = newRadioButton(radioGroup, "Use other settings", radioButtonListener)
 
     // the inner controls
     val innerGroup = newGroup("", radioGroup)
     innerGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 2, 1))
 
-    // Note: Mark Occurences is now working properly, so it doesn't need to be recommended to be turned off...
-    //    val markOccurrencesButton =
-    //      newCheckboxButton(innerGroup, "Enable JDT \"Mark Occurrences\" (not recommended)", markOccurrencesData)
-
-    val completionButton =
-      newCheckboxButton(innerGroup, "Use Scala-compatible JDT content assist proposals (recommended)", completionData)
+//    val completionButton =
+//      newCheckboxButton(innerGroup, "Use Scala-compatible JDT content assist proposals (recommended)", completionData)
 
     this.autoActivationButton =
       newCheckboxButton(innerGroup, "Enable JDT content assist auto-activation (recommended)", autoActivationData)
@@ -268,8 +265,8 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
     val otherGroup = newGroup("Additional", control, new GridLayout(1, true))
 
     val knownIssuesLink = new Link(otherGroup, SWT.NONE)
-    val knownIssuesUrl = "http://scala-ide.org/docs/current-user-doc/faq/index.html#Know_Issue"
-    knownIssuesLink.setText(s"""See list of <a href="$knownIssuesUrl">known issues</a> for known problems and workarounds""")
+    val knownIssuesUrl = "https://github.com/fgwei/argus-ide/issues"
+    knownIssuesLink.setText(s"""See <a href="$knownIssuesUrl">issue tracker</a> for known problems and workarounds""")
     knownIssuesLink.addListener(SWT.Selection, linkListener)
 
     errorMessageField = new Text(control, SWT.READ_ONLY | SWT.WRAP)
@@ -290,7 +287,7 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
 
     //    markOccurrencesButton.addSelectionListener(selectionListener)
     autoActivationButton.addSelectionListener(selectionListener)
-    completionButton.addSelectionListener(selectionListener)
+//    completionButton.addSelectionListener(selectionListener)
 
     delayText.addModifyListener(new ModifyListener {
       def modifyText(e: ModifyEvent) {
@@ -340,7 +337,7 @@ class DiagnosticDialog(configurer: WeavingStateConfigurer, shell: Shell) extends
   def refreshRadioButtons() {
     if (!updating) {
       val isDefault = widgetDataList forall { _.isRecommendedVal }
-      scalaSettingsButton.setSelection(isDefault)
+      argusSettingsButton.setSelection(isDefault)
       otherSettingsButton.setSelection(!isDefault)
     }
   }

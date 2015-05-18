@@ -14,7 +14,7 @@ import org.arguside.util.ui.DisplayThread
 import org.arguside.ui.syntax.JawaSyntaxClasses
 import org.arguside.ui.internal.editor.decorators.semantichighlighting
 
-/** Trait containing common logic used by both the `ArgusSourceFileEditor` and `ArgusClassFileEditor`.*/
+/** Trait containing common logic used by both the `JawaSourceFileEditor` and `JawaClassFileEditor`.*/
 trait JawaCompilationUnitEditor extends JavaEditor with JawaEditor {
   /**@note Current implementation assumes that all accesses to this member should be confined to the UI Thread */
   private var semanticHighlightingPresenter: semantichighlighting.Presenter = _

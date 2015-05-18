@@ -25,7 +25,7 @@ class Position (
   override def equals(that: Any): Boolean = that match {
     // This implementation of `equals` is NOT symmetric.
     case that: Position =>
-      lock.synchronized { super.equals(that) && kind == that.kind && deprecated == isDeleted() == that.isDeleted() }
+      lock.synchronized { super.equals(that) && kind == that.kind && isDeleted() == that.isDeleted() }
     case _ => false
   }
 

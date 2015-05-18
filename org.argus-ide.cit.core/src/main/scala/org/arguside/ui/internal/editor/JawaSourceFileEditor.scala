@@ -119,18 +119,18 @@ class JawaSourceFileEditor extends CompilationUnitEditor with JawaCompilationUni
     // disable Java indent logic, which is otherwise invoked when the tab key is entered
     setAction("IndentOnTab", null)
 
-//    val openAction = new Action {
-//      private def jawaCompilationUnit: Option[JawaCompilationUnit] =
-//        Option(getInteractiveCompilationUnit) map (_.asInstanceOf[JawaCompilationUnit])
-//
-//      override def run {
-//        jawaCompilationUnit foreach { scu =>
-//          scu.followDeclaration(JawaSourceFileEditor.this, getSelectionProvider.getSelection.asInstanceOf[ITextSelection])
-//        }
-//      }
-//    }
-//    openAction.setActionDefinitionId(IJavaEditorActionDefinitionIds.OPEN_EDITOR)
-//    setAction("OpenEditor", openAction)
+    val openAction = new Action {
+      private def jawaCompilationUnit: Option[JawaCompilationUnit] =
+        Option(getInteractiveCompilationUnit) map (_.asInstanceOf[JawaCompilationUnit])
+
+      override def run {
+        jawaCompilationUnit foreach { scu =>
+          scu.followDeclaration(JawaSourceFileEditor.this, getSelectionProvider.getSelection.asInstanceOf[ITextSelection])
+        }
+      }
+    }
+    openAction.setActionDefinitionId(IJavaEditorActionDefinitionIds.OPEN_EDITOR)
+    setAction("OpenEditor", openAction)
   }
 
   /**

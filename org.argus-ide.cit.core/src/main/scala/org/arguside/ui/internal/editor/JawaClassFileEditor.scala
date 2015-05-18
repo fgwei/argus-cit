@@ -7,6 +7,8 @@ import org.eclipse.jface.action.Action
 import org.eclipse.jface.text.ITextSelection
 import org.arguside.core.internal.jdt.model.JawaClassFile
 import org.arguside.core.internal.jdt.model.JawaCompilationUnit
+import org.arguside.ui.internal.editor.decorators.semantichighlighting.TextPresentationHighlighter
+import org.arguside.ui.internal.editor.decorators.semantichighlighting.TextPresentationEditorHighlighter
 
 class JawaClassFileEditor extends ClassFileEditor with JawaCompilationUnitEditor {
 
@@ -24,21 +26,21 @@ class JawaClassFileEditor extends ClassFileEditor with JawaCompilationUnitEditor
     }
   }
 
-//  override protected def createActions() {
-//    super.createActions()
-//    val openAction = new Action {
-//      override def run {
-//        Option(getInputJavaElement) map (_.asInstanceOf[JawaCompilationUnit]) foreach { scu =>
-//         scu.followDeclaration(JawaClassFileEditor.this, getSelectionProvider.getSelection.asInstanceOf[ITextSelection])
-//        }
-//      }
-//    }
-//    openAction.setActionDefinitionId(IJavaEditorActionDefinitionIds.OPEN_EDITOR)
-//    setAction("OpenEditor", openAction)
-//  }
+  override protected def createActions() {
+    super.createActions()
+    val openAction = new Action {
+      override def run {
+        Option(getInputJavaElement) map (_.asInstanceOf[JawaCompilationUnit]) foreach { scu =>
+         scu.followDeclaration(JawaClassFileEditor.this, getSelectionProvider.getSelection.asInstanceOf[ITextSelection])
+        }
+      }
+    }
+    openAction.setActionDefinitionId(IJavaEditorActionDefinitionIds.OPEN_EDITOR)
+    setAction("OpenEditor", openAction)
+  }
 
-//  override def createSemanticHighlighter: TextPresentationHighlighter =
-//    TextPresentationEditorHighlighter(this, semanticHighlightingPreferences, _ => (), _ => ())
-//
-//  override def forceSemanticHighlightingOnInstallment: Boolean = true
+  override def createSemanticHighlighter: TextPresentationHighlighter =
+    TextPresentationEditorHighlighter(this, semanticHighlightingPreferences, _ => (), _ => ())
+
+  override def forceSemanticHighlightingOnInstallment: Boolean = true
 }

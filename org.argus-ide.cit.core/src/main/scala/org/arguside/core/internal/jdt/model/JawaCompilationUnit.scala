@@ -52,6 +52,7 @@ import org.sireum.jawa.sjc.io.AbstractFile
 import org.arguside.core.internal.hyperlink.DeclarationHyperlinkDetector
 import org.sireum.jawa.sjc.util.Position
 import org.sireum.util._
+import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
 
 trait JawaCompilationUnit extends Openable
   with env.ICompilationUnit
@@ -99,10 +100,14 @@ trait JawaCompilationUnit extends Openable
       try {
         logger.info("[%s] buildStructure for %s (%s)".format(argusProject.underlying.getName(), this.getResource(), sourceFile.file))
 
-        val tree = compiler.askStructure(sourceFile).getOrElse(compiler.EmptyTree)()
-        compiler.asyncExec {
-          new compiler.StructureBuilderTraverser(this, info, tmpMap, sourceLength).traverse(tree)
-        }.getOption() // block until the traverser finished
+        compiler.askStructure(sourceFile).get match {
+          case Left(cu) =>
+//            compiler.asyncExec {
+//              new compiler.StructureBuilderTraverser(this, info, tmpMap, sourceLength).traverse(cu)
+//            }.getOption() // block until the traverser finished
+          case _ =>
+        }
+        
 
         info match {
           case cuei: CompilationUnitElementInfo =>
@@ -201,11 +206,15 @@ trait JawaCompilationUnit extends Openable
     if (argusProject.hasArgusNature){}
       argusProject.presentationCompiler.internal { compiler =>
         try {
-          val tree = compiler.askStructure(sourceFile, keepLoaded = true).getOrElse(compiler.EmptyTree)()
+          compiler.askStructure(sourceFile).get match {
+            case Left(cu) =>
+//              compiler.asyncExec {
+//                new compiler.OverrideIndicatorBuilderTraverser(this, annotationMap.asInstanceOf[JMap[AnyRef, AnyRef]]).traverse(tree)
+//              }.getOption()  // block until traverser finished
+            case _ =>
+          }
 
-          compiler.asyncExec {
-            new compiler.OverrideIndicatorBuilderTraverser(this, annotationMap.asInstanceOf[JMap[AnyRef, AnyRef]]).traverse(tree)
-          }.getOption()  // block until traverser finished
+          
         } catch {
           case ex: Exception =>
            logger.error("Exception thrown while creating override indicators for %s".format(sourceFile), ex)
@@ -218,7 +227,7 @@ trait JawaCompilationUnit extends Openable
 
     val descriptor = Exception.catching(classOf[JavaModelException]).opt(getCorrespondingResource) map { file =>
       val javaProject = JavaCore.create(argusProject.underlying)
-      if (javaProject.isOnClasspath(file)) ArgusImages.ARGUS_FILE else ArgusImages.EXCLUDED_ARGUS_FILE
+      if (javaProject.isOnClasspath(file)) ArgusImages.JAWA_FILE else ArgusImages.EXCLUDED_JAWA_FILE
     }
     descriptor.orNull
   }

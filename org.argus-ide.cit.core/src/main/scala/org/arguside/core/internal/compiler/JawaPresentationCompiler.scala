@@ -62,9 +62,9 @@ class JawaPresentationCompiler(name: String) extends {
   with IJawaPresentationCompiler
   with HasLogger { self =>
 
-  override lazy val analyzer = new {
-    val global: JawaPresentationCompiler.this.type = JawaPresentationCompiler.this
-  }
+//  override lazy val analyzer = new {
+//    val global: JawaPresentationCompiler.this.type = JawaPresentationCompiler.this
+//  }
   
   def presentationReporter = reporter.asInstanceOf[JawaPresentationCompiler.PresentationReporter]
   presentationReporter.compiler = this
@@ -225,7 +225,7 @@ class JawaPresentationCompiler(name: String) extends {
       askReloadManagedUnits()
   }
 
-  override def synchronizeNames = true
+//  override def synchronizeNames = true
 
   override def logError(msg: String, t: Throwable) =
     eclipseLog.error(msg, t)

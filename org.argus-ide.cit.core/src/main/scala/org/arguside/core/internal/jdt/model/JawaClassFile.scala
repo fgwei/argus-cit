@@ -19,10 +19,11 @@ import org.eclipse.jdt.internal.core.util.Util
 import org.arguside.core.compiler.JawaCompilationProblem
 import org.sireum.jawa.sjc.io.AbstractFile
 import org.sireum.jawa.sjc.io.VirtualFile
+import org.sireum.util.IList
 
-class JawaClassFile(parent : PackageFragment, name : String, sourceFile : String)
+class JawaClassFile(parent : PackageFragment, name : String, srcFile : String)
   extends ClassFile(parent, name) with JawaCompilationUnit with IJawaClassFile {
-  override def getImageDescriptor = ArgusImages.ARGUS_CLASS_FILE
+  override def getImageDescriptor = ArgusImages.JAWA_CLASS_FILE
 
   override def getElementAt(position : Int) : IJavaElement = {
     val e = getSourceElementAt(position)
@@ -30,7 +31,7 @@ class JawaClassFile(parent : PackageFragment, name : String, sourceFile : String
   }
 
   /** We don't need to reconcile for a classfile. */
-//  override def scheduleReconcile(contents: Array[Char]): Unit = ()
+  override def scheduleReconcile(contents: Array[Char]): Unit = ()
 
   /** Return the corresponding element in the source-based JDT elements.
    *
@@ -44,7 +45,7 @@ class JawaClassFile(parent : PackageFragment, name : String, sourceFile : String
    *  when an editor is open, and attached sources are found, the java element hierarchy
    *  (created by the structure builder based on the source file) is:
    *
-   *  ArgusSourceFile("Symbols.pilar") / `Symbols` / `TypeSymbol`
+   *  JawaSourceFile("Symbols.pilar") / `Symbols` / `TypeSymbol`
    *
    *  This method (on `ScalaClassFile`) maps back the `ScalaBinaryType` to the correct inner element
    *  `TypeSymbol`.
@@ -78,12 +79,12 @@ class JawaClassFile(parent : PackageFragment, name : String, sourceFile : String
 
   override lazy val file : AbstractFile = new VirtualFile(getSourceFileName, getSourceFilePath)
 
-  def getSourceFileName() = sourceFile
+  def getSourceFileName() = srcFile
 
   def getSourceFilePath() = {
     val tpe = getType
     val pkgFrag = tpe.getPackageFragment.asInstanceOf[PackageFragment]
-    Util.concatWith(pkgFrag.names, sourceFile, '/')
+    Util.concatWith(pkgFrag.names, srcFile, '/')
   }
 
   def getPackage(): PackageFragment = parent
@@ -102,14 +103,14 @@ class JawaClassFile(parent : PackageFragment, name : String, sourceFile : String
     }
   }
 
-  class ScalaBinaryType(name: String) extends BinaryType(this, name) {
+  class JawaBinaryType(name: String) extends BinaryType(this, name) {
     lazy val mirror = {
       allTypes.find(t => t.exists && (t.getElementName == name))
     }
     override def exists = mirror.isDefined
   }
 
-  override def getType(): IType = new ScalaBinaryType(getTypeName)
+  override def getType(): IType = new JawaBinaryType(getTypeName)
 
   def getMainTypeName(): Array[Char] =
     Util.getNameWithoutJavaLikeExtension(getElementName).toCharArray
@@ -130,7 +131,7 @@ class JawaClassFile(parent : PackageFragment, name : String, sourceFile : String
   if ((underlyingResource ne null) && !underlyingResource.isAccessible) newDoesNotExistStatus() else JavaModelStatus.VERIFIED_OK
   }
 
-//  override def currentProblems: List[ArgusCompilationProblem] = Nil
+  override def currentProblems: IList[JawaCompilationProblem] = Nil
 
   def closeBuffer0() = super.closeBuffer()
   def closing0(info : AnyRef) = super.closing(info)

@@ -23,7 +23,9 @@ class PerspectiveFactory extends IPerspectiveFactory {
   }
   private def addShortcuts(layout : IPageLayout) = {
     layout.addNewWizardShortcut(CitConstants.ProjectWizId)
+    layout.addNewWizardShortcut("org.eclipse.jdt.ui.wizards.NewPackageCreationWizard")
     layout.addNewWizardShortcut(CitConstants.ClassWizId)
+    layout.addNewWizardShortcut("org.eclipse.jdt.ui.wizards.NewSourceFolderCreationWizard")
     layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder")
     layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file")
 

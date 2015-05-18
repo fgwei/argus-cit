@@ -21,6 +21,7 @@ import org.sireum.jawa.sjc.lexer.{Token => JawaToken}
 import org.sireum.jawa.sjc.util.FailedInterrupt
 import org.sireum.jawa.sjc.interactive.FreshRunReq
 import org.sireum.jawa.sjc.interactive.MissingResponse
+import org.sireum.jawa.sjc.parser.CompilationUnit
 
 /** This interface provides access to Jawa Presentation compiler services. Even though methods are inherited from
  *  `org.sireum.jawa.sjc.interactive.Global`, prefer the convenience methods offered in this trait.
@@ -81,9 +82,9 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *  @param keepLoaded    Whether to keep that file in the PC if it was not loaded before. If
    *                       the file is already loaded, this flag is ignored.
    */
-  def askStructure(sourceFile: SourceFile, keepLoaded: Boolean = false): Response[JawaAstNode]
+  def askStructure(sourceFile: SourceFile, keepLoaded: Boolean = false): Response[CompilationUnit]
 
-  /** Ask to put scu in the beginning of the list of files to be typechecked.
+  /** Ask to put scu in the beginning of the list of files to be resolved.
    *
    *  If the file has not been 'reloaded' first, it does nothing. If the file was marked as `crashed`,
    *  this method will add it back to the managed file set, and type-check it from now on.
@@ -163,7 +164,7 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *                  it uses all Java projects in the workspace. Usually, a single projects
    *                  is passed.
    */
-  def getJavaElement(token: JawaToken, projects: IJavaProject*): Option[IJavaElement]
+//  def getJavaElement(token: JawaToken, projects: IJavaProject*): Option[IJavaElement]
 
   /** Return the compilation unit (Jawa File) in which the symbol passed as an argument is defined.
    *  This method is time-consuming and may trigger building the structure of many Scala files.

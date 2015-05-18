@@ -14,7 +14,7 @@ object IArgusPlugin {
 
 }
 
-/** The public interface of the plugin runtime class of the SDT plugin.
+/** The public interface of the plugin runtime class of the CIT plugin.
  *
  *  All methods defined inside this trait are thread-safe.
  *  For the inherited methods, check their own documentation.
@@ -24,16 +24,16 @@ trait IArgusPlugin extends AbstractUIPlugin with HasLogger {
   /** Always returns the ArgusProject for the given project, creating a
    *  new instance if needed.
    *
-   *  The given project has to have the Argus nature,
+   *  The given project has to have the argus nature,
    *  otherwise it might lead to errors later on.
    *
-   *  If it is not known if the project has the Argus nature or not,
-   *  use [[org.arguside.core.IArgusPlugin!.asArgusProject]] instead.
+   *  If it is not known if the project has the argus nature or not,
+   *  use [[org.arguside.core.IArgusPlugin.asArgusProject]] instead.
    */
   def getArgusProject(project: IProject): IArgusProject
 
   /**
-   * Return Some(ScalaProject) if the project has the Scala nature, None otherwise.
+   * Return Some(ArgusProject) if the project has the argus nature, None otherwise.
    */
   def asArgusProject(project: IProject): Option[IArgusProject]
 

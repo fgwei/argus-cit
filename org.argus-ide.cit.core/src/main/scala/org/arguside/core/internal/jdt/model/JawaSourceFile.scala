@@ -30,6 +30,8 @@ import org.arguside.core.compiler.InteractiveCompilationUnit
 import org.sireum.jawa.sjc.io.AbstractFile
 import org.arguside.core.resources.EclipseFile
 import org.sireum.jawa.sjc.io.VirtualFile
+import org.sireum.jawa.sjc.interactive.Response
+import org.arguside.core.compiler.JawaCompilationProblem
 
 class JawaSourceFileProvider extends SourceFileProvider {
   override def createFrom(path: IPath): Option[InteractiveCompilationUnit] =
@@ -71,28 +73,32 @@ object JawaSourceFile {
 class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCopyOwner : WorkingCopyOwner)
   extends JDTCompilationUnit(fragment, elementName, workingCopyOwner) with JawaCompilationUnit with IJawaSourceFile {
 
-  override def getMainTypeName : Array[Char] =
-    getElementName.substring(0, getElementName.length - ".scala".length).toCharArray()
+  override def getMainTypeName : Array[Char] = {
+    val en = getElementName
+    if (en endsWith ".pilar") {
+      en.substring(0, en.length - ".pilar".length).toCharArray()
+    } else en.substring(0, en.length - ".plr".length).toCharArray()
+  }
 
   /** Schedule this source file for reconciliation. Add the file to
    *  the loaded files managed by the presentation compiler.
    */
-//  override def initialReconcile(): Response[Unit] = {
-//    val reloaded = super.initialReconcile()
-//
-//    this.reconcile(
-//        ICompilationUnit.NO_AST,
-//        false /* don't force problem detection */,
-//        null /* use primary owner */,
-//        null /* no progress monitor */);
-//
-//    reloaded
-//  }
+  override def initialReconcile(): Response[Unit] = {
+    val reloaded = super.initialReconcile()
+
+    this.reconcile(
+        ICompilationUnit.NO_AST,
+        false /* don't force problem detection */,
+        null /* use primary owner */,
+        null /* no progress monitor */);
+
+    reloaded
+  }
 
   /* getProblems should be reserved for a Java context, @see getProblems */
-//  def reconcile(newContents: String): List[ArgusCompilationProblem] = {
-//    super.forceReconcile()
-//  }
+  def reconcile(newContents: String): List[JawaCompilationProblem] = {
+    super.forceReconcile()
+  }
 
   override def reconcile(
       astLevel : Int,
@@ -132,8 +138,8 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
 
   /** Implementing the weaving interface requires to return `null` for an empty array. */
   override def getProblems: Array[IProblem] = {
-//    val probs = currentProblems()
-//    if (probs.isEmpty) null else probs.toArray
+    val probs = currentProblems()
+    if (probs.isEmpty) null else probs.toArray
     null
   }
 
@@ -147,15 +153,15 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
     Exception.failAsValue(classOf[CoreException])(CharOperation.NO_CHAR) { super.getContents() }
   }
 
-//  /** Makes sure {{{this}}} source is not in the ignore buffer of the compiler and ask the compiler to reload it. */
-//  final def forceReload(): Unit = argusProject.presentationCompiler { compiler =>
-//    compiler.askToDoFirst(this)
-//    reload()
-//  }
-//
-//  /** Ask the compiler to reload {{{this}}} source. */
-//  final def reload(): Unit = argusProject.presentationCompiler { _.askReload(this, lastSourceMap().sourceFile) }
-//
-//  /** Ask the compiler to discard {{{this}}} source. */
-//  final def discard(): Unit = argusProject.presentationCompiler { _.discardCompilationUnit(this) }
+  /** Makes sure {{{this}}} source is not in the ignore buffer of the compiler and ask the compiler to reload it. */
+  final def forceReload(): Unit = argusProject.presentationCompiler { compiler =>
+    compiler.askToDoFirst(this)
+    reload()
+  }
+
+  /** Ask the compiler to reload {{{this}}} source. */
+  final def reload(): Unit = argusProject.presentationCompiler { _.askReload(this, sourceFile) }
+
+  /** Ask the compiler to discard {{{this}}} source. */
+  final def discard(): Unit = argusProject.presentationCompiler { _.discardCompilationUnit(this) }
 }

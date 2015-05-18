@@ -49,6 +49,8 @@ import org.arguside.ui.internal.editor.spelling.SpellingReconcileStrategy
 import org.arguside.ui.internal.editor.spelling.SpellingService
 import org.arguside.ui.internal.editor.spelling.JawaSpellingEngine
 import org.arguside.ui.internal.reconciliation.JawaReconciler
+import org.arguside.core.lexical.JawaCodeScanners
+import org.arguside.core.lexical.JawaPartitions
 
 class JawaSourceViewerConfiguration(
   javaPreferenceStore: IPreferenceStore,

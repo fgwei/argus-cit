@@ -94,7 +94,7 @@ public class WeavingStateConfigurer {
         } else {
             // if successful, also schedule to ask for reindexing on startup
             if (becomeEnabled) {
-              // We don't ask to reindex (anyway, the Pilar nature was not part of the 'weavable natures' list) 
+              // We don't ask to reindex (anyway, the Argus nature was not part of the 'weavable natures' list) 
               // while using the JDT weaving plugin
 //                JDTWeavingPreferences.setAskToReindex(true);
             }

@@ -243,7 +243,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     }
     findRemovedSources(event.getDelta)
 
-    // ask for the changed scala files to be refreshed in each project presentation compiler if needed
+    // ask for the changed jawa files to be refreshed in each project presentation compiler if needed
     if (changed.nonEmpty) {
       changed.toList groupBy (_.getJavaProject.getProject) foreach {
         case (project, units) =>

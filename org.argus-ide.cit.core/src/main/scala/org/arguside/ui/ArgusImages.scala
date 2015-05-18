@@ -8,9 +8,9 @@ import org.arguside.util.eclipse.OSGiUtils
 object ArgusImages {
   val MISSING_ICON: ImageDescriptor = ImageDescriptor.getMissingImageDescriptor
 
-  val ARGUS_FILE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/scu_obj.gif")
-  val ARGUS_CLASS_FILE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/sclassf_obj.gif")
-  val EXCLUDED_ARGUS_FILE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/scu_resource_obj.gif")
+  val JAWA_FILE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/scu_obj.gif")
+  val JAWA_CLASS_FILE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/sclassf_obj.gif")
+  val EXCLUDED_JAWA_FILE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/scu_resource_obj.gif")
 
   val ARGUS_CLASS: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/class_obj.gif")
   val ARGUS_TRAIT: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/trait_obj.gif")

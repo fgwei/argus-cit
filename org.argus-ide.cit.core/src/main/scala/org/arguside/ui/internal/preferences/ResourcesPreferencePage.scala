@@ -32,7 +32,7 @@ class ResourcesPreferencePage extends FieldEditorPreferencePage(FieldEditorPrefe
 
   override def createFieldEditors(): Unit = {
     presCompGroup = new Group(getFieldEditorParent, SWT.NONE)
-    presCompGroup.setText("Scala Presentation Compiler")
+    presCompGroup.setText("Jawa Presentation Compiler")
 
     presCompGroup.setLayout(new GridLayout(1, true))
     presCompGroup.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false))

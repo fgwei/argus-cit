@@ -38,7 +38,7 @@ object HighlightingStyle {
       case Class             => CLASS
       case LocalVar          => LOCAL_VAR
       case Method            => METHOD
-      case Param             => PARAM
+      case Location          => LOCATION
     }
   }
 }

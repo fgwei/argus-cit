@@ -10,6 +10,8 @@ import org.arguside.util.Utils.WithAsInstanceOfOpt
 import org.arguside.util.eclipse.EclipseUtils
 import org.arguside.ui.editor.ISourceViewerEditor
 import org.arguside.ui.editor.InteractiveCompilationUnitEditor
+import org.arguside.core.lexical.JawaCodePartitioner
+import org.arguside.core.lexical.JawaPartitions
 
 trait JawaEditor extends IJawaEditor with ISourceViewerEditor with InteractiveCompilationUnitEditor {
 

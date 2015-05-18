@@ -58,7 +58,7 @@ trait InteractiveCompilationUnit {
   /** The `SourceFile` that the Jawa compiler uses to read this compilation unit. It should not change through the lifetime of this unit. */
   def file: AbstractFile
   
-  override lazy val sourceFile = new FgSourceFile(file)
+  lazy val sourceFile = new FgSourceFile(file)
   
   /** Map from the original source into the corresponding position in the Scala translation. */
   def jawaPos: IPositionInformation = IPositionInformation.plainJawa(sourceFile)

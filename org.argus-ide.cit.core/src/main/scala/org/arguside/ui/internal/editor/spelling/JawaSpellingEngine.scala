@@ -55,7 +55,7 @@ class JawaSpellingEngine extends ISpellingEngine {
   private def getSpellCheckablePartitionTypes = {
     val ignoreStrings = PreferenceConstants.getPreferenceStore.getBoolean(PreferenceConstants.SPELLING_IGNORE_JAVA_STRINGS)
     Set(JAVA_DOC, JAVA_MULTI_LINE_COMMENT, JAVA_SINGLE_LINE_COMMENT) ++
-      (if (ignoreStrings) Set() else Set(JAVA_STRING, SCALA_MULTI_LINE_STRING))
+      (if (ignoreStrings) Set() else Set(JAVA_STRING, JAWA_MULTI_LINE_STRING))
   }
 
   private class SpellEventListener(collector: ISpellingProblemCollector, document: IDocument) extends ISpellEventListener {
