@@ -163,7 +163,7 @@ final class PresentationCompilerProxy(name: String) extends IPresentationCompile
         case ex @ MissingRequirementError(required) =>
           eclipseLog.error(ex)
           null
-        case ex @ FatalError(required) if required.startsWith("package scala does not have a member") =>
+        case ex @ FatalError(required) if required.startsWith("package jawa does not have a member") =>
           eclipseLog.error(ex)
           null
         case ex: Throwable =>

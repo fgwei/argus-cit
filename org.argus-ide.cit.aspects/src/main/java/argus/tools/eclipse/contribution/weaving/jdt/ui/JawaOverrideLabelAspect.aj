@@ -5,7 +5,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.OverrideIndicatorLabelDecorator;
 
 @SuppressWarnings("restriction")
-public privileged aspect PilarOverrideLabelAspect {
+public privileged aspect JawaOverrideLabelAspect {
   pointcut getOverrideIndicators(IMethod method) :
     args (method) &&
 	  (execution(int OverrideIndicatorLabelDecorator.getOverrideIndicators(IMethod)));

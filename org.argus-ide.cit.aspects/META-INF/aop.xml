@@ -1,0 +1,28 @@
+<aspectj>
+<aspects>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.configuration.IsWovenTester"/>
+<aspect name="org.eclipse.jdt.core.dom.ASTConverterAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.cfprovider.ClassFileProviderAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.cuprovider.CompilationUnitProviderAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.imagedescriptor.ImageDescriptorSelectorAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.BindingKeyAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.CompilationUnitProblemFinderAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.CompilationUnitNameAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.DOMAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.NameLookupAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.RefactoringAvailabilityAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.SourceLookupAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.hierarchy.HierarchyAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.indexerprovider.IndexerProviderAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.search.SearchAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.ui.JawaOverrideLabelAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.ui.actions.OpenActionProviderAspect" />
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.ClassFileEditorIdAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.JawaCloseStringsAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.JawaEditorPreferencesAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter.FormatterCleanUpRegistryAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.JawaPartitionerAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.OutlineAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.pde.ui.PluginImportAspect"/>
+</aspects>
+</aspectj>

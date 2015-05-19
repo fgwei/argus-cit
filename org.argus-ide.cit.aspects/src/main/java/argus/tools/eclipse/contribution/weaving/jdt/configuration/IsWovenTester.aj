@@ -2,6 +2,8 @@ package argus.tools.eclipse.contribution.weaving.jdt.configuration;
 
 import org.eclipse.jdt.core.ToolFactory;
 
+import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin;
+
 /**
  * This aspect tests to see if the weaving service is properly installed.
  * 
@@ -11,15 +13,15 @@ import org.eclipse.jdt.core.ToolFactory;
  */
 public aspect IsWovenTester {
 
-    interface PilarWeavingMarker { }
+    interface ArgusWeavingMarker { }
     
     /**
      * add a marker interface to an arbitrary class in JDT
      * later, we can see if the marker has been added.
      */
-    declare parents : ToolFactory implements PilarWeavingMarker;
+    declare parents : ToolFactory implements ArgusWeavingMarker;
     
-    private static boolean weavingActive = new ToolFactory() instanceof PilarWeavingMarker;
+    private static boolean weavingActive = new ToolFactory() instanceof ArgusWeavingMarker;
     
     public static boolean isWeavingActive() {
         return weavingActive;

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.argus-ide.cit.aspects" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="argus.tools.eclipse.contribution.weaving.jdt" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.argus-ide.cit.aspects" id="cfprovider" name="ClassFile Provider"/>
+         <meta.schema plugin="argus.tools.eclipse.contribution.weaving.jdt" id="cfprovider" name="ClassFile Provider"/>
       </appinfo>
       <documentation>
          Provides an alternate implementation of org.eclipse.jdt.internal.core.ClassFile based on classfile content.

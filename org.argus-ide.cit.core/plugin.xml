@@ -29,7 +29,7 @@
             name="Syntax Coloring">
       </page>
       <page
-            category="org.scalaide.ui.preferences"
+            category="org.arguside.ui.preferences"
             class="org.arguside.ui.internal.preferences.ResourcesPreferencePage"
             id="org.arguside.ui.preferences.resources"
             name="Resources">
@@ -209,7 +209,11 @@
          point="org.argus-ide.cit.aspects.cuprovider">
       <provider
             class="org.arguside.core.internal.jdt.model.JawaCompilationUnitProvider"
-            file_extension="pilar,plr">
+            file_extension="pilar">
+      </provider>
+      <provider
+            class="org.arguside.core.internal.jdt.model.JawaCompilationUnitProvider"
+            file_extension="plr">
       </provider>
    </extension>
    <extension
@@ -222,7 +226,11 @@
          point="org.argus-ide.cit.core.sourcefileprovider">
       <provider
             class="org.arguside.core.internal.jdt.model.JawaSourceFileProvider"
-            file_extension="pilar,plr">
+            file_extension="pilar">
+      </provider>
+      <provider
+            class="org.arguside.core.internal.jdt.model.JawaSourceFileProvider"
+            file_extension="plr">
       </provider>
    </extension>
    <extension

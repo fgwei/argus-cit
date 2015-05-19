@@ -12,7 +12,7 @@ object ToggleArgusNatureAction {
   val PDE_BUNDLE_NAME = "org.eclipse.pde.ui"
 }
 
-class ToggleScalaNatureAction extends AbstractPopupAction {
+class ToggleArgusNatureAction extends AbstractPopupAction {
   import ToggleArgusNatureAction._
 
   override def performAction(project: IProject) {
@@ -20,7 +20,7 @@ class ToggleScalaNatureAction extends AbstractPopupAction {
   }
 
   private def toggleArgusNature(project: IProject): Unit =
-    EclipseUtils.withSafeRunner("Couldn't toggle Jawa nature.") {
+    EclipseUtils.withSafeRunner("Couldn't toggle Argus nature.") {
       if (project.hasNature(CitConstants.NatureId)) {
 //        doIfPdePresent(project) { ScalaLibraryPluginDependencyUtils.removeScalaLibraryRequirement(project) }
         updateNatureIds(project) { _ filterNot (_ == CitConstants.NatureId) }

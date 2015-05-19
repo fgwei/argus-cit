@@ -32,6 +32,8 @@ import org.arguside.core.resources.EclipseFile
 import org.sireum.jawa.sjc.io.VirtualFile
 import org.sireum.jawa.sjc.interactive.Response
 import org.arguside.core.compiler.JawaCompilationProblem
+import org.arguside.core.internal.ArgusPlugin
+import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin
 
 class JawaSourceFileProvider extends SourceFileProvider {
   override def createFrom(path: IPath): Option[InteractiveCompilationUnit] =
@@ -48,12 +50,12 @@ object JawaSourceFile {
     override protected def initialValue(): HandleFactory = new HandleFactory
   }
 
-  /** Creates a argus source file handle if the given resource path points to a pilar source.
-   *  The resource path is a path to a Scala source file in the workbench (e.g. /Proj/a/b/c/Foo.pilar).
+  /** Creates a jawa source file handle if the given resource path points to a pilar source.
+   *  The resource path is a path to a Jawa source file in the workbench (e.g. /Proj/a/b/c/Foo.pilar).
    *
    *  @note This assumes that the resource path is the toString() of an `IPath`.
    *
-   *  @param path Is a path to a Scala source file in the workbench.
+   *  @param path Is a path to a Jawa source file in the workbench.
    */
   def createFromPath(path: String): Option[JawaSourceFile] = {
     if (!path.endsWith(".pilar") && !path.endsWith(".plr"))
@@ -72,7 +74,7 @@ object JawaSourceFile {
 
 class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCopyOwner : WorkingCopyOwner)
   extends JDTCompilationUnit(fragment, elementName, workingCopyOwner) with JawaCompilationUnit with IJawaSourceFile {
-
+  
   override def getMainTypeName : Array[Char] = {
     val en = getElementName
     if (en endsWith ".pilar") {
@@ -84,8 +86,9 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
    *  the loaded files managed by the presentation compiler.
    */
   override def initialReconcile(): Response[Unit] = {
+    ArgusJDTWeavingPlugin.logErrorMessage("initialReconcile " + file)
     val reloaded = super.initialReconcile()
-
+    ArgusJDTWeavingPlugin.logErrorMessage("reloaded " + reloaded)
     this.reconcile(
         ICompilationUnit.NO_AST,
         false /* don't force problem detection */,
@@ -97,6 +100,7 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
 
   /* getProblems should be reserved for a Java context, @see getProblems */
   def reconcile(newContents: String): List[JawaCompilationProblem] = {
+    ArgusJDTWeavingPlugin.logErrorMessage("reconcile " + file)
     super.forceReconcile()
   }
 
@@ -107,6 +111,7 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
       monitor : IProgressMonitor) : org.eclipse.jdt.core.dom.CompilationUnit = {
     /* This explicit call to super matters, presumably exercised
       through AspectJ. See #1002016. */
+    ArgusJDTWeavingPlugin.logErrorMessage("reconcile2 " + file)
     super.reconcile(ICompilationUnit.NO_AST, reconcileFlags, workingCopyOwner, monitor)
   }
 
@@ -116,7 +121,7 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
     reconcileFlags : Int,
     problems : JHashMap[_,_],
     monitor : IProgressMonitor) : org.eclipse.jdt.core.dom.CompilationUnit = {
-
+    ArgusJDTWeavingPlugin.logErrorMessage("makeconsistent " + file)
     // don't rerun this expensive operation unless necessary
     if (!isConsistent()) {
       val info = createElementInfo.asInstanceOf[OpenableElementInfo]
@@ -135,17 +140,22 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
       case _ => new VirtualFile(getElementName, getPath.toString)
     }
   }
-
+  
   /** Implementing the weaving interface requires to return `null` for an empty array. */
   override def getProblems: Array[IProblem] = {
+    ArgusJDTWeavingPlugin.logErrorMessage("getProblems " + file)
     val probs = currentProblems()
     if (probs.isEmpty) null else probs.toArray
     null
   }
 
-  override def getType(name : String) : IType = new LazyToplevelClass(this, name)
+  override def getType(name : String) : IType = {
+    ArgusJDTWeavingPlugin.logErrorMessage("gettype " + file)
+    new LazyToplevelClass(this, name)
+  }
 
   override def getContents() : Array[Char] = {
+    ArgusJDTWeavingPlugin.logErrorMessage("getContents " + file)
     // in the following case, super#getContents() logs an exception for no good reason
     if (getBufferManager().getBuffer(this) == null && getResource().getLocation() == null && getResource().getLocationURI() == null) {
       return CharOperation.NO_CHAR
@@ -154,14 +164,23 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
   }
 
   /** Makes sure {{{this}}} source is not in the ignore buffer of the compiler and ask the compiler to reload it. */
-  final def forceReload(): Unit = argusProject.presentationCompiler { compiler =>
-    compiler.askToDoFirst(this)
-    reload()
+  final def forceReload(): Unit ={
+    ArgusJDTWeavingPlugin.logErrorMessage("forceReload " + file)
+    argusProject.presentationCompiler { compiler =>
+      compiler.askToDoFirst(this)
+      reload()
+    }
   }
 
   /** Ask the compiler to reload {{{this}}} source. */
-  final def reload(): Unit = argusProject.presentationCompiler { _.askReload(this, sourceFile) }
+  final def reload(): Unit = {
+    ArgusJDTWeavingPlugin.logErrorMessage("reload " + file)
+    argusProject.presentationCompiler { _.askReload(this, sourceFile) }
+  }
 
   /** Ask the compiler to discard {{{this}}} source. */
-  final def discard(): Unit = argusProject.presentationCompiler { _.discardCompilationUnit(this) }
+  final def discard(): Unit = {
+    ArgusJDTWeavingPlugin.logErrorMessage("discard " + file)
+    argusProject.presentationCompiler { _.discardCompilationUnit(this) }
+  }
 }
