@@ -34,7 +34,6 @@ import org.eclipse.ui.IWorkbenchPart
 import org.eclipse.ui.part.FileEditorInput
 import org.arguside.core.IArgusProject
 import org.arguside.core.IArgusProjectEvent
-import org.arguside.core.ScalaInstallationChange
 import org.arguside.core.BuildSuccess
 import org.arguside.core.IArgusPlugin
 import org.arguside.core.internal.ArgusPlugin.plugin
@@ -60,6 +59,9 @@ import java.io.IOException
 import org.arguside.ui.internal.preferences.PropertyStore
 import org.arguside.core.internal.compiler.PresentationCompilerProxy
 import org.arguside.core.internal.compiler.PresentationCompilerActivityListener
+import org.arguside.core.compiler.IJawaPresentationCompiler
+import org.arguside.core.internal.builder.EclipseBuildManager
+import org.arguside.core.internal.compiler.JawaPresentationCompiler
 
 object ArgusProject {
   def apply(underlying: IProject): ArgusProject = {
@@ -71,46 +73,46 @@ object ArgusProject {
   /** Listen for [[IWorkbenchPart]] event and takes care of loading/discarding jawa compilation units.*/
   private class ProjectPartListener(project: ArgusProject) extends PartAdapter with HasLogger {
     override def partOpened(part: IWorkbenchPart) {
-//      doWithCompilerAndFile(part) { (compiler, ssf) =>
-//        logger.debug("open " + part.getTitle)
-//        ssf.forceReload()
-//      }
+      doWithCompilerAndFile(part) { (compiler, ssf) =>
+        logger.debug("open " + part.getTitle)
+        ssf.forceReload()
+      }
     }
 
     override def partClosed(part: IWorkbenchPart) {
-//      doWithCompilerAndFile(part) { (compiler, ssf) =>
-//        logger.debug("close " + part.getTitle)
-//        ssf.discard()
-//      }
+      doWithCompilerAndFile(part) { (compiler, ssf) =>
+        logger.debug("close " + part.getTitle)
+        ssf.discard()
+      }
     }
 
-//    private def doWithCompilerAndFile(part: IWorkbenchPart)(op: (IScalaPresentationCompiler, JawaSourceFile) => Unit) {
-//      part match {
-//        case editor: IEditorPart =>
-//          editor.getEditorInput match {
-//            case fei: FileEditorInput =>
-//              val f = fei.getFile
-//              if (f.getProject == project.underlying && (f.getName.endsWith(CitConstants.PilarFileExtn) || f.getName.endsWith(CitConstants.PilarFileExtn))) {
-//                for (ssf <- JawaSourceFile.createFromPath(f.getFullPath.toString)) {
-//                  if (project.underlying.isOpen)
-//                    project.presentationCompiler(op(_, ssf))
-//                }
-//              }
-//            case _ =>
-//          }
-//        case _ =>
-//      }
-//    }
+    private def doWithCompilerAndFile(part: IWorkbenchPart)(op: (IJawaPresentationCompiler, JawaSourceFile) => Unit) {
+      part match {
+        case editor: IEditorPart =>
+          editor.getEditorInput match {
+            case fei: FileEditorInput =>
+              val f = fei.getFile
+              if (f.getProject == project.underlying && (f.getName.endsWith(CitConstants.PilarFileExtn) || f.getName.endsWith(CitConstants.PilarFileExtnShort))) {
+                for (ssf <- JawaSourceFile.createFromPath(f.getFullPath.toString)) {
+                  if (project.underlying.isOpen)
+                    project.presentationCompiler(op(_, ssf))
+                }
+              }
+            case _ =>
+          }
+        case _ =>
+      }
+    }
   }
 
   /**
-   * Return true if the given Java project is also a Scala project, false otherwise.
+   * Return true if the given Java project is also a Argus project, false otherwise.
    */
   def isArgusProject(project: IJavaProject): Boolean =
     (project ne null) && isArgusProject(project.getProject)
 
   /**
-   * Return true if the given project is a Scala project, false othrerwise.
+   * Return true if the given project is a Argus project, false othrerwise.
    */
   def isArgusProject(project: IProject): Boolean =
     try {
@@ -121,8 +123,11 @@ object ArgusProject {
     }
 }
 
-class ArgusProject private (val underlying: IProject) extends HasLogger with IArgusProject {
+class ArgusProject private (val underlying: IProject) extends ClasspathManagement with Publisher[IArgusProjectEvent] with HasLogger with IArgusProject {
 
+  private var buildManager0: EclipseBuildManager = null
+  private var hasBeenBuilt = false
+  
   private val worbenchPartListener: IPartListener = new ArgusProject.ProjectPartListener(this)
   
   override val presentationCompiler = new PresentationCompilerProxy(underlying.getName)
@@ -139,29 +144,42 @@ class ArgusProject private (val underlying: IProject) extends HasLogger with IAr
   /** Does this project have the Argus nature? */
   def hasArgusNature: Boolean = ArgusProject.isArgusProject(underlying)
 
-//  private def settingsError(severity: Int, msg: String, monitor: IProgressMonitor): Unit = {
-//    val mrk = underlying.createMarker(CitConstants.SettingProblemMarkerId)
-//    mrk.setAttribute(IMarker.SEVERITY, severity)
-//    mrk.setAttribute(IMarker.MESSAGE, msg)
-//  }
-//
-//  private def clearSettingsErrors(): Unit =
-//    if (isUnderlyingValid) {
-//      underlying.deleteMarkers(CitConstants.SettingProblemMarkerId, true, IResource.DEPTH_ZERO)
-//    }
+  private def settingsError(severity: Int, msg: String, monitor: IProgressMonitor): Unit = {
+    val mrk = underlying.createMarker(CitConstants.SettingProblemMarkerId)
+    mrk.setAttribute(IMarker.SEVERITY, severity)
+    mrk.setAttribute(IMarker.MESSAGE, msg)
+  }
 
-//  def directDependencies: Seq[IProject] =
-//    underlying.getReferencedProjects.filter(_.isOpen)
-//
-//  def transitiveDependencies: Seq[IProject] =
-//    directDependencies ++ (directDependencies flatMap (p => IArgusPlugin().getArgusProject(p).exportedDependencies))
+    /** Deletes the build problem marker associated to {{{this}}} Scala project. */
+  private def clearBuildProblemMarker(): Unit =
+    if (isUnderlyingValid) {
+      underlying.deleteMarkers(CitConstants.ProblemMarkerId, true, IResource.DEPTH_ZERO)
+    }
 
-//  def exportedDependencies: Seq[IProject] = {
-//    for {
-//      entry <- resolvedClasspath
-//      if entry.getEntryKind == IClasspathEntry.CPE_PROJECT && entry.isExported
-//    } yield EclipseUtils.workspaceRoot.getProject(entry.getPath().toString)
-//  }
+  /** Deletes all build problem markers for all resources in {{{this}}} Scala project. */
+  private def clearAllBuildProblemMarkers(): Unit = {
+    if (isUnderlyingValid) {
+      underlying.deleteMarkers(CitConstants.ProblemMarkerId, true, IResource.DEPTH_INFINITE)
+    }
+  }
+
+  private def clearSettingsErrors(): Unit =
+    if (isUnderlyingValid) {
+      underlying.deleteMarkers(CitConstants.SettingProblemMarkerId, true, IResource.DEPTH_ZERO)
+    }
+
+  def directDependencies: Seq[IProject] =
+    underlying.getReferencedProjects.filter(_.isOpen)
+
+  def transitiveDependencies: Seq[IProject] =
+    directDependencies ++ (directDependencies flatMap (p => IArgusPlugin().getArgusProject(p).exportedDependencies))
+
+  def exportedDependencies: Seq[IProject] = {
+    for {
+      entry <- resolvedClasspath
+      if entry.getEntryKind == IClasspathEntry.CPE_PROJECT && entry.isExported
+    } yield EclipseUtils.workspaceRoot.getProject(entry.getPath().toString)
+  }
 
   lazy val javaProject: IJavaProject = JavaCore.create(underlying)
 
@@ -398,6 +416,102 @@ class ArgusProject private (val underlying: IProject) extends HasLogger with IAr
   def storage: IPreferenceStore = {
 //    if (usesProjectSettings) projectSpecificStorage else 
       IArgusPlugin().getPreferenceStore()
+  }
+  
+  def buildManager: EclipseBuildManager = {
+    if (buildManager0 == null) {
+//      val settings = JawaPresentationCompiler.defaultScalaSettings(msg => settingsError(IMarker.SEVERITY_ERROR, msg, null))
+      clearSettingsErrors()
+//      initializeCompilerSettings(settings, _ => true)
+      // source path should be empty. The build manager decides what files get recompiled when.
+      // if scalac finds a source file newer than its corresponding classfile, it will 'compileLate'
+      // that file, using an AbstractFile/PlainFile instead of the EclipseResource instance. This later
+      // causes problems if errors are reported against that file. Anyway, it's wrong to have a sourcepath
+      // when using the build manager.
+//      settings.sourcepath.value = ""
+
+//      logger.info("BM: SBT enhanced Build Manager for " + IArgusPlugin().argusVersion + " Scala library")
+
+//      buildManager0 = {
+//        val useScopeCompilerProperty = SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.useScopesCompiler.name)
+//        if (storage.getBoolean(useScopeCompilerProperty))
+//          new SbtScopesBuildManager(this, settings)
+//        else new ProjectsDependentSbtBuildManager(this, settings)
+//      }
+      buildManager0 = new ProjectsDependentSbtBuildManager(this)
+    }
+    buildManager0
+  }
+
+  /* If true, then it means that all source files have to be reloaded */
+  def prepareBuild(): Boolean = if (!hasBeenBuilt)
+    buildManager.invalidateAfterLoad
+  else false
+
+  def build(addedOrUpdated: Set[IFile], removed: Set[IFile], monitor: SubMonitor) {
+    hasBeenBuilt = true
+
+    clearBuildProblemMarker()
+    buildManager.build(addedOrUpdated, removed, monitor)
+    refreshOutputFolders()
+
+    // Already performs saving the dependencies
+
+    if (!buildManager.hasErrors) {
+      // reset presentation compilers of projects that depend on this one
+      // since the output directory now contains the up-to-date version of this project
+      // note: ScalaBuilder resets the presentation compiler when a referred project
+      // is built, but only when it has changes! this call makes sure that a rebuild,
+      // even when there are no changes, propagates the classpath to dependent projects
+      resetDependentProjects()
+      publish(BuildSuccess())
+    }
+  }
+
+  def resetDependentProjects() {
+    for {
+      prj <- underlying.getReferencingProjects()
+      if prj.isOpen() && ArgusProject.isArgusProject(prj)
+      dependentArgusProject <- IArgusPlugin().asArgusProject(prj)
+    } {
+      logger.debug("[%s] Reset PC of referring project %s".format(this, dependentArgusProject))
+      dependentArgusProject.presentationCompiler.askRestart()
+    }
+  }
+  
+  def clean(implicit monitor: IProgressMonitor) = {
+    clearAllBuildProblemMarkers()
+    resetClasspathCheck()
+
+    if (buildManager != null)
+      buildManager.clean(monitor)
+    cleanOutputFolders
+    logger.info("Resetting compilers due to Project.clean")
+    resetCompilers // reset them only after the output directory is emptied
+  }
+  
+  private def resetBuildCompiler() {
+    buildManager0 = null
+    hasBeenBuilt = false
+  }
+  
+  protected def resetCompilers(implicit monitor: IProgressMonitor = null) = {
+    logger.info("resetting compilers!  project: " + this.toString)
+    resetBuildCompiler()
+    presentationCompiler.askRestart()
+  }
+  
+  /** Should only be called when `this` project is being deleted or closed from the workspace. */
+  private[core] def dispose(): Unit = {
+    def shutDownCompilers() {
+      logger.info("shutting down compilers for " + this)
+      resetBuildCompiler()
+      presentationCompiler.shutdown()
+    }
+
+    SWTUtils.getWorkbenchWindow map (_.getPartService().removePartListener(worbenchPartListener))
+//    projectSpecificStorage.removePropertyChangeListener(compilerSettingsListener)
+    shutDownCompilers()
   }
 
   override def newSearchableEnvironment(workingCopyOwner: WorkingCopyOwner = DefaultWorkingCopyOwner.PRIMARY): SearchableEnvironment = {

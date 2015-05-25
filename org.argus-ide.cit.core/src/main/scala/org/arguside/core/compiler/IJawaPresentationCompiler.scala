@@ -74,7 +74,7 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
     withResponse[Position](askLinkPos(token, _))
 
 
-  /** If source is not yet loaded, get an outline view with askParseEntered.
+  /** If source is not yet loaded, get an outline view with askParsedEntered.
    *  If source is loaded, wait for it to be resolved.
    *  In both cases, set response to parsed tree.
    *

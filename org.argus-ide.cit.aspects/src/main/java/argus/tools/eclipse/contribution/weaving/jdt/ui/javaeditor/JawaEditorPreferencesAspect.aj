@@ -7,6 +7,7 @@ import org.eclipse.jdt.ui.text.java.IInvocationContext;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 
+import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin;
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaCompilationUnit;
 
 @SuppressWarnings("restriction")
@@ -18,7 +19,7 @@ public privileged aspect JawaEditorPreferencesAspect {
     execution(IJavaCompletionProposal[] QuickFixProcessor.getCorrections(IInvocationContext, IProblemLocation[])) && args(context, locations);
 
   /**
-   * Disable Java quick fixes/assists on Pilar sources. They can be very slow, and totally useless.
+   * Disable Java quick fixes/assists on Jawa sources. They can be very slow, and totally useless.
    */
   IJavaCompletionProposal[] around(IInvocationContext context, IProblemLocation[] locations):
     getAssists(context, locations) {

@@ -14,46 +14,47 @@ import org.eclipse.jdt.core.WorkingCopyOwner
 import org.eclipse.jdt.internal.core.DefaultWorkingCopyOwner
 import org.eclipse.jdt.internal.core.SearchableEnvironment
 import org.arguside.core.compiler.IPresentationCompilerProxy
+import org.arguside.core.internal.builder.EclipseBuildManager
 
 /**
- * A message class to signal various project-related statuses, such as a pilar Installation change, or a successful Build.
+ * A message class to signal various project-related statuses, such as a argus Installation change, or a successful Build.
  * Immutable.
  */
 trait IArgusProjectEvent
 case class BuildSuccess() extends IArgusProjectEvent
-case class ScalaInstallationChange() extends IArgusProjectEvent
+case class ArgusInstallationChange() extends IArgusProjectEvent
 
-/** The pilar classpath broken down in the JDK, Scala library and user library.
+/** The Argus classpath broken down in the JDK, android library and user library.
  *
- *  The Scala compiler needs these entries to be separated for proper setup.
+ *  The Jawa compiler needs these entries to be separated for proper setup.
  *  Immutable.
  *
  *  @note All paths are file-system absolute paths. Any path variables or
  *        linked resources are resolved.
  */
-//trait IPilarClasspath {
-//  /**
-//   * The JDK elements that should figure on classpath.
-//   */
-//  val jdkPaths: Seq[IPath]
-//  /**
-//   * The scala standard library.
-//   */
-//  val scalaLibrary: Option[IPath]
-//  /**
-//   * User libraries that should figure on classpath.
-//   */
-//  val userCp: Seq[IPath]
-//  /**
-//   * An optional Scala version string for diagnostics.
-//   * If present, should match the content of the library.properties in the scala Library.
-//   */
-//  val scalaVersionString: Option[String]
-//  /**
-//   * The concatenation of the full classpath.
-//   */
-//  val fullClasspath: Seq[File]
-//}
+trait IArgusClasspath {
+  /**
+   * The JDK elements that should figure on classpath.
+   */
+  val jdkPaths: Seq[IPath]
+  /**
+   * The scala standard library.
+   */
+  val androidLibrary: Option[IPath]
+  /**
+   * User libraries that should figure on classpath.
+   */
+  val userCp: Seq[IPath]
+  /**
+   * An optional android version string for diagnostics.
+   * If present, should match the content of the library.properties in the android Library.
+   */
+  val androidVersionString: Option[String]
+  /**
+   * The concatenation of the full classpath.
+   */
+  val fullClasspath: Seq[File]
+}
 
 /**
  * This class represents a Scala Project and associated tools necessary to build it.
@@ -77,6 +78,25 @@ trait IArgusProject extends Publisher[IArgusProjectEvent] {
    */
   def hasArgusNature: Boolean
 
+  /** The direct dependencies of this project. It only returns opened projects. */
+  def directDependencies: Seq[IProject]
+
+  /** All direct and indirect dependencies of this project.
+   *
+   *  Indirect dependencies are considered only if that dependency is exported by the dependent project.
+   *  Consider the following dependency graph:
+   *     A -> B -> C
+   *
+   *  transitiveDependencies(C) = {A, B} iff B *exports* the A project in its classpath
+   */
+  def transitiveDependencies: Seq[IProject]
+
+  /** Return the exported dependencies of this project. An exported dependency is
+   *  another project this project depends on, and which is exported to downstream
+   *  dependencies.
+   */
+  def exportedDependencies(): Seq[IProject]
+  
   /** The JDT-level project corresponding to this (Argus) project. */
   val javaProject: IJavaProject
 
@@ -117,6 +137,47 @@ trait IArgusProject extends Publisher[IArgusProjectEvent] {
    */
   def storage: IPreferenceStore
 
+  /**
+   * Initialization for the build manager associated to this project
+   * @return an initialized EclipseBuildManager
+   */
+  def buildManager(): EclipseBuildManager
+
+  /**
+   * It true, it means all source Files have to be reloaded
+   */
+  def prepareBuild(): Boolean
+
+  /**
+   * Builds the project.
+   */
+  def build(addedOrUpdated: Set[IFile], removed: Set[IFile], monitor: SubMonitor): Unit
+
+  /** Reset the presentation compiler of projects that depend on this one.
+   *  This should be done after a successful build, since the output directory
+   *  now contains an up-to-date version of this project.
+   */
+  def resetDependentProjects(): Unit
+  
+  /**
+   *  Cleans metadata on the project, such as error markers and classpath validation status
+   */
+  def clean(implicit monitor: IProgressMonitor): Unit
+  
+  /* Classpath Management */
+
+  /** The ScalaClasspath Instance valid for tihs project */
+  def argusClasspath: IArgusClasspath
+
+  /** The result of validation checks performed on classpath */
+  def isClasspathValid(): Boolean
+
+  /** Inform this project the classpath was just changed. Triggers validation
+   *
+   *  @param queue If true, a classpath validation run will be triggered eventually.
+   *    If false, the validation will yield to any ongoing validation of the classpath.
+   */
+  def classpathHasChanged(queue: Boolean = true): Unit
 
   /** Returns a new search name environment for this Scala project.
    *

@@ -46,6 +46,8 @@ import org.sireum.jawa.sjc.util.NoPosition
 import org.sireum.jawa.sjc.lexer.{Token => JawaToken}
 import org.sireum.jawa.sjc.parser.CompilationUnit
 import org.arguside.core.internal.hyperlink.JawaHyperlink
+import org.arguside.core.internal.jdt.model.JawaStructureBuilder
+import org.arguside.core.internal.jdt.model.JawaJavaMapper
 
 class JawaPresentationCompiler(name: String) extends {
   /*
@@ -58,6 +60,8 @@ class JawaPresentationCompiler(name: String) extends {
   private val nameLock = new Object
 
 } with Global(name, new JawaPresentationCompiler.PresentationReporter)
+  with JawaStructureBuilder
+  with JawaJavaMapper
   with LocateToken
   with IJawaPresentationCompiler
   with HasLogger { self =>
@@ -70,9 +74,9 @@ class JawaPresentationCompiler(name: String) extends {
   presentationReporter.compiler = this
 
   def compilationUnits: IList[InteractiveCompilationUnit] = {
-    val managedFiles = unitOfFile.keySet.toList
+    val files = managedFiles.toList
     for {
-      f <- managedFiles.collect { case ef: EclipseFile => ef }
+      f <- files.collect { case ef: EclipseFile => ef }
       icu <- SourceFileProviderRegistry.getProvider(f.workspacePath).createFrom(f.workspacePath)
       if icu.exists
     } yield icu
@@ -142,12 +146,12 @@ class JawaPresentationCompiler(name: String) extends {
   }
 
   def problemsOf(file: AbstractFile): IList[JawaCompilationProblem] = {
-    unitOfFile get file match {
+    getCompilationUnit(file) match {
       case Some(unit) =>
         unit.problems.toList flatMap presentationReporter.eclipseProblem
       case None =>
         logger.info("Missing unit for file %s when retrieving errors. Errors will not be shown in this file".format(file))
-        logger.info(unitOfFile.toString)
+        logger.info(getCompilationUnits.toString)
         Nil
     }
   }
@@ -210,8 +214,8 @@ class JawaPresentationCompiler(name: String) extends {
     }
 
     // only the files not already managed should be refreshed
-    val managedFiles = unitOfFile.keySet
-    val notLoadedFiles = freshSources.filter(f => !managedFiles(f.file))
+    val managedFs = managedFiles
+    val notLoadedFiles = freshSources.filter(f => !managedFs(f.file))
 
     notLoadedFiles.foreach(file => {
       // call askParsedEntered to force the refresh without loading the file

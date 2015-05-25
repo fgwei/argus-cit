@@ -66,7 +66,7 @@ trait JawaCompilationUnit extends Openable
     ArgusPlugin().getArgusProject(getJavaProject.getProject)
 
   override val file : AbstractFile
-
+  
   override def workspaceFile: IFile = getUnderlyingResource.asInstanceOf[IFile]
 
   override def bufferChanged(e : BufferChangedEvent) {
@@ -102,13 +102,11 @@ trait JawaCompilationUnit extends Openable
 
         compiler.askStructure(sourceFile).get match {
           case Left(cu) =>
-//            compiler.asyncExec {
-//              new compiler.StructureBuilderTraverser(this, info, tmpMap, sourceLength).traverse(cu)
-//            }.getOption() // block until the traverser finished
+            compiler.asyncExec {
+              new compiler.StructureBuilderTraverser(this, info, tmpMap, sourceLength).traverse(cu)
+            }.getOption() // block until the traverser finished
           case _ =>
         }
-        
-
         info match {
           case cuei: CompilationUnitElementInfo =>
             cuei.setSourceLength(sourceLength)
@@ -175,7 +173,7 @@ trait JawaCompilationUnit extends Openable
   // TODO
   override def codeSelect(cu: env.ICompilationUnit, offset: Int, length: Int, workingCopyOwner: WorkingCopyOwner): Array[IJavaElement] = {
     withSourceFile { (srcFile, compiler) =>
-      val pos = Position.range(srcFile, offset, 0)
+      val pos = Position.range(srcFile, offset, 1)
 
       val res: MList[IJavaElement] = mlistEmpty
 
@@ -186,7 +184,7 @@ trait JawaCompilationUnit extends Openable
 
   override def codeComplete(cu : env.ICompilationUnit, unitToSkip : env.ICompilationUnit, position : Int,
                             requestor : CompletionRequestor, owner : WorkingCopyOwner, typeRoot : ITypeRoot, monitor : IProgressMonitor) {
-    // This is a no-op. The Scala IDE provides code completions via an extension point
+    // This is a no-op. The jawa IDE provides code completions via an extension point
   }
 
   override def reportMatches(matchLocator : MatchLocator, possibleMatch : PossibleMatch) {

@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="sourcefileprovider" name="Source File Providers" schema="schema/sourcefileprovider.exsd"/>
    <extension-point id="semanticHighlightingParticipants" name="Semantic Highlighting Participants" schema="schema/semanticHighlightingParticipants.exsd"/>
+   <extension-point id="quickAssists" name="Quick Assists" schema="schema/quickAssists.exsd"/>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
@@ -337,6 +338,9 @@
       <requires-nature
             id="org.eclipse.jdt.core.javanature">
       </requires-nature>
+      <builder
+            id="org.argus-ide.cit.core.jawabuilder">
+      </builder>
    </extension>
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
@@ -363,22 +367,6 @@
             class="org.eclipse.jdt.internal.ui.javaeditor.JavaDocumentSetupParticipant"
             contentTypeId="argus.tools.eclipse.jawaSource">
       </participant>
-   </extension>
-   <extension
-         id="id1"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-      <super
-            type="org.eclipse.core.resources.textmarker">
-      </super>
-      <super
-            type="org.eclipse.jdt.core.problem">
-      </super>
-      <persistent
-            value="true">
-      </persistent>
    </extension>
    <extension
          point="org.eclipse.debug.core.statusHandlers">
@@ -479,6 +467,70 @@
                label="Jawa Text Editor">
          </toolbar>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="Jawa editor category"
+            id="argus.tools.eclipse.category"
+            name="Jawa Editor">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="argus.tools.eclipse.category"
+            defaultHandler="org.arguside.core.internal.quickassist.QuickAssistHandler"
+            description="Opens the Jawa Quick Assist dialog"
+            id="org.arguside.core.quickassist"
+            name="Jawa Quick Assist">
+      </command>
+      <command
+            categoryId="argus.tools.eclipse.category"
+            defaultHandler="org.arguside.core.internal.quickassist.QuickAssistHandler"
+            description="Shows a proposal to fix a type mismatch error"
+            id="org.arguside.core.quickassist.FixTypeMismatch"
+            name="Jawa Quick Assist - Fix Type Mismatch">
+      </command>
+   </extension>
+   <extension
+         id="problem"
+         name="Jawa Problem"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="true">
+      </persistent>
+      <super
+            type="org.eclipse.jdt.core.problem">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+   </extension>
+   <extension
+         id="jawabuilder"
+         name="Jawa Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="org.arguside.core.internal.builder.JawaBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="javaelementfilters"
+         point="org.eclipse.jdt.ui.javaElementFilters">
+      <filter
+            class="org.arguside.ui.internal.jdt.model.JawaElementFilter"
+            description="Prevents Jawa elements which are artefacts of the Jawa to Java encoding from appearing in the Package Explorer"
+            enabled="true"
+            id="argus.tools.eclipse.javaelements.JawaElementFilter"
+            name="Jawa element filter">
+      </filter>
    </extension>
 
 

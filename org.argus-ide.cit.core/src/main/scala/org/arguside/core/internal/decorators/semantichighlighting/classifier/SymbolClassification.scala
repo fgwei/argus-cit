@@ -23,7 +23,7 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: IJa
     def toRegion: IRegion = new Region(range.offset, range.length)
   }
   
-  def compilationUnitOfFile(f: AbstractFile) = global.unitOfFile.get(f)
+  def compilationUnitOfFile(f: AbstractFile) = global.getCompilationUnit(f)
 
   def classifySymbols(progressMonitor: IProgressMonitor): IList[SymbolInfo] = {
     val symbolInfos: MList[SymbolInfo] = mlistEmpty
@@ -32,8 +32,8 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: IJa
     }
     symbolInfos += SymbolInfo(Class, classes.toList)
     symbolInfos += SymbolInfo(Method, methods.toList)
-    symbolInfos += SymbolInfo(SymbolTypes.Location, classes.toList)
-    symbolInfos += SymbolInfo(SymbolTypes.Annotation, classes.toList)
+    symbolInfos += SymbolInfo(SymbolTypes.Location, locations.toList)
+    symbolInfos += SymbolInfo(SymbolTypes.Annotation, annotations.toList)
     symbolInfos += SymbolInfo(LocalVar, localvars.toList)
     symbolInfos.toList
   }

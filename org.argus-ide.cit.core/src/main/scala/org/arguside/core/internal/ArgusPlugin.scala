@@ -158,8 +158,6 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     
     // check if the changes are linked with the build path
     val modelDelta = event.getDelta()
-    ArgusJDTWeavingPlugin.logErrorMessage("elementChanged " + modelDelta)
-    ArgusJDTWeavingPlugin.logErrorMessage("elementChanged before")
     // check that the notification is about a change (CHANGE) of some elements (F_CHILDREN) of the java model (JAVA_MODEL)
     if (modelDelta.getElement().getElementType() == JAVA_MODEL && modelDelta.getKind() == CHANGED && (modelDelta.getFlags() & F_CHILDREN) != 0) {
       for (innerDelta <- modelDelta.getAffectedChildren()) {
@@ -175,7 +173,6 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
         }
       }
     }
-    ArgusJDTWeavingPlugin.logErrorMessage("elementChanged after")
     // process deleted files
     val buff: MList[JawaSourceFile] = mlistEmpty
     val changed: MList[ICompilationUnit] = mlistEmpty
@@ -189,7 +186,6 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
       def hasFlag(flag: Int) = (delta.getFlags & flag) != 0
 
       val elem = delta.getElement
-      ArgusJDTWeavingPlugin.logErrorMessage("elem:" + elem.getElementType)
       val processChildren: Boolean = elem.getElementType match {
         case JAVA_MODEL =>
           true
@@ -244,7 +240,6 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
         delta.getAffectedChildren foreach findRemovedSources
     }
     findRemovedSources(event.getDelta)
-    ArgusJDTWeavingPlugin.logErrorMessage("elementChanged findremoved")
     // ask for the changed jawa files to be refreshed in each project presentation compiler if needed
     if (changed.nonEmpty) {
       changed.toList groupBy (_.getJavaProject.getProject) foreach {
@@ -256,7 +251,6 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
           }
       }
     }
-    ArgusJDTWeavingPlugin.logErrorMessage("elementChanged findremoved after")
     projectsToReset.foreach(_.presentationCompiler.askRestart())
     if (buff.nonEmpty) {
       buff.toList groupBy (_.getJavaProject.getProject) foreach {

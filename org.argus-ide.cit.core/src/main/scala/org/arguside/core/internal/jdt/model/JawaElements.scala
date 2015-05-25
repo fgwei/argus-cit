@@ -2,7 +2,6 @@ package org.arguside.core.internal.jdt.model
 
 import scala.collection.immutable.Seq
 import scala.reflect.NameTransformer
-
 import org.eclipse.jdt.core.IField
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IMember
@@ -30,19 +29,19 @@ import org.eclipse.jdt.internal.ui.viewsupport.JavaElementImageProvider
 import org.eclipse.jdt.ui.JavaElementImageDescriptor
 import org.eclipse.jface.resource.ImageDescriptor
 import org.eclipse.swt.graphics.Image
-
 import org.arguside.ui.ArgusImages
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaElement
 import argus.tools.eclipse.contribution.weaving.jdt.ui.IMethodOverrideInfo
 import org.arguside.util.internal.ReflectionUtils
+import org.sireum.jawa.sjc.ObjectType
 
 trait JawaElement extends JavaElement with IJawaElement {
-  def getElementInfo : AnyRef
-  def getElementName : String
-  def scalaName : String = getElementName
-  def labelName : String = scalaName
-  def getLabelText(flags : Long) : String = labelName
-  def getImageDescriptor : ImageDescriptor = null
+  def getElementInfo: AnyRef
+  def getElementName: String
+  def jawaName: String = getElementName
+  def labelName: String = jawaName
+  def getLabelText(flags: Long): String = labelName
+  def getImageDescriptor: ImageDescriptor = null
   def isVisible = true
 
   override def getCompilationUnit() = {
@@ -50,7 +49,7 @@ trait JawaElement extends JavaElement with IJawaElement {
     if (cu != null) cu else new CompilationUnitAdapter(getClassFile().asInstanceOf[JawaClassFile])
   }
 
-  override def getAncestor(ancestorType : Int) : IJavaElement = {
+  override def getAncestor(ancestorType: Int): IJavaElement = {
     val ancestor = super.getAncestor(ancestorType)
     if (ancestor != null)
       ancestor
@@ -61,94 +60,60 @@ trait JawaElement extends JavaElement with IJawaElement {
   }
 }
 
-trait JawaFieldElement extends JawaElement
-
-class JawaSourceTypeElement(parent : JavaElement, name : String)
+class JawaSourceTypeElement(parent: JavaElement, name: String)
   extends SourceType(parent, name) with JawaElement {
 
-  def getCorrespondingElement(element : IJavaElement) : Option[IJavaElement] = {
+  def getCorrespondingElement(element: IJavaElement): Option[IJavaElement] = {
     val name = element.getElementName
     val tpe = element.getElementType
     getChildren.find(e => e.getElementName == name && e.getElementType == tpe)
   }
 
-  override def getType(typeName : String) : IType = {
+  override def getType(typeName: String): IType = {
     val tpe = super.getType(typeName)
     getCorrespondingElement(tpe).getOrElse(tpe).asInstanceOf[IType]
   }
 
-  override def getField(fieldName : String) : IField = {
+  override def getField(fieldName: String): IField = {
     val field = super.getField(fieldName)
     getCorrespondingElement(field).getOrElse(field).asInstanceOf[IField]
   }
 
-  override def getMethod(selector : String, parameterTypeSignatures : Array[String]) : IMethod = {
+  override def getMethod(selector: String, parameterTypeSignatures: Array[String]): IMethod = {
     val method = super.getMethod(selector, parameterTypeSignatures)
     getCorrespondingElement(method).getOrElse(method).asInstanceOf[IMethod]
   }
 }
 
-class JawaClassElement(parent : JavaElement, name : String, synthetic : Boolean)
-  extends JawaSourceTypeElement(parent, name) {
+class JawaClassElement(parent: JavaElement, typ: ObjectType)
+  extends JawaSourceTypeElement(parent, typ.name) {
   override def getImageDescriptor = ArgusImages.ARGUS_CLASS
-  override def isVisible = !synthetic
 }
 
-class JawaAnonymousClassElement(parent : JavaElement, name : String)
-  extends JawaClassElement(parent, name, false) {
-    override def getLabelText(flags : Long) = if (name != null ) "new "+name+" {...}" else "new {...}"
+class JawaInterfaceElement(parent: JavaElement, typ: ObjectType)
+  extends JawaSourceTypeElement(parent, typ.name) {
+  override def getImageDescriptor = ArgusImages.ARGUS_INTERFACE
 }
 
-class JawaDefElement(parent : JavaElement, name: String, paramTypes : Array[String], synthetic : Boolean, display : String, overrideInfo : Int)
+class JawaFieldElement(parent: JavaElement, name: String, display: String)
+  extends SourceField(parent, name) with JawaElement {
+  override def getLabelText(flags: Long) = display
+}
+
+class JawaMethodElement(parent : JavaElement, name: String, paramTypes : Array[String], synthetic : Boolean, display : String, overrideInfo : Int)
   extends SourceMethod(parent, name, paramTypes) with JawaElement with IMethodOverrideInfo {
   override def getLabelText(flags : Long) = display
   override def isVisible = !synthetic && !getElementInfo.isInstanceOf[JawaSourceConstructorInfo]
   def getOverrideInfo = overrideInfo
 }
 
-class JawaFunctionElement(declaringType : JavaElement, parent : JavaElement, name: String, paramTypes : Array[String], display : String)
-  extends SourceMethod(parent, name, paramTypes) with JawaElement {
-  override def getDeclaringType() : IType = declaringType.asInstanceOf[IType]
-  override def getLabelText(flags : Long) = display
-}
-
-class JawaAccessorElement(parent : JavaElement, name: String, paramTypes : Array[String])
-  extends SourceMethod(parent, name, paramTypes) with JawaElement {
-  override def isVisible = false
-}
-
-class JawaValElement(parent : JavaElement, name: String, display : String)
-  extends SourceField(parent, name) with JawaFieldElement {
-  override def getLabelText(flags : Long) = display
-  override def getImageDescriptor = {
-    val flags = getFlags
-    if ((flags & ClassFileConstants.AccPublic) != 0)
-      ArgusImages.PUBLIC_VAL
-    else if ((flags & ClassFileConstants.AccProtected) != 0)
-      ArgusImages.PROTECTED_VAL
-    else
-      ArgusImages.PRIVATE_VAL
-  }
-}
-
-class JawaVarElement(parent : JavaElement, name: String, display : String)
-  extends SourceField(parent, name) with JawaFieldElement {
-  override def getLabelText(flags : Long) = display
-}
-
-class JawaTypeElement(parent : JavaElement, name : String, display : String)
-  extends SourceField(parent, name) with JawaFieldElement {
-  override def getLabelText(flags : Long) = display
-  override def getImageDescriptor = ArgusImages.ARGUS_TYPE
-}
-
 class JawaLocalVariableElement(
-  parent : JavaElement, name : String,
-  declarationSourceStart : Int, declarationSourceEnd : Int, nameStart : Int, nameEnd : Int,
-  typeSignature : String, display : String, jdtFlags : Int, methodParameter : Boolean ) extends LocalVariable(
+  parent: JavaElement, name: String,
+  declarationSourceStart: Int, declarationSourceEnd: Int, nameStart: Int, nameEnd: Int,
+  typeSignature: String, display: String, jdtFlags: Int, methodParameter: Boolean ) extends LocalVariable(
   parent, name, declarationSourceStart, declarationSourceEnd, nameStart, nameEnd, typeSignature, null, jdtFlags, methodParameter) with
   JawaElement {
-  override def getLabelText(flags : Long) = display
+  override def getLabelText(flags: Long) = display
 }
 
 object JawaMemberElementInfo extends ReflectionUtils {
@@ -160,22 +125,22 @@ object JawaMemberElementInfo extends ReflectionUtils {
   val getNameSourceStartMethod = try {
     getDeclaredMethod(meiClazz, "getNameSourceStart")
   } catch {
-    case _ : NoSuchMethodException => getDeclaredMethod(aiClazz, "getNameSourceStart")
+    case _: NoSuchMethodException => getDeclaredMethod(aiClazz, "getNameSourceStart")
   }
   val getNameSourceEndMethod = try {
     getDeclaredMethod(meiClazz, "getNameSourceEnd")
   } catch {
-    case _ : NoSuchMethodException => getDeclaredMethod(aiClazz, "getNameSourceEnd")
+    case _: NoSuchMethodException => getDeclaredMethod(aiClazz, "getNameSourceEnd")
   }
   val setNameSourceStartMethod = try {
     getDeclaredMethod(meiClazz, "setNameSourceStart", classOf[Int])
   } catch {
-    case _ : NoSuchMethodException => getDeclaredMethod(aiClazz, "setNameSourceStart", classOf[Int])
+    case _: NoSuchMethodException => getDeclaredMethod(aiClazz, "setNameSourceStart", classOf[Int])
   }
   val setNameSourceEndMethod = try {
     getDeclaredMethod(meiClazz, "setNameSourceEnd", classOf[Int])
   } catch {
-    case _ : NoSuchMethodException => getDeclaredMethod(aiClazz, "setNameSourceEnd", classOf[Int])
+    case _: NoSuchMethodException => getDeclaredMethod(aiClazz, "setNameSourceEnd", classOf[Int])
   }
   val setSourceRangeStartMethod = getDeclaredMethod(sreiClazz, "setSourceRangeStart", classOf[Int])
   val setSourceRangeEndMethod = getDeclaredMethod(sreiClazz, "setSourceRangeEnd", classOf[Int])
@@ -185,7 +150,7 @@ object JawaMemberElementInfo extends ReflectionUtils {
     getDeclaredField(jeiClazz, "children")
     true
   } catch {
-    case _ : NoSuchFieldException => false
+    case _: NoSuchFieldException => false
   }
   val addChildMethod = if (hasChildrenField) getDeclaredMethod(jeiClazz, "addChild", classOf[IJavaElement]) else null
 }
@@ -193,33 +158,33 @@ object JawaMemberElementInfo extends ReflectionUtils {
 trait SourceRefJawaElementInfo extends JavaElementInfo {
   import JawaMemberElementInfo._
 
-  def getDeclarationSourceStart0 : Int = getDeclarationSourceStartMethod.invoke(this).asInstanceOf[Integer].intValue
-  def getDeclarationSourceEnd0 : Int = getDeclarationSourceEndMethod.invoke(this).asInstanceOf[Integer].intValue
-  def setSourceRangeStart0(start : Int) : Unit = setSourceRangeStartMethod.invoke(this, new Integer(start))
-  def setSourceRangeEnd0(end : Int) : Unit = setSourceRangeEndMethod.invoke(this, new Integer(end))
+  def getDeclarationSourceStart0: Int = getDeclarationSourceStartMethod.invoke(this).asInstanceOf[Integer].intValue
+  def getDeclarationSourceEnd0: Int = getDeclarationSourceEndMethod.invoke(this).asInstanceOf[Integer].intValue
+  def setSourceRangeStart0(start: Int): Unit = setSourceRangeStartMethod.invoke(this, new Integer(start))
+  def setSourceRangeEnd0(end: Int): Unit = setSourceRangeEndMethod.invoke(this, new Integer(end))
 }
 
 trait JawaMemberElementInfo extends SourceRefJawaElementInfo {
   import JawaMemberElementInfo._
   import java.lang.Integer
 
-  def addChild0(child : IJavaElement) : Unit
+  def addChild0(child: IJavaElement): Unit
 
-  def setFlags0(flags : Int) = setFlagsMethod.invoke(this, new Integer(flags))
-  def getNameSourceStart0 : Int = getNameSourceStartMethod.invoke(this).asInstanceOf[Integer].intValue
-  def getNameSourceEnd0 : Int = getNameSourceEndMethod.invoke(this).asInstanceOf[Integer].intValue
-  def setNameSourceStart0(start : Int) = setNameSourceStartMethod.invoke(this, new Integer(start))
-  def setNameSourceEnd0(end : Int) = setNameSourceEndMethod.invoke(this, new Integer(end))
+  def setFlags0(flags: Int) = setFlagsMethod.invoke(this, new Integer(flags))
+  def getNameSourceStart0: Int = getNameSourceStartMethod.invoke(this).asInstanceOf[Integer].intValue
+  def getNameSourceEnd0: Int = getNameSourceEndMethod.invoke(this).asInstanceOf[Integer].intValue
+  def setNameSourceStart0(start: Int) = setNameSourceStartMethod.invoke(this, new Integer(start))
+  def setNameSourceEnd0(end: Int) = setNameSourceEndMethod.invoke(this, new Integer(end))
 }
 
 trait AuxChildrenElementInfo extends JavaElementInfo {
   import JawaMemberElementInfo._
 
-  var auxChildren : Array[IJavaElement] = if (hasChildrenField) null else new Array(0)
+  var auxChildren: Array[IJavaElement] = if (hasChildrenField) null else new Array(0)
 
   override def getChildren = if (hasChildrenField) super.getChildren else auxChildren
 
-  def addChild0(child : IJavaElement) : Unit =
+  def addChild0(child: IJavaElement): Unit =
     if (hasChildrenField)
       addChildMethod.invoke(this, child)
     else if (auxChildren.length == 0)
@@ -228,16 +193,12 @@ trait AuxChildrenElementInfo extends JavaElementInfo {
       auxChildren = auxChildren ++ Seq(child)
 }
 
-trait HasTypeParameters {
-  def setTypeParameters(typeParams: Array[ITypeParameter])
-}
-
 class TypeParameterScalaElementInfo extends TypeParameterElementInfo with SourceRefJawaElementInfo
 
-class JawaElementInfo extends SourceTypeElementInfo with JawaMemberElementInfo with HasTypeParameters {
+class JawaElementInfo extends SourceTypeElementInfo with JawaMemberElementInfo {
   import JawaMemberElementInfo._
 
-  override def addChild0(child : IJavaElement) : Unit = {
+  override def addChild0(child: IJavaElement): Unit = {
     if (hasChildrenField)
       addChildMethod.invoke(this, child)
     else if (children.length == 0)
@@ -246,39 +207,30 @@ class JawaElementInfo extends SourceTypeElementInfo with JawaMemberElementInfo w
       children = children ++ Seq(child)
   }
 
-  override def setHandle(handle : IType) = super.setHandle(handle)
-  override def setSuperclassName(superclassName : Array[Char]) = super.setSuperclassName(superclassName)
-  override def setSuperInterfaceNames(superInterfaceNames : Array[Array[Char]]) = super.setSuperInterfaceNames(superInterfaceNames)
-  override def setTypeParameters(tps : Array[ITypeParameter]) {
-    typeParameters = tps
-  }
+  override def setHandle(handle: IType) = super.setHandle(handle)
+  override def setSuperclassName(superclassName: Array[Char]) = super.setSuperclassName(superclassName)
+  override def setSuperInterfaceNames(superInterfaceNames: Array[Array[Char]]) = super.setSuperInterfaceNames(superInterfaceNames)
 }
 
-trait FnInfo extends SourceMethodElementInfo with JawaMemberElementInfo with HasTypeParameters {
-  override def setArgumentNames(argumentNames : Array[Array[Char]]) = super.setArgumentNames(argumentNames)
-  def setReturnType(returnType : Array[Char])
-  override def setExceptionTypeNames(exceptionTypeNames : Array[Array[Char]]) = super.setExceptionTypeNames(exceptionTypeNames)
+trait FnInfo extends SourceMethodElementInfo with JawaMemberElementInfo {
+  override def setArgumentNames(argumentNames: Array[Array[Char]]) = super.setArgumentNames(argumentNames)
+  def setReturnType(returnType: Array[Char])
+  override def setExceptionTypeNames(exceptionTypeNames: Array[Array[Char]]) = super.setExceptionTypeNames(exceptionTypeNames)
 }
 
-class JawaSourceConstructorInfo extends SourceConstructorInfo with FnInfo with AuxChildrenElementInfo with HasTypeParameters {
-  override def setReturnType(returnType : Array[Char]) = super.setReturnType(returnType)
-  override def setTypeParameters(tps : Array[ITypeParameter]) {
-    typeParameters = tps
-  }
+class JawaSourceConstructorInfo extends SourceConstructorInfo with FnInfo with AuxChildrenElementInfo {
+  override def setReturnType(returnType: Array[Char]) = super.setReturnType(returnType)
 }
 
-class JawaSourceMethodInfo extends SourceMethodInfo with FnInfo with AuxChildrenElementInfo with HasTypeParameters {
-  override def setReturnType(returnType : Array[Char]) = super.setReturnType(returnType)
-  override def setTypeParameters(tps : Array[ITypeParameter]) {
-    typeParameters = tps
-  }
+class JawaSourceMethodInfo extends SourceMethodInfo with FnInfo with AuxChildrenElementInfo {
+  override def setReturnType(returnType: Array[Char]) = super.setReturnType(returnType)
 }
 
 class JawaSourceFieldElementInfo extends SourceFieldElementInfo with JawaMemberElementInfo with AuxChildrenElementInfo {
-  override def setTypeName(name : Array[Char]) = super.setTypeName(name)
+  override def setTypeName(name: Array[Char]) = super.setTypeName(name)
 }
 
-class LazyToplevelClass(unit : JawaCompilationUnit, name : String) extends SourceType(unit, name) with IType with JawaElement {
+class LazyToplevelClass(unit: JawaCompilationUnit, name: String) extends SourceType(unit, name) with IType with JawaElement {
 
   /** I rewrote this method from the previous implementation, to what I believe was the initial intention.
    *  The commented line is the original, in case this causes any problems.

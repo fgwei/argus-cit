@@ -47,6 +47,28 @@ object FileUtils {
     toIFile(file).map(_.getFullPath)
   }
 
+  /**
+   * Removes all problem markers from this IFile.
+   */
+  def clearBuildErrors(file: IFile, monitor: IProgressMonitor) =
+    try {
+      file.deleteMarkers(CitConstants.ProblemMarkerId, true, IResource.DEPTH_INFINITE)
+    } catch {
+      case _: ResourceException =>
+    }
+
+  /**
+   * Returns all problem markers for a given file.
+   */
+  def findBuildErrors(file: IResource): Seq[IMarker] =
+    file.findMarkers(CitConstants.ProblemMarkerId, true, IResource.DEPTH_INFINITE)
+
+  /**
+   * Returns true if the file bears problem markers with error severity.
+   */
+  def hasBuildErrors(file: IResource): Boolean =
+    file.findMarkers(CitConstants.ProblemMarkerId, true, IResource.DEPTH_INFINITE).exists(_.getAttribute(IMarker.SEVERITY) == IMarker.SEVERITY_ERROR)
+
   /** Delete directory recursively. Does nothing if dir is not a directory. */
   def deleteDir(dir: File): Unit = {
     if (dir.isDirectory()) {
@@ -85,7 +107,7 @@ object FileUtils {
   }
 
   /** Is the file buildable by the Argus plugin? In other words, is it a
-   *  Java or Pilar source file?
+   *  Java or Jawa source file?
    *
    *  @note If you don't have an IFile yet, prefer the String overload, as
    *        creating an IFile is usually expensive

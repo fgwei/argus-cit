@@ -2,6 +2,7 @@
 <aspects>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.configuration.IsWovenTester"/>
 <aspect name="org.eclipse.jdt.core.dom.ASTConverterAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.builderoptions.JawaJavaBuilderAspect"/>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.cfprovider.ClassFileProviderAspect"/>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.cuprovider.CompilationUnitProviderAspect"/>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.imagedescriptor.ImageDescriptorSelectorAspect"/>

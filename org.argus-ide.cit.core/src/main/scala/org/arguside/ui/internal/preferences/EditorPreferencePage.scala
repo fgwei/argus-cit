@@ -103,7 +103,7 @@ class EditorPreferencePage extends PreferencePage with IWorkbenchPreferencePage 
 }
 
 object EditorPreferencePage {
-  private final val BASE = "scala.tools.eclipse.editor."
+  private final val BASE = "argus.tools.eclipse.editor."
 
   final val P_ENABLE_SMART_BRACKETS = BASE + "smartBrackets"
   final val P_ENABLE_SMART_BRACES = BASE + "smartBraces"

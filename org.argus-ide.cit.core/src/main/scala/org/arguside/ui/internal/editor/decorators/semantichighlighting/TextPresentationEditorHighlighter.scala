@@ -81,7 +81,7 @@ object TextPresentationEditorHighlighter {
       /* There is no need to call `semanticHighlightingJob.cancel()` here because the document has a listener that
        * already cancels the ongoing semantic highlighting job whenever the document is about to be changed. And `this`
        * reconciling listener always gets executed '''after''' the aforementioned listener (check
-       * [[org.scalaide.ui.internal.editors.decorators.semantichighlighting.Presenter$DocumentContentListener]] for more details).
+       * [[org.arguside.ui.internal.editors.decorators.semantichighlighting.Presenter$DocumentContentListener]] for more details).
        *
        * Furthermore, a new semantic highlighting job run is only scheduled if the ongoing reconciliation has not been
        * cancelled. If it was cancelled, this usually means that the editor was closed, or the document was change.

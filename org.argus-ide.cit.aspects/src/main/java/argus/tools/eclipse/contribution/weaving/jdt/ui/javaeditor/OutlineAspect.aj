@@ -6,9 +6,10 @@ import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
 
+import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin;
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaElement;
 
-/** Tweaks the labels in the outline, to display pilar native syntax
+/** Tweaks the labels in the outline, to display jawa native syntax
  * 
  */
 @SuppressWarnings("restriction")
@@ -29,9 +30,8 @@ public privileged aspect OutlineAspect {
         jelc.fBuffer.append(JavaElementLabels.CONCAT_STRING);
       }
       
-      IJawaElement pilarElement = (IJawaElement)element;
-      jelc.fBuffer.append(pilarElement.getLabelText(flags));
-      
+      IJawaElement jawaElement = (IJawaElement)element;
+      jelc.fBuffer.append(jawaElement.getLabelText(flags));
       if (JavaElementLabelComposer.getFlag(flags, JavaElementLabels.APPEND_ROOT_PATH)) {
         int offset= jelc.fBuffer.length();
         jelc.fBuffer.append(JavaElementLabels.CONCAT_STRING);
@@ -40,6 +40,8 @@ public privileged aspect OutlineAspect {
         if (JavaElementLabelComposer.getFlag(flags, JavaElementLabels.COLORIZE)) {
           jelc.fBuffer.setStyle(offset, jelc.fBuffer.length() - offset, JavaElementLabelComposer.QUALIFIER_STYLE);
         }
+      } else {
+    	  	ArgusJDTWeavingPlugin.logErrorMessage(" " + element.getElementType());
       }
     }
   }
