@@ -34,7 +34,7 @@ import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin;
  */
 @SuppressWarnings("restriction")
 public class WeavingStateConfigurer {
-    
+
     private final static Version MIN_WEAVER_VERSION = new Version(1, 6, 1);
 
     private final static boolean IS_WEAVING = IsWovenTester.isWeavingActive();

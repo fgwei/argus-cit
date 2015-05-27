@@ -86,7 +86,7 @@ class JawaSourceTypeElement(parent: JavaElement, name: String)
 }
 
 class JawaClassElement(parent: JavaElement, typ: ObjectType)
-  extends JawaSourceTypeElement(parent, typ.name) {
+  extends JawaSourceTypeElement(parent, typ.simpleName) {
   override def getImageDescriptor = ArgusImages.ARGUS_CLASS
 }
 
@@ -103,7 +103,6 @@ class JawaFieldElement(parent: JavaElement, name: String, display: String)
 class JawaMethodElement(parent : JavaElement, name: String, paramTypes : Array[String], synthetic : Boolean, display : String, overrideInfo : Int)
   extends SourceMethod(parent, name, paramTypes) with JawaElement with IMethodOverrideInfo {
   override def getLabelText(flags : Long) = display
-  override def isVisible = !synthetic && !getElementInfo.isInstanceOf[JawaSourceConstructorInfo]
   def getOverrideInfo = overrideInfo
 }
 

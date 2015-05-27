@@ -40,8 +40,6 @@ public privileged aspect OutlineAspect {
         if (JavaElementLabelComposer.getFlag(flags, JavaElementLabels.COLORIZE)) {
           jelc.fBuffer.setStyle(offset, jelc.fBuffer.length() - offset, JavaElementLabelComposer.QUALIFIER_STYLE);
         }
-      } else {
-    	  	ArgusJDTWeavingPlugin.logErrorMessage(" " + element.getElementType());
       }
     }
   }

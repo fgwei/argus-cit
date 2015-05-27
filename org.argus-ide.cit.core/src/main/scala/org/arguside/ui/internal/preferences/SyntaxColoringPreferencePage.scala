@@ -26,7 +26,6 @@ class SyntaxColoringPreferencePage extends BaseSyntaxColoringPreferencePage(
 
   private var enableSemanticHighlightingCheckBox: Button = _
   private var extraAccuracyCheckBox: Button = _
-  private var strikethroughDeprecatedCheckBox: Button = _
 
   override def additionalOverlayKeys: List[OverlayKey] = List(
     new OverlayKey(BOOLEAN, ENABLE_SEMANTIC_HIGHLIGHTING),
@@ -35,7 +34,6 @@ class SyntaxColoringPreferencePage extends BaseSyntaxColoringPreferencePage(
   override def additionalPerformDefaults() {
     enableSemanticHighlightingCheckBox.setSelection(overlayStore getBoolean ENABLE_SEMANTIC_HIGHLIGHTING)
     extraAccuracyCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
-    strikethroughDeprecatedCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
     extraAccuracyCheckBox.setSelection(overlayStore getBoolean USE_SYNTACTIC_HINTS)
   }
 
@@ -58,7 +56,6 @@ class SyntaxColoringPreferencePage extends BaseSyntaxColoringPreferencePage(
     enableSemanticHighlightingCheckBox.addSelectionListener { () =>
       overlayStore.setValue(ENABLE_SEMANTIC_HIGHLIGHTING, enableSemanticHighlightingCheckBox.getSelection)
       extraAccuracyCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
-      strikethroughDeprecatedCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
       handleSyntaxColorListSelection()
     }
     extraAccuracyCheckBox.addSelectionListener { () =>
@@ -78,7 +75,7 @@ object SyntaxColoringPreferencePage {
         |  `a.a.ab` `a.a.aa.a`    @AccessFlag PRIVATE;
         |}
         |global `java.lang.String`[] `@@a.a.aa.z`    @AccessFlag PRIVATE_STATIC_FINAL;
-        |procedure `void` `a.a.aa.b` (`a.a.aa` v1 @type `this`, `a.a.ab` v2 @type `object`) @owner `a.a.aa` @signature `La/a/aa;.a:(La/a/ab;)V` @Access `PRIVATE_DECLARED_SYNCHRONIZED` {
+        |procedure `void` `a.a.aa.b` (`a.a.aa` v1 @type `this`, `a.a.ab` v2 @type `object`) @owner `a.a.aa` @signature `La/a/aa;.b:(La/a/ab;)V` @Access `PRIVATE_DECLARED_SYNCHRONIZED` {
         |  temp ;
         |  v0;
         |

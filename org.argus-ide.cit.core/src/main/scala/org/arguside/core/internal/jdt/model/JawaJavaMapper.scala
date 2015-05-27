@@ -76,7 +76,6 @@ trait JawaJavaMapper extends InternalCompilerServices with HasLogger { self: Jaw
     if(je.isPrivate)
       jdtMods = jdtMods | ClassFileConstants.AccPrivate
     else
-      // protected entities need to be exposed as public to match scala compiler's behavior.
       jdtMods = jdtMods | ClassFileConstants.AccPublic
 
     if(je.isAbstract)

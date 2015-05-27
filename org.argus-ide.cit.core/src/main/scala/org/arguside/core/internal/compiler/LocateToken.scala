@@ -35,12 +35,7 @@ trait LocateToken { self: JawaPresentationCompiler =>
      * need to rethink later
      */
     def tokenClassType(token: JawaToken): Option[ObjectType] = asyncExec {
-      getSymbolTable.compilationUnitSymbolTable(token.file.file).classOrInterfaceSymbolTables.find{
-        cist =>
-          if(cist.classOrInterfaceDecl.tokens.contains(token)){
-            true
-          } else false
-      }.get.classOrInterfaceType
+      null
     }.getOption()
 
 //    def findClassFile(): Option[InteractiveCompilationUnit] = {

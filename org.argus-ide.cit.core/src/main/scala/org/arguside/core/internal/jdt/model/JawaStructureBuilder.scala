@@ -93,7 +93,9 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
         val typ: ObjectType = c.typ
         val clazz: JawaClass = resolveClassFromSource(typ, c.firstToken.file, ResolveLevel.HIERARCHY)
 
-        val classElem = new JawaClassElement(element, typ)
+        val classElem = 
+          if(clazz.isInterface) new JawaInterfaceElement(element, typ)
+          else new JawaClassElement(element, typ)
 
         resolveDuplicates(classElem)
         addChild(classElem)
@@ -113,10 +115,10 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
         classElemInfo.setSuperInterfaceNames(interfaceNames.toArray)
         
         val start: Int = c.cityp.baseTypeID.pos.start
-        val end: Int = start + typ.name.length() - 1
+        val end: Int = c.cityp.baseTypeID.pos.end
         classElemInfo.setNameSourceStart0(start)
         classElemInfo.setNameSourceEnd0(end)
-        setSourceRange(classElemInfo, c.cityp.baseTypeID)
+        setSourceRange(classElemInfo, c)
         newElements0.put(classElem, classElemInfo)
 
         clazz.getMethods foreach{fillOverrideInfos(_)}
@@ -134,9 +136,9 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
       override def addField(f : Field with Declaration) : Owner = {
         require(element.isInstanceOf[JawaClassElement])
         val elemName = f.fieldName
-        val display = f.FQN
+        
         val field = getField(f.FQN).get
-
+        val display = " " + f.fieldName  + " : " + field.getType.simpleName
         val fieldElem = new JawaFieldElement(element, elemName.toString, display)
 
         resolveDuplicates(fieldElem)
@@ -145,12 +147,12 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
         val fieldElemInfo = new JawaSourceFieldElementInfo
         fieldElemInfo.setFlags0(mapModifiers(field))
 
-        val start = f.nameID.pos.point
-        val end = start+display.length-1
+        val start = f.nameID.pos.start
+        val end = f.nameID.pos.end
 
         fieldElemInfo.setNameSourceStart0(start)
         fieldElemInfo.setNameSourceEnd0(end)
-        setSourceRange(fieldElemInfo, f.nameID)
+        setSourceRange(fieldElemInfo, f)
         newElements0.put(fieldElem, fieldElemInfo)
 
         fieldElemInfo.setTypeName(field.getType.name.toCharArray())
@@ -163,7 +165,7 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
       override def addMethod(m: MethodDeclaration): Owner = {
         val method = getMethod(m.signature).get
         val isCtor0 = method.isConstructor
-        val nameString = method.getName
+        val nameString = method.getName.replaceAll("<init>", "init_ctor").replaceAll("<clinit>", "init_sctor")
 
         val paramsTypes = method.getParamTypes.map(n => n.name).toArray
 
@@ -174,7 +176,7 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
           paramsTypes.map(n => n.toCharArray)
         }
 
-        val display = method.getSignature.signature
+        val display = " " + method.getDisplay
 
         val methodElem = new JawaMethodElement(element, nameString, paramsTypes, method.isSynthetic, display, overrideInfos(method))
         resolveDuplicates(methodElem)
@@ -193,23 +195,12 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
 
         methodElemInfo.setFlags0(mods)
 
-        if (isCtor0) {
-          elementInfo match {
-            case smei : JawaMemberElementInfo =>
-              methodElemInfo.setNameSourceStart0(smei.getNameSourceStart0)
-              methodElemInfo.setNameSourceEnd0(smei.getNameSourceEnd0)
-              methodElemInfo.setSourceRangeStart0(smei.getDeclarationSourceStart0)
-              methodElemInfo.setSourceRangeEnd0(smei.getDeclarationSourceEnd0)
-            case _ =>
-          }
-        } else {
-          val start = m.nameID.pos.pointOrElse(-1)
-          val end = if (start >= 0) start+methodElem.labelName.length-1 else -1
+        val start = m.nameID.pos.start
+        val end = m.nameID.pos.end
 
-          methodElemInfo.setNameSourceStart0(start)
-          methodElemInfo.setNameSourceEnd0(end)
-          setSourceRange(methodElemInfo, m.nameID)
-        }
+        methodElemInfo.setNameSourceStart0(start)
+        methodElemInfo.setNameSourceEnd0(end)
+        setSourceRange(methodElemInfo, m)
 
         newElements0.put(methodElem, methodElemInfo)
 
@@ -232,13 +223,12 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
     
     abstract class Builder extends ClassOwner with FieldOwner with MethodOwner
 
-    def setSourceRange(info: JawaMemberElementInfo, token: JawaToken) {
-      val pos = token.pos
+    def setSourceRange(info: JawaMemberElementInfo, n: JawaAstNode) {
       val (start, end) =
-        if (pos.isDefined) {
-          val pos0 =  pos
-          val start0 = pos0.start
-          (start0, pos0.end-1)
+        if (n.firstTokenOption.isDefined) {
+          val start0 = n.firstToken.pos.start
+          val end0 = n.lastToken.pos.end
+          (start0, end0)
         }
         else
           (-1, -1)
