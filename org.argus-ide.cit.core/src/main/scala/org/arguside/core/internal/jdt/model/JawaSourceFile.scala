@@ -173,5 +173,5 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
   final def discard(): Unit = {
     argusProject.presentationCompiler { _.discardCompilationUnit(this) }
   }
-  getUnderlyingResource.deleteMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE)
+//  getUnderlyingResource.deleteMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE)
 }

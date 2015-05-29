@@ -197,7 +197,7 @@ object NewArgusProjectCreator {
     val workspaceRunnable = new IWorkspaceRunnable() {
       override def run(submonitor: IProgressMonitor) = {
         try {
-          ApkDecompiler.decompile(apk, new Path(projectLocation))
+          ApkDecompiler.decompile(apk, new Path(projectLocation), true)
           createEclipseProject(monitor, project, description, target)
         } catch {
           case e: IOException =>

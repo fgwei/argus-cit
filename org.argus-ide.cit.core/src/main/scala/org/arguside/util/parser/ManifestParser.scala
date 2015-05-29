@@ -5,8 +5,31 @@ import java.io.File
 import java.io.InputStream
 import java.io.IOException
 import brut.androlib.res.decoder.AXmlResourceParser
+import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin
 
 object ManifestParser {
+  def loadPackageName(apk: File): String = {
+    var pkg: String = ""
+    AndroidXMLParser.handleAndroidXMLFiles(apk, Set("AndroidManifest.xml"), new AndroidXMLHandler() {
+      
+      override def handleXMLFile(fileName: String, fileNameFilter: Set[String], stream: InputStream) = {
+        try {
+          if (fileNameFilter.contains(fileName)){
+            pkg = getPackageNameFromManifest(stream)
+          }
+        }
+        catch {
+          case ex: IOException =>
+            System.err.println("Could not read AndroidManifest file: " + ex.getMessage())
+            ex.printStackTrace()
+        }
+      }
+      
+    })
+    
+    pkg
+  }
+  
   def loadSdkVersionFromManifestFile(apk: File): (Int, Int, Int) = {
     var min: Int = 1
     var target: Int = min
@@ -33,6 +56,33 @@ object ManifestParser {
     (min, target, max)
   }
   
+  protected def getPackageNameFromManifest(manifestIS: InputStream): String = {
+    var pkg: String = ""
+    try {
+      val parser = new AXmlResourceParser()
+      parser.open(manifestIS)
+      var typ = parser.next()
+      while (typ != 0x00000001) { // XmlPullParser.END_DOCUMENT
+        typ match {
+          case 0x00000000 => // XmlPullParser.START_DOCUMENT
+          case 0x00000002 => //XmlPullParser.START_TAG
+            val tagName = parser.getName
+            if(tagName.equals("manifest")){
+              pkg = getAttributeValue(parser, "package")
+              if(pkg == null) pkg = ""
+            }
+          case 0x00000003 => //XmlPullParser.END_TAG
+          case 0x00000004 => //XmlPullParser.TEXT
+        }
+        typ = parser.next()
+      }
+    } catch {
+      case e: Exception =>
+        e.printStackTrace()
+    }
+    pkg
+  }
+  
   protected def getSdkVersionFromBinaryManifest(manifestIS: InputStream): (Int, Int, Int) = {
     var min: Int = 1
     var target: Int = min
@@ -40,7 +90,6 @@ object ManifestParser {
     try {
       val parser = new AXmlResourceParser()
       parser.open(manifestIS)
-      var applicationEnabled = true
       var typ = parser.next()
       while (typ != 0x00000001) { // XmlPullParser.END_DOCUMENT
          typ match {
@@ -73,9 +122,13 @@ object ManifestParser {
   }
   
   private def getAttributeValue(parser: AXmlResourceParser, attributeName: String): String = {
-    for (i <- 0 to parser.getAttributeCount() - 1)
+    val count = parser.getAttributeCount
+    for (i <- 0 to count - 1){
+      ArgusJDTWeavingPlugin.logErrorMessage(parser.getAttributeName(i).equals(attributeName) + "")
+      ArgusJDTWeavingPlugin.logErrorMessage(parser.getAttributeValue(i))      
       if (parser.getAttributeName(i).equals(attributeName))
         return parser.getAttributeValue(i)
-    return null
+    }
+    null
   }
 }
