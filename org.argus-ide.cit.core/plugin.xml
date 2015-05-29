@@ -532,6 +532,25 @@
             name="Jawa element filter">
       </filter>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            canFinishEarly="false"
+            category="org.argus-ide.cit.core.wizards"
+            class="org.arguside.ui.internal.wizards.NewArgusProjectWizard"
+            finalPerspective="org.argus-ide.cit.core.perspective"
+            hasPages="true"
+            icon="icons/full/etool16/newsprj_wiz.gif"
+            id="org.argus-ide.cit.core.wizards.newProject"
+            name="Argus Project"
+            preferredPerspectives="org.argus-ide.cit.core.perspective"
+            project="true">
+      </wizard>
+      <category
+            id="org.argus-ide.cit.core.wizards"
+            name="Argus">
+      </category>
+   </extension>
 
 
 </plugin>
