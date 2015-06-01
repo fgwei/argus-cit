@@ -48,6 +48,7 @@ import org.sireum.jawa.sjc.parser.CompilationUnit
 import org.arguside.core.internal.hyperlink.JawaHyperlink
 import org.arguside.core.internal.jdt.model.JawaStructureBuilder
 import org.arguside.core.internal.jdt.model.JawaJavaMapper
+import org.arguside.core.internal.jdt.search.JawaIndexBuilder
 
 class JawaPresentationCompiler(name: String) extends {
   /*
@@ -62,7 +63,8 @@ class JawaPresentationCompiler(name: String) extends {
 } with Global(name, new JawaPresentationCompiler.PresentationReporter)
   with JawaStructureBuilder
   with JawaJavaMapper
-  with LocateToken
+  with JawaIndexBuilder
+  with LocateAST
   with IJawaPresentationCompiler
   with HasLogger { self =>
 
@@ -366,16 +368,17 @@ class JawaPresentationCompiler(name: String) extends {
     import org.arguside.util.eclipse.RegionUtils._
 
     asyncExec {
-      findDeclaration(token, javaProject) map {
-        case (f, pos) =>
-          val tokenLen = token.length
-          val targetRegion = (new Region(pos, tokenLen)).map(f.jawaPos)
-          new JawaHyperlink(openableOrUnit = f,
-              region = targetRegion,
-              label = label(token),
-              text = name,
-              wordRegion = region)
-      }
+//      findDeclaration(token, javaProject) map {
+//        case (f, pos) =>
+//          val tokenLen = token.length
+//          val targetRegion = (new Region(pos, tokenLen)).map(f.jawaPos)
+//          new JawaHyperlink(openableOrUnit = f,
+//              region = targetRegion,
+//              label = label(token),
+//              text = name,
+//              wordRegion = region)
+//      }
+      None
     }.getOrElse(None)()
   }
 

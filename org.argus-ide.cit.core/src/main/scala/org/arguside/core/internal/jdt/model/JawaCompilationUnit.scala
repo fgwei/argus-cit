@@ -53,6 +53,7 @@ import org.arguside.core.internal.hyperlink.DeclarationHyperlinkDetector
 import org.sireum.jawa.sjc.util.Position
 import org.sireum.util._
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
+import org.arguside.core.internal.jdt.search.JawaSourceIndexer
 
 trait JawaCompilationUnit extends Openable
   with env.ICompilationUnit
@@ -127,6 +128,20 @@ trait JawaCompilationUnit extends Openable
       }
     } getOrElse false
     true
+  }
+  
+  /** Index this source file, but only if the project has the Jawa nature.
+   *
+   */
+  def addToIndexer(indexer : JawaSourceIndexer) {
+    if (argusProject.hasArgusNature) {
+      try argusProject.presentationCompiler.internal { compiler =>
+        val cu = compiler.parseCompilationUnit(sourceFile).get
+        new compiler.IndexBuilderTraverser(indexer).traverse(cu)
+      } catch {
+        case ex: Throwable => logger.error("Compiler crash during indexing of %s".format(getResource()), ex)
+      }
+    }
   }
 
   override def getSourceElementAt(pos : Int) : IJavaElement = {

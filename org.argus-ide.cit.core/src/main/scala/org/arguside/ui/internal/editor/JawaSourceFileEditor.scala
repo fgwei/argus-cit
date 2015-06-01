@@ -51,6 +51,7 @@ import org.arguside.util.eclipse.EditorUtils
 import org.arguside.util.internal.eclipse.AnnotationUtils.RichModel
 import org.arguside.util.ui.DisplayThread
 
+
 class JawaSourceFileEditor extends CompilationUnitEditor with JawaCompilationUnitEditor { self =>
   import JawaSourceFileEditor._
 
@@ -119,6 +120,10 @@ class JawaSourceFileEditor extends CompilationUnitEditor with JawaCompilationUni
     // disable Java indent logic, which is otherwise invoked when the tab key is entered
     setAction("IndentOnTab", null)
 
+    val selectEnclosingAction = new actions.JawaStructureSelectEnclosingAction(this, selectionHistory)
+    selectEnclosingAction.setActionDefinitionId(IJavaEditorActionDefinitionIds.SELECT_ENCLOSING)
+    setAction(StructureSelectionAction.ENCLOSING, selectEnclosingAction)
+    
     val openAction = new Action {
       private def jawaCompilationUnit: Option[JawaCompilationUnit] =
         Option(getInteractiveCompilationUnit) map (_.asInstanceOf[JawaCompilationUnit])

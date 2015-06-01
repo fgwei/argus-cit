@@ -27,4 +27,7 @@ trait InternalCompilerServices extends Global {
 
   /** Return a JDT specific value for the modifiers of given symbol/ */
   private[core] def mapModifiers(je: SJCJawaElement): Int
+  
+  /** Return a JDT specific value for the modifiers of given symbol/ */
+  private[core] def mapModifiers(af: Int): Int
 }

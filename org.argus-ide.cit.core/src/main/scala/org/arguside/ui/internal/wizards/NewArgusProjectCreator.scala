@@ -36,6 +36,26 @@ import com.android.ide.eclipse.adt.internal.sdk.Sdk
 import com.android.SdkConstants
 import com.android.ide.eclipse.adt.AdtPlugin
 import java.io.FileInputStream
+import com.android.ide.eclipse.adt.internal.actions.AddSupportJarAction
+import org.arguside.core.internal.ArgusPlugin
+import org.eclipse.core.resources.IFile
+import com.android.ide.eclipse.adt.AdtUtils
+import org.eclipse.ltk.core.refactoring.NullChange
+import org.apache.commons.io.IOUtils
+import com.google.common.io.Files
+import com.google.common.base.Charsets
+import com.android.SdkConstants._
+import com.android.ide.eclipse.adt.internal.editors.formatting.EclipseXmlPrettyPrinter
+import com.android.ide.eclipse.adt.internal.editors.formatting.EclipseXmlFormatPreferences
+import org.eclipse.jdt.core.ToolFactory
+import org.eclipse.jdt.core.formatter.CodeFormatter
+import org.eclipse.ltk.core.refactoring.Change
+import org.eclipse.ltk.core.refactoring.TextFileChange
+import org.eclipse.jface.text.IDocument
+import org.eclipse.jface.text.BadLocationException
+import org.eclipse.text.edits.InsertEdit
+import org.eclipse.ltk.core.refactoring.CompositeChange
+import java.lang.reflect.InvocationTargetException
 
 object NewArgusProjectCreator {
   
@@ -83,7 +103,6 @@ object NewArgusProjectCreator {
             monitor);
     
     Sdk.getCurrent().initProject(project, target)
-    ProjectHelper.fixProject(project)
     project
   }
   
@@ -181,7 +200,8 @@ object NewArgusProjectCreator {
              target: IAndroidTarget,
              apk: File,
              projectLocation: String,
-             workingSets: IList[IWorkingSet]): Unit = {
+             workingSets: IList[IWorkingSet],
+             mValues: NewArgusProjectWizardState): Unit = {
     val workspace = ResourcesPlugin.getWorkspace
     val description = workspace.newProjectDescription(project.getName)
     
@@ -197,7 +217,47 @@ object NewArgusProjectCreator {
     val workspaceRunnable = new IWorkspaceRunnable() {
       override def run(submonitor: IProgressMonitor) = {
         try {
-          ApkDecompiler.decompile(apk, new Path(projectLocation), true)
+          val dependencies = ApkDecompiler.decompile(apk, new Path(projectLocation), true).get
+          dependencies foreach {
+            d =>
+              d match {
+                case CitConstants.MAVEN_SUPPORT_V4 | CitConstants.MAVEN_SUPPORT_V13 => 
+                  val path = 
+                    if(d == CitConstants.MAVEN_SUPPORT_V4) AddSupportJarAction.getSupportJarFile
+                    else AddSupportJarAction.getSupport13JarFile
+                  val to = getTargetPath(SdkConstants.FD_NATIVE_LIBS + '/' + path.getName)
+                  mValues.finalizingActions.addAction(new Runnable(){
+                    override def run(): Unit = {
+                      try {
+                        val changes: ISet[Change] = copy(path, to, project)
+                        if (!changes.isEmpty) {
+                          monitor.beginTask("Creating project...", changes.size)
+                          try {
+                            val composite = new CompositeChange("", changes.toArray)
+                            composite.perform(monitor);
+                          } catch {
+                            case e: CoreException =>
+                              ArgusPlugin().logError(null, e)
+                              throw new InvocationTargetException(e)
+                          } finally {
+                            monitor.done()
+                          }
+                        }
+                      } catch {
+                        case ioe: IOException =>
+                          ArgusPlugin().logError(null, ioe)
+                      }
+                    }
+                  })
+                case CitConstants.MAVEN_APPCOMPAT =>
+                  mValues.finalizingActions.addAction(new Runnable(){
+                    override def run(): Unit = {
+                      AddSupportJarAction.installAppCompatLibrary(project, true)
+                    }
+                  })
+                case _ =>
+              }
+          }
           createEclipseProject(monitor, project, description, target)
         } catch {
           case e: IOException =>
@@ -217,6 +277,160 @@ object NewArgusProjectCreator {
     }
     
     ResourcesPlugin.getWorkspace.run(workspaceRunnable, monitor)
+  }
+  
+  private def getTargetPath(relative: String): IPath = {
+    var temp = relative
+    if (temp.indexOf('\\') != -1) {
+      temp = temp.replace('\\', '/')
+    }
+    return new Path(temp)
+  }
+  
+  /**
+   * Copies the given source file into the given destination file (where the
+   * source is allowed to be a directory, in which case the whole directory is
+   * copied recursively)
+   */
+  private def copy(src: File, path: IPath, project: IProject): ISet[Change] = {
+    val changes: MSet[Change] = msetEmpty
+    if (src.isDirectory()) {
+      val children = src.listFiles()
+      if (children != null) {
+        for (child <- children) {
+          changes ++= copy(child, path.append(child.getName()), project)
+        }
+      }
+    } else {
+      val dest = project.getFile(path)
+      if (dest.exists() && !(dest.isInstanceOf[IFile])) {// Don't attempt to overwrite a folder
+        return changes.toSet
+      }
+      val file: IFile = dest.asInstanceOf[IFile]
+      val targetName = path.lastSegment()
+      if (dest.isInstanceOf[IFile]) {
+        if (dest.exists() && isIdentical(Files.toByteArray(src), file)) {
+          val label = String.format(
+                  "Not overwriting %1$s because the files are identical", targetName)
+          val change = new NullChange(label)
+          change.setEnabled(false)
+          changes.add(change)
+          return changes.toSet
+        }
+      }
+      
+      if (targetName.endsWith(DOT_XML)
+        || targetName.endsWith(DOT_JAVA)
+        || targetName.endsWith(DOT_TXT)
+        || targetName.endsWith(DOT_RS)
+        || targetName.endsWith(DOT_AIDL)
+        || targetName.endsWith(DOT_SVG)) {
+
+        var newFile = Files.toString(src, Charsets.UTF_8)
+        newFile = format(project, newFile, path)
+
+        val addFile = createNewFileChange(file)
+        addFile.setEdit(new InsertEdit(0, newFile))
+        changes += addFile
+      } else {
+          // Write binary file: Need custom change for that
+          val workspacePath = project.getFullPath().append(path)
+          changes += new CreateFileChange(targetName, workspacePath, src)
+      }
+    }
+    changes.toSet
+  }
+  
+  private def format(project: IProject, contents: String, to: IPath): String = {
+    
+    import scala.collection.JavaConversions._
+    
+    val name = to.lastSegment()
+    if (name.endsWith(DOT_XML)) {
+      val formatStyle = EclipseXmlPrettyPrinter.getForFile(to)
+      val prefs = EclipseXmlFormatPreferences.create()
+      return EclipseXmlPrettyPrinter.prettyPrint(contents, prefs, formatStyle, null)
+    } else if (name.endsWith(DOT_JAVA)) {
+      var options: java.util.Map[_, _] = null
+      if (project != null && project.isAccessible()) {
+        try {
+          val javaProject = BaseProjectHelper.getJavaProject(project)
+          if (javaProject != null) {
+            options = javaProject.getOptions(true)
+          }
+        } catch {
+          case e: CoreException =>
+            ArgusPlugin().logError(null, e)
+        }
+      }
+      if (options == null) {
+        options = JavaCore.getOptions()
+      }
+
+      val formatter = ToolFactory.createCodeFormatter(options)
+
+      try {
+        val doc = new org.eclipse.jface.text.Document()
+        // format the file (the meat and potatoes)
+        doc.set(contents);
+        val edit = formatter.format(
+              CodeFormatter.K_COMPILATION_UNIT | CodeFormatter.F_INCLUDE_COMMENTS,
+              contents, 0, contents.length(), 0, null);
+        if (edit != null) {
+          edit.apply(doc)
+        }
+
+        return doc.get()
+      } catch {
+        case e: Exception =>
+          ArgusPlugin().logError(null, e)
+      }
+    }
+
+    contents
+  }
+  
+  private def createNewFileChange(targetFile: IFile): TextFileChange = {
+    val fileName = targetFile.getName()
+    var message: String = null
+    if (targetFile.exists()) {
+        message = String.format("Replace %1$s", fileName)
+    } else {
+        message = String.format("Create %1$s", fileName)
+    }
+
+    val change = new TextFileChange(message, targetFile) {
+        override protected def acquireDocument(pm: IProgressMonitor): IDocument = {
+          val document = super.acquireDocument(pm)
+
+          // In our case, we know we *always* use this TextFileChange
+          // to *create* files, we're not appending to existing files.
+          // However, due to the following bug we can end up with cached
+          // contents of previously deleted files that happened to have the
+          // same file name:
+          //   https://bugs.eclipse.org/bugs/show_bug.cgi?id=390402
+          // Therefore, as a workaround, wipe out the cached contents here
+          if (document.getLength() > 0) {
+              try {
+                document.replace(0, document.getLength(), "");
+              } catch {
+                case e: BadLocationException =>
+                  // pass
+              }
+          }
+
+          document
+        }
+    }
+    change.setTextType(fileName.substring(fileName.lastIndexOf('.') + 1))
+    change
+  }
+  
+  /** Returns true if the given file contains the given bytes */
+  private def isIdentical(data: Array[Byte], dest: IFile): Boolean = {
+    assert(dest.exists())
+    val existing = AdtUtils.readData(dest)
+    java.util.Arrays.equals(existing, data)
   }
   
   private class WorksetAdder(mProject: IJavaProject, mWorkingSets: IList[IWorkingSet]) extends Runnable {

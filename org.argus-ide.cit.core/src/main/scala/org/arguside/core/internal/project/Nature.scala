@@ -15,6 +15,8 @@ import org.arguside.util.eclipse.EclipseUtils
 import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.core.runtime.NullProgressMonitor
 import com.android.ide.eclipse.adt.AdtConstants
+import org.sireum.util._
+import com.android.ide.eclipse.adt.internal.build.builders.PostCompilerBuilder
 
 
 class Nature extends IProjectNature {
@@ -26,11 +28,36 @@ class Nature extends IProjectNature {
   override def configure() {
     if (project == null || !project.isOpen)
       return
+      
+    updateBuilders(project, List(JavaCore.BUILDER_ID), Some(CitConstants.BuilderId))
   }
 
   override def deconfigure() {
     if (project == null || !project.isOpen)
       return
+      
+    updateBuilders(project, List(CitConstants.BuilderId), Some(JavaCore.BUILDER_ID))
+  }
+  
+  private def updateBuilders(project: IProject, buildersToRemove: List[String], builderToAdd: Option[String]) {
+    EclipseUtils.withSafeRunner(s"Error occurred while trying to update builder of project '$project'") {
+      val description = project.getDescription
+      val previousCommands = description.getBuildSpec
+      val filteredCommands = previousCommands.filterNot(buildersToRemove contains _.getBuilderName).toList
+      val newCommands: IList[ICommand] = 
+        if (!builderToAdd.isDefined || filteredCommands.exists(_.getBuilderName == builderToAdd.get))
+          filteredCommands
+        else
+          filteredCommands :+ {
+            val newBuilderCommand = description.newCommand
+            newBuilderCommand.setBuilderName(builderToAdd.get)
+            newBuilderCommand
+          }
+      //always keep the android builder at the end
+      val newerCommands: IList[ICommand] = newCommands.filterNot(_.getBuilderName == PostCompilerBuilder.ID) ::: newCommands.filter(_.getBuilderName == PostCompilerBuilder.ID)
+      description.setBuildSpec(newerCommands.toArray)
+      project.setDescription(description, IResource.FORCE, null)
+    }
   }
 
 }
@@ -41,7 +68,6 @@ object Nature {
     if(project == null || !project.isOpen()) return
     if(usemonitor == null) usemonitor = new NullProgressMonitor
     updateNatureIds(project, monitor)(_ filter (x => false))
-    
     // Add the natures. We need to add the Java nature first, so it adds its builder to the
     // project first. This way, when the android nature is added, we can control where to put
     // the android builders in relation to the java builder.

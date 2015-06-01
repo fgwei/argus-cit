@@ -4,8 +4,8 @@ import org.sireum.amandroid.parser.AndroidXMLHandler
 import java.io.File
 import java.io.InputStream
 import java.io.IOException
-import brut.androlib.res.decoder.AXmlResourceParser
-import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin
+import android.content.res.AXmlResourceParser
+import android.util.TypedValue
 
 object ManifestParser {
   def loadPackageName(apk: File): String = {
@@ -123,12 +123,69 @@ object ManifestParser {
   
   private def getAttributeValue(parser: AXmlResourceParser, attributeName: String): String = {
     val count = parser.getAttributeCount
-    for (i <- 0 to count - 1){
-      ArgusJDTWeavingPlugin.logErrorMessage(parser.getAttributeName(i).equals(attributeName) + "")
-      ArgusJDTWeavingPlugin.logErrorMessage(parser.getAttributeValue(i))      
+    for (i <- 0 to count - 1){ 
       if (parser.getAttributeName(i).equals(attributeName))
-        return parser.getAttributeValue(i)
+        return getAttributeValue(parser, i)
     }
     null
   }
+  
+  private def getAttributeValue(parser: AXmlResourceParser,index: Int): String = {
+    val typ: Int = parser.getAttributeValueType(index)
+    val data: Int = parser.getAttributeValueData(index)
+    if (typ == TypedValue.TYPE_STRING) {
+      return parser.getAttributeValue(index);
+    }
+    if (typ==TypedValue.TYPE_ATTRIBUTE) {
+      val pkg = getPackage(data)
+      return f"?$pkg%s$data%08X"
+    }
+    if (typ==TypedValue.TYPE_REFERENCE) {
+      val pkg = getPackage(data)
+      return f"@$pkg%s$data%08X"
+    }
+    if (typ==TypedValue.TYPE_FLOAT) {
+      return String.valueOf(data.toFloat)
+    }
+    if (typ==TypedValue.TYPE_INT_HEX) {
+      return f"0x$data%08X"
+    }
+    if (typ==TypedValue.TYPE_INT_BOOLEAN) {
+      return if(data!=0)"true"else"false"
+    }
+    if (typ==TypedValue.TYPE_DIMENSION) {
+      return complexToFloat(data) + DIMENSION_UNITS(data & TypedValue.COMPLEX_UNIT_MASK)
+    }
+    if (typ == TypedValue.TYPE_FRACTION) {
+      return complexToFloat(data) + FRACTION_UNITS(data & TypedValue.COMPLEX_UNIT_MASK)
+    }
+    if (typ >= TypedValue.TYPE_FIRST_COLOR_INT && typ<=TypedValue.TYPE_LAST_COLOR_INT) {
+      return f"#$data%08X"
+    }
+    if (typ >= TypedValue.TYPE_FIRST_INT && typ<=TypedValue.TYPE_LAST_INT) {
+      return String.valueOf(data)
+    }
+    return f"<0x$data%X, type 0x$typ%02X>"
+  }
+  
+  private def getPackage(id: Int): String = {
+    if (id>>>24==1) {
+      return "android:"
+    }
+    return ""
+  }
+  
+  def complexToFloat(complex: Int): Float = {
+    return (complex & 0xFFFFFF00)*RADIX_MULTS((complex>>4) & 3)
+  }
+  
+  private final def RADIX_MULTS = List(
+    0.00390625F,3.051758E-005F,1.192093E-007F,4.656613E-010F
+  )
+  private final def DIMENSION_UNITS = List(
+    "px","dip","sp","pt","in","mm","",""
+  )
+  private final def FRACTION_UNITS = List(
+    "%","%p","","","","","",""
+  )
 }

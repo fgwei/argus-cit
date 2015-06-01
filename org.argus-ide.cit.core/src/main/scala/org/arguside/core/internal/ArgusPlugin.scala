@@ -263,4 +263,12 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     }
   }
 
+  def logError(message: String, exception: Throwable): Unit = {
+    logger.error(if(message == null) "" else message, exception)
+  }
+  
+  def logError(message: String): Unit = {
+    logger.error(if(message == null) "" else message)
+  }
+  
 }

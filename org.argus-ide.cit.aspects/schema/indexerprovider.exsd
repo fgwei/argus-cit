@@ -6,7 +6,7 @@
          <meta.schema plugin="argus.tools.eclipse.contribution.weaving.jdt" id="indexerprovider" name="Indexer Provider"/>
       </appinfo>
       <documentation>
-         Provides an alternate implementation of SourceIndexer for Scala source files.
+         Provides an alternate implementation of SourceIndexer for Jawa source files.
       </documentation>
    </annotation>
 

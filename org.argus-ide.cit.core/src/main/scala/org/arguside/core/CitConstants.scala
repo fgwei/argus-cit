@@ -32,4 +32,9 @@ object CitConstants {
 
   final val IssueTracker = "https://github.com/fgwei/argus-ide/issues"
 
+  // dependency libs
+  final val MAVEN_SUPPORT_V4 = "support-v4"   //$NON-NLS-1$
+  final val MAVEN_SUPPORT_V13 = "support-v13" //$NON-NLS-1$
+  final val MAVEN_APPCOMPAT = "appcompat-v7"  //$NON-NLS-1$
+  
 }

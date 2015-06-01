@@ -11,8 +11,8 @@ import org.arguside.core.internal.logging.EclipseLogger
  * Clients can inject different loggers if needed.
  */
 trait HasLogger {
-  /** The Scala IDE logger.
-   *  To use to log messages in the Scala IDE log.
+  /** The Argus IDE logger.
+   *  To use to log messages in the Argus IDE log.
    */
   protected[this] lazy val logger: Logger = {
     val clazz = this.getClass

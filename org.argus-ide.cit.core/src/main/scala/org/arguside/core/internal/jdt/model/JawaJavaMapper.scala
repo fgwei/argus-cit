@@ -20,7 +20,7 @@ import org.sireum.jawa.sjc.JawaType
  */
 trait JawaJavaMapper extends InternalCompilerServices with HasLogger { self: JawaPresentationCompiler =>
 
-  /** Return the Java Element corresponding to the given Jawa Token, looking in the
+  /** Return the Java Element corresponding to the given Jawa Element, looking in the
    *  given project list
    *
    *  If the symbol exists in several projects, it returns one of them.
@@ -72,19 +72,23 @@ trait JawaJavaMapper extends InternalCompilerServices with HasLogger { self: Jaw
   }
 
   override def mapModifiers(je: SJCJawaElement): Int = {
+    mapModifiers(je.getAccessFlags)
+  }
+  
+  override def mapModifiers(af: Int): Int = {
     var jdtMods = 0
-    if(je.isPrivate)
+    if(AccessFlag.isPrivate(af))
       jdtMods = jdtMods | ClassFileConstants.AccPrivate
     else
       jdtMods = jdtMods | ClassFileConstants.AccPublic
 
-    if(je.isAbstract)
+    if(AccessFlag.isAbstract(af))
       jdtMods = jdtMods | ClassFileConstants.AccAbstract
 
-    if(je.isFinal)
+    if(AccessFlag.isFinal(af))
       jdtMods = jdtMods | ClassFileConstants.AccFinal
 
-    if(AccessFlag.isInterface(je.getAccessFlags))
+    if(AccessFlag.isInterface(af))
       jdtMods = jdtMods | ClassFileConstants.AccInterface
 
     jdtMods

@@ -260,7 +260,7 @@
       <editor
             class="org.arguside.ui.internal.editor.JawaSourceFileEditor"
             contributorClass="org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditorActionContributor"
-            default="false"
+            default="true"
             extensions="pilar,plr"
             icon="icons/full/obj16/scu_obj.gif"
             id="argus.tools.eclipse.JawaSourceFileEditor"
@@ -550,6 +550,18 @@
             id="org.argus-ide.cit.core.wizards"
             name="Argus">
       </category>
+   </extension>
+   <extension
+         point="org.argus-ide.cit.aspects.indexerprovider">
+      <provider
+            class="org.arguside.core.internal.jdt.search.JawaSourceIndexerFactory">
+      </provider>
+   </extension>
+   <extension
+         point="org.argus-ide.cit.aspects.openactionprovider">
+      <provider
+            class="org.arguside.ui.internal.actions.hyperlinks.OpenActionProvider">
+      </provider>
    </extension>
 
 

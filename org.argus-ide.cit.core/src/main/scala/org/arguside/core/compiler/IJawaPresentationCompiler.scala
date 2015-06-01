@@ -22,6 +22,7 @@ import org.sireum.jawa.sjc.util.FailedInterrupt
 import org.sireum.jawa.sjc.interactive.FreshRunReq
 import org.sireum.jawa.sjc.interactive.MissingResponse
 import org.sireum.jawa.sjc.parser.CompilationUnit
+import org.sireum.jawa.sjc.interactive.{JawaElement => SJCJawaElement}
 
 /** This interface provides access to Jawa Presentation compiler services. Even though methods are inherited from
  *  `org.sireum.jawa.sjc.interactive.Global`, prefer the convenience methods offered in this trait.
@@ -152,7 +153,7 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *        be different from the absolute offset in the workspace file of that unit if the unit is
    *        not a Jawa source file.
    */
-  def findDeclaration(token: JawaToken, javaProject: IJavaProject): Option[(InteractiveCompilationUnit, Int)]
+  def findDeclaration(node: JawaAstNode, javaProject: IJavaProject): Option[(InteractiveCompilationUnit, Int)]
 
   /** Return the JDT element corresponding to this Jawa symbol. This method is time-consuming
    *  and may trigger building the structure of many Jawa files.
@@ -164,14 +165,14 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *                  it uses all Java projects in the workspace. Usually, a single projects
    *                  is passed.
    */
-//  def getJavaElement(token: JawaToken, projects: IJavaProject*): Option[IJavaElement]
+  def getJavaElement(token: SJCJawaElement, projects: IJavaProject*): Option[IJavaElement]
 
   /** Return the compilation unit (Jawa File) in which the symbol passed as an argument is defined.
    *  This method is time-consuming and may trigger building the structure of many Scala files.
    *
    *  @param token      The token to seek a compilation unit for.
    */
-  def findCompilationUnit(token: JawaToken, javaProject: IJavaProject): Option[InteractiveCompilationUnit]
+  def findCompilationUnit(node: JawaAstNode, javaProject: IJavaProject): Option[InteractiveCompilationUnit]
 
 
 

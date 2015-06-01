@@ -18,7 +18,7 @@ public aspect IndexerProviderAspect {
     indexDocument(document, indexPath) {
 
     String path = document.getPath();
-    if (path.endsWith(".pilar")||path.endsWith(".plr")) {
+    if (path.endsWith(".pilar") || path.endsWith(".plr")) {
       for (IIndexerFactory provider : IndexerProviderRegistry.getInstance().getProviders()) {
         try {
           AbstractIndexer indexer = provider.createIndexer(document);
@@ -27,15 +27,9 @@ public aspect IndexerProviderAspect {
           ArgusJDTWeavingPlugin.logException(t);
         }
       }
-    } else if (!isScalaArtifact(path)) {
+    } else {
       proceed(document, indexPath);
     }
   }
 
-  private boolean isScalaArtifact(String path) {
-    return path.endsWith(".class")
-        && (path.endsWith("$.class")          // top-level object
-            || path.endsWith("$class.class")  // trait implementation class
-            || path.contains("$anon"));       // anonymous class or function
-  }
 }

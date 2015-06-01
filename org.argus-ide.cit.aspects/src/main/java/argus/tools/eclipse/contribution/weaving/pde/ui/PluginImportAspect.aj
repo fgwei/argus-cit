@@ -27,7 +27,7 @@ public privileged aspect PluginImportAspect {
           }
         } else {
           String label = provider.getLabel(curr); 
-          if (label.endsWith(".java") || label.endsWith(".scala") || label.endsWith(".aj")) {
+          if (label.endsWith(".java") || label.endsWith(".scala") || label.endsWith(".pilar") || label.endsWith(".plr") || label.endsWith(".aj")) {
             return true;
           }
         }

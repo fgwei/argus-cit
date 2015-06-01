@@ -53,6 +53,8 @@ class NewArgusProjectWizardState {
   /** The set of chosen working sets to use when creating the project */
   var workingSets: IList[IWorkingSet] = ilistEmpty
 
+  val finalizingActions: FinalizingActions = new FinalizingActions
+  
   /**
    * Returns the build target API level
    *

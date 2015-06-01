@@ -12,6 +12,8 @@ import org.eclipse.jdt.internal.core.builder.JavaBuilder;
 //import org.eclipse.jdt.internal.core.builder.ClasspathMultiDirectory;
 import org.eclipse.jdt.internal.core.util.Util;
 
+import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin;
+
 @SuppressWarnings("restriction")
 public privileged aspect JawaJavaBuilderAspect {
   pointcut build() :
@@ -46,6 +48,7 @@ public privileged aspect JawaJavaBuilderAspect {
     isJavaLikeFileName(fileName) &&
     cflow(build()) &&
     !cflow(cleanOutputFolders(*)) {
+	ArgusJDTWeavingPlugin.logErrorMessage("javafile:" + fileName);
     if (fileName != null && (fileName.endsWith("pilar") || fileName.endsWith("plr")))
       return false;
     else
@@ -55,6 +58,7 @@ public privileged aspect JawaJavaBuilderAspect {
   boolean around(IResource resource) :
     filterExtraResource(resource) &&
     cflow(build()) {
+	ArgusJDTWeavingPlugin.logErrorMessage("javafileExtra:" + resource.getName());
     return (resource.getName().endsWith(".pilar") || resource.getName().endsWith(".plr")) || proceed(resource);
   }
 }

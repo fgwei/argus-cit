@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/asm-all.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/AXMLPrinter2.jar" sourcepath="/sireum-amandroid/lib/AXMLPrinter2-src.zip"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="lib/antlr-runtime.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/antlr4-runtime.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/apfloat.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/apktool.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/automaton.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/axml.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/blueprints-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-configuration.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javax.servlet-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javax.websocket-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jettison.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jetty.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jgrapht-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jgrapht-ext.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsr305.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mapdb.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/rxjava-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/rxjava-scala.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/scala-logging.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-alir.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-amandroid-alir.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-amandroid-cli.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-amandroid-security.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-amandroid.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-cli.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-jawa-alir.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-jawa.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-macro.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-option.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-parser.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-pilar.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-pipeline.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-tools.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-util.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-jdk14.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/string-template.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/tika-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlpull.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xpp3_min.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xstream.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/akka-actor_2.11-2.3.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/config-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/jline-2.12.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-actors-2.11.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-actors-migration_2.11-1.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-compiler.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-continuations-library_2.11-1.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-continuations-plugin_2.11.5-1.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-library.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-parser-combinators_2.11-1.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-reflect.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-swing_2.11-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scala-xml_2.11-1.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="elib/scalap-2.11.6.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

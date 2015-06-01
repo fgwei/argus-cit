@@ -4,7 +4,7 @@ import argus.tools.eclipse.contribution.weaving.jdt.util.AbstractProviderRegistr
 
 public class IndexerProviderRegistry extends AbstractProviderRegistry<IIndexerFactory> {
 
-        public static String INDEXING_PROVIDERS_EXTENSION_POINT = "org.argus-ide.cit.aspects.indexerprovider"; //$NON-NLS-1$
+    public static String INDEXING_PROVIDERS_EXTENSION_POINT = "org.argus-ide.cit.aspects.indexerprovider"; //$NON-NLS-1$
 
 	private static final IndexerProviderRegistry INSTANCE = new IndexerProviderRegistry();
 
