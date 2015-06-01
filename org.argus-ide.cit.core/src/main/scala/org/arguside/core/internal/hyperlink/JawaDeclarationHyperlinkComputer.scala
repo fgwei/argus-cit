@@ -28,21 +28,20 @@ class JawaDeclarationHyperlinkComputer extends HasLogger {
 
         val pos = Position.range(sourceFile, start, end - start + 1)
         
-//        val nodeOpt: Option[List[(JawaAstNode, String)]] = compiler.asyncExec {
-//          val targetsOpt = Option(List[JawaToken]())
-//
-//          for {
-//            targets <- targetsOpt.toList
-//            target <- targets
-//          } yield (target -> target.toString)
-//        }.getOption()
-//
-//        tokenOpt map { syms =>
-//          syms flatMap {
-//            case (sym, symName) => compiler.mkHyperlink(sym, s"Open Declaration (${symName})", wordRegion, icu.argusProject.javaProject).toList
-//          }
-//        }
-        None
+        val nodeOpt: Option[List[(JawaAstNode, String)]] = compiler.asyncExec {
+          val targetsOpt = Option(List[JawaAstNode]())
+
+          for {
+            targets <- targetsOpt.toList
+            target <- targets
+          } yield (target -> target.toString)
+        }.getOption()
+
+        nodeOpt map { nodes =>
+          nodes flatMap {
+            case (node, nodeName) => compiler.mkHyperlink(node, s"Open Declaration (${nodeName})", wordRegion, icu.argusProject.javaProject).toList
+          }
+        }
       }
     }).flatten
   }

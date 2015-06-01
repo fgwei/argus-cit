@@ -181,14 +181,14 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *  @note The resulting type does not have any path-dependent types coming from the
    *        compiler instance.
    *
-   * @param token         The token definition to which the hyperlink should go
+   * @param node       The ast definition to which the hyperlink should go
    * @param name        The primary information to be displayed, if more than one hyperlink is available
    * @param region      The region to be underlined in the editor
    * @param javaProject The java project where to search for the definition of this symbol
    * @param label       A way to compute the attached hyperlink label. Normally this can be ignored and use the default label,
    *                    consisting of the symbol kind and full name.
    */
-  def mkHyperlink(token: JawaToken, name: String, region: IRegion, javaProject: IJavaProject, label: JawaToken => String = defaultHyperlinkLabel _): Option[IHyperlink]
+  def mkHyperlink(node: JawaAstNode, name: String, region: IRegion, javaProject: IJavaProject, label: JawaAstNode => String = defaultHyperlinkLabel _): Option[IHyperlink]
 }
 
 object IJawaPresentationCompiler extends HasLogger {

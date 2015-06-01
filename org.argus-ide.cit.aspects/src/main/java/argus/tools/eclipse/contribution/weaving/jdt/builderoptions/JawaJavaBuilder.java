@@ -10,7 +10,6 @@ import org.eclipse.jdt.internal.core.builder.JavaBuilder;
 @SuppressWarnings("restriction")
 public abstract class JawaJavaBuilder extends JavaBuilder {
 
-  
   @Override
   public void clean(IProgressMonitor monitor) throws CoreException {
     super.clean(monitor);

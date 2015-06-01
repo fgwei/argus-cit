@@ -1,10 +1,6 @@
 **/.cache
 **/*.tmpBin
 target/
-org.argus-ide.cit.core/META-INF/MANIFEST.MF
-org.argus-ide.cit.debug/META-INF/MANIFEST.MF
-org.argus-ide.cit.feature/feature.xml
-org.argus-ide.cit.source.feature/feature.xml
 .idea
 .metadata
 *~

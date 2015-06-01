@@ -364,25 +364,25 @@ class JawaPresentationCompiler(name: String) extends {
 //      docFun)
 //  }
 
-  def mkHyperlink(token: JawaToken, name: String, region: IRegion, javaProject: IJavaProject, label: JawaToken => String = defaultHyperlinkLabel _): Option[IHyperlink] = {
+  def mkHyperlink(node: JawaAstNode, name: String, region: IRegion, javaProject: IJavaProject, label: JawaAstNode => String = defaultHyperlinkLabel _): Option[IHyperlink] = {
     import org.arguside.util.eclipse.RegionUtils._
 
     asyncExec {
-//      findDeclaration(token, javaProject) map {
-//        case (f, pos) =>
-//          val tokenLen = token.length
-//          val targetRegion = (new Region(pos, tokenLen)).map(f.jawaPos)
-//          new JawaHyperlink(openableOrUnit = f,
-//              region = targetRegion,
-//              label = label(token),
-//              text = name,
-//              wordRegion = region)
-//      }
+      findDeclaration(node, javaProject) map {
+        case (f, pos) =>
+          val nodeLen = node.toCode.length()
+          val targetRegion = (new Region(pos, nodeLen)).map(f.jawaPos)
+          new JawaHyperlink(openableOrUnit = f,
+              region = targetRegion,
+              label = label(node),
+              text = name,
+              wordRegion = region)
+      }
       None
     }.getOrElse(None)()
   }
 
-  private [core] def defaultHyperlinkLabel(token: JawaToken): String = s"${token.text}"
+  private [core] def defaultHyperlinkLabel(node: JawaAstNode): String = s"${node.toCode}"
 
   override def inform(msg: String): Unit =
     logger.debug("[%s]: %s".format(name, msg))
