@@ -271,4 +271,8 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     logger.error(if(message == null) "" else message)
   }
   
+  def eclipseError(message: String): Unit = {
+    eclipseLog.error(message)
+  }
+  
 }

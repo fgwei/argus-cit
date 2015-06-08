@@ -3,6 +3,7 @@ package org.arguside.ui.editor
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.Region
+import org.sireum.jawa.sjc.lexer.Chars
 
 object WordFinder {
   /** Returns the region of the word enclosing the given offset in the document.
@@ -16,10 +17,13 @@ object WordFinder {
   def findWord(document: IDocument, offset: Int): IRegion = {
     val docLenght = document.getLength()
     var end = offset
-    while (end < docLenght && !Character.isWhitespace(document.getChar(end))) end += 1
+    while (end < docLenght && !Chars.isWhitespace(document.getChar(end)) && document.getChar(end) != '`') end += 1
+    val isGraveAccent = if(document.getChar(end) == '`') true else false
+    end = offset
+    while (end < docLenght && Chars.isIdentifierPart(document.getChar(end), isGraveAccent)) end += 1
 
     var start = offset
-    while (start > 0 && !Character.isWhitespace(document.getChar(start - 1))) start -= 1
+    while (start > 0 && Chars.isIdentifierPart(document.getChar(start - 1), isGraveAccent)) start -= 1
 
     start = Math.max(0, start)
     end = Math.min(docLenght, end)

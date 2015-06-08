@@ -189,8 +189,8 @@ trait JawaCompilationUnit extends Openable
   override def codeSelect(cu: env.ICompilationUnit, offset: Int, length: Int, workingCopyOwner: WorkingCopyOwner): Array[IJavaElement] = {
     withSourceFile { (srcFile, compiler) =>
       val pos = Position.range(srcFile, offset, 1)
-
-//      compiler.askLinkPos(token)
+      
+      
       
       val res: MList[IJavaElement] = mlistEmpty
       res

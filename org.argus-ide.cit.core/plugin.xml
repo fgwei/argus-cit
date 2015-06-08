@@ -352,16 +352,6 @@
       </actionSetPartAssociation>
    </extension>
    <extension
-         point="org.eclipse.jdt.ui.javaElementFilters">
-      <filter
-            class="org.arguside.ui.internal.jdt.model.JawaElementFilter"
-            description="Prevents Jawa elements which are artefacts of the Jawa to Java encoding from appearing in the Package Explorer"
-            enabled="true"
-            id="argus.tools.eclipse.javaelements.JawaElementFilter"
-            name="Jawa element filter">
-      </filter>
-   </extension>
-   <extension
          point="org.eclipse.core.filebuffers.documentSetup">
       <participant
             class="org.eclipse.jdt.internal.ui.javaeditor.JavaDocumentSetupParticipant"
@@ -418,6 +408,10 @@
             markerType="org.argus-ide.cit.core.problem"
             name="org.eclipse.jdt.ui.warning"
             super="org.eclipse.ui.workbench.texteditor.warning">
+      </type>
+      <type
+            markerType="org.arguside.refactoring.extractionScope"
+            name="org.arguside.refactoring.extractionScope">
       </type>
    </extension>
    <extension
@@ -562,6 +556,14 @@
       <provider
             class="org.arguside.ui.internal.actions.hyperlinks.OpenActionProvider">
       </provider>
+   </extension>
+   <extension
+         id="org.arguside.refactoring.extractionScope"
+         name="Extraction Scope"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
    </extension>
 
 

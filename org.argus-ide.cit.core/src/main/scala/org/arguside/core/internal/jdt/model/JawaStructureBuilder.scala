@@ -106,16 +106,16 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
         
         classElemInfo.setFlags0((mapModifiers(clazz)))
 
-        val superClass = clazz.getSuperClass match {
-          case Some(su) => classElemInfo.setSuperclassName(su.getName.toCharArray)
+        val superClass = c.superClassOpt match {
+          case Some(su) => classElemInfo.setSuperclassName(su.name.toCharArray)
           case None =>
         }
         
-        val interfaceNames = clazz.getInterfaces.map(_.getName.toCharArray)
+        val interfaceNames = c.interfaces.map(_.name.toCharArray)
         classElemInfo.setSuperInterfaceNames(interfaceNames.toArray)
         
-        val start: Int = c.cityp.baseTypeID.pos.start
-        val end: Int = c.cityp.baseTypeID.pos.end
+        val start: Int = c.cityp.firstToken.pos.start
+        val end: Int = c.cityp.firstToken.pos.end
         classElemInfo.setNameSourceStart0(start)
         classElemInfo.setNameSourceEnd0(end)
         setSourceRange(classElemInfo, c)
@@ -147,8 +147,8 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
         val fieldElemInfo = new JawaSourceFieldElementInfo
         fieldElemInfo.setFlags0(mapModifiers(field))
 
-        val start = f.nameID.pos.start
-        val end = f.nameID.pos.end
+        val start = f.fieldSymbol.id.pos.start
+        val end = f.fieldSymbol.id.pos.end
 
         fieldElemInfo.setNameSourceStart0(start)
         fieldElemInfo.setNameSourceEnd0(end)
@@ -165,9 +165,11 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
       override def addMethod(m: MethodDeclaration): Owner = {
         val method = getMethod(m.signature).get
         val isCtor0 = method.isConstructor
-        val nameString = method.getName.replaceAll("<init>", "init_ctor").replaceAll("<clinit>", "init_sctor")
+        val nameString = 
+          if(isCtor0) m.enclosingTopLevelClass.typ.simpleName
+          else method.getName
 
-        val paramsTypes = method.getParamTypes.map(n => n.name).toArray
+        val paramsTypes = m.signature.getParameterTypes().map(n => formatTypeToTypeSignature(n)).toArray
 
         /** Return the parameter names. Make sure that parameter names and the
          *  parameter types have the same length. A mismatch here will crash the JDT later.
@@ -189,14 +191,14 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
             new JawaSourceMethodInfo
 
         methodElemInfo.setArgumentNames(paramNames)
-        methodElemInfo.setReturnType(method.returnType.name.toCharArray())
+        methodElemInfo.setReturnType(method.returnType.canonicalName.toCharArray())
 
         val mods = mapModifiers(method)
 
         methodElemInfo.setFlags0(mods)
 
-        val start = m.nameID.pos.start
-        val end = m.nameID.pos.end
+        val start = m.methodSymbol.id.pos.start
+        val end = m.methodSymbol.id.pos.end
 
         methodElemInfo.setNameSourceStart0(start)
         methodElemInfo.setNameSourceEnd0(end)

@@ -21,7 +21,7 @@ class DeclarationHyperlinkDetector extends BaseHyperlinkDetector with HasLogger 
   override protected def runDetectionStrategy(icu: InteractiveCompilationUnit, textEditor: ITextEditor, currentSelection: IRegion): List[IHyperlink] = {
     val input = textEditor.getEditorInput
     val doc = textEditor.getDocumentProvider.getDocument(input)
-    val wordRegion = JawaWordFinder.findWord(doc.get, currentSelection.getOffset)
+    val wordRegion = JawaWordFinder.findWord(doc, currentSelection.getOffset)
 
     findHyperlinks(textEditor, icu, wordRegion)
   }
@@ -39,7 +39,7 @@ class DeclarationHyperlinkDetector extends BaseHyperlinkDetector with HasLogger 
             // the following assumes too heavily a Java compilation unit, being based on the dreaded
             // ScalaSelectionEngine. However, this is a last-resort hyperlinking that uses search for
             // top-level types, and unless there are bugs, normal hyperlinking (through compiler symbols)
-            // would find it. So we go here only for `ScalaCompilationUnit`s.
+            // would find it. So we go here only for `JawaCompilationUnit`s.
             javaDeclarationHyperlinkComputer(textEditor, wordRegion, icuOpenable, icuOpenable, mappedRegion)
           case _ =>
             javaDeclarationHyperlinkComputer(textEditor, wordRegion, icu, null, mappedRegion)
@@ -71,7 +71,7 @@ object DeclarationHyperlinkDetector {
 
 /** Helper object to locate Java elements based on a region */
 object JavaSelectionEngine extends HasLogger {
- protected[core] def getJavaElements(icu: InteractiveCompilationUnit, openable: Openable, mappedRegion: IRegion): List[IJavaElement] = {
+  protected[core] def getJavaElements(icu: InteractiveCompilationUnit, openable: Openable, mappedRegion: IRegion): List[IJavaElement] = {
     try {
       val environment = icu.argusProject.newSearchableEnvironment()
       val requestor = new JawaSelectionRequestor(environment.nameLookup, openable)

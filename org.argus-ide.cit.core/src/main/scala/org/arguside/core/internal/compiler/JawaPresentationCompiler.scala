@@ -49,6 +49,22 @@ import org.arguside.core.internal.hyperlink.JawaHyperlink
 import org.arguside.core.internal.jdt.model.JawaStructureBuilder
 import org.arguside.core.internal.jdt.model.JawaJavaMapper
 import org.arguside.core.internal.jdt.search.JawaIndexBuilder
+import org.sireum.jawa.sjc.parser.JawaSymbol
+import org.sireum.jawa.sjc.parser.ClassSym
+import org.sireum.jawa.sjc.parser.MethodSym
+import org.sireum.jawa.sjc.parser.TypeSymbol
+import org.sireum.jawa.sjc.parser.MethodNameSymbol
+import org.sireum.jawa.sjc.parser.SignatureSymbol
+import org.sireum.jawa.sjc.parser.FieldNameSymbol
+import org.sireum.jawa.sjc.parser.LocationSymbol
+import org.sireum.jawa.sjc.parser.VarSymbol
+import org.sireum.jawa.sjc.parser.RefSymbol
+import org.eclipse.core.resources.IProject
+import com.android.ide.eclipse.adt.AdtUtils
+import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility
+import org.eclipse.core.resources.ResourcesPlugin
+import org.sireum.jawa.sjc.parser.DefSymbol
+import org.eclipse.jdt.ui.JavaUI
 
 class JawaPresentationCompiler(name: String) extends {
   /*
@@ -128,9 +144,9 @@ class JawaPresentationCompiler(name: String) extends {
     super.askFilesDeleted(sources, response)
   }
 
-  override def askLinkPos(token: JawaToken, response: Response[Position]): Unit = {
+  override def askLinkPos(sym: JawaSymbol, response: Response[Position]): Unit = {
     flushScheduledReloads()
-    super.askLinkPos(token, response)
+    super.askLinkPos(sym, response)
   }
 
   override def askParsedEntered(source: SourceFile, keepLoaded: Boolean, response: Response[CompilationUnit]): Unit = {
@@ -141,6 +157,11 @@ class JawaPresentationCompiler(name: String) extends {
   override def askToDoFirst(source: SourceFile): Unit = {
     flushScheduledReloads()
     super.askToDoFirst(source)
+  }
+  
+  override def askTypeAt(pos: Position, response: Response[Option[JawaSymbol]]): Unit = {
+    flushScheduledReloads()
+    super.askTypeAt(pos, response)
   }
 
   override def askStructure(sourceFile: SourceFile, keepLoaded: Boolean): Response[CompilationUnit] = {
@@ -364,22 +385,17 @@ class JawaPresentationCompiler(name: String) extends {
 //      docFun)
 //  }
 
-  def mkHyperlink(node: JawaAstNode, name: String, region: IRegion, javaProject: IJavaProject, label: JawaAstNode => String = defaultHyperlinkLabel _): Option[IHyperlink] = {
+  def mkHyperlink(sym: JawaSymbol, name: String, region: IRegion, label: JawaAstNode => String = defaultHyperlinkLabel _): Option[IHyperlink] = {
     import org.arguside.util.eclipse.RegionUtils._
-
-    asyncExec {
-      findDeclaration(node, javaProject) map {
-        case (f, pos) =>
-          val nodeLen = node.toCode.length()
-          val targetRegion = (new Region(pos, nodeLen)).map(f.jawaPos)
-          new JawaHyperlink(openableOrUnit = f,
-              region = targetRegion,
-              label = label(node),
-              text = name,
-              wordRegion = region)
-      }
-      None
+    
+    val link = asyncExec {
+      val elementOrPos = findDeclaration(sym)
+      Some(new JawaHyperlink(elementOrPos,
+        label = label(sym),
+        text = name,
+        wordRegion = region))
     }.getOrElse(None)()
+    link
   }
 
   private [core] def defaultHyperlinkLabel(node: JawaAstNode): String = s"${node.toCode}"

@@ -30,37 +30,40 @@ trait JawaIndexBuilder extends HasLogger { self: JawaPresentationCompiler =>
   class IndexBuilderTraverser(indexer : JawaSourceIndexer) {
 
     def getSuperNames(supers: List[ObjectType]): Array[Array[Char]] = {
-      val superNames = supers map (_.name.toArray)
+      val superNames = supers map (_.canonicalName.toArray)
       superNames.toArray
     }
 
     def addClass(c : ClassOrInterfaceDeclaration) {
       val classType = c.typ
-      val enclClassNames = classType.getEnclosingTypes.map(_.name.toCharArray())
+      val enclClassNames = classType.getEnclosingTypes.map(_.canonicalName.toCharArray())
       indexer.addClassDeclaration(
         mapModifiers(AccessFlag.getAccessFlags(c.accessModifier)),
         c.typ.pkg.toCharArray,
         c.typ.simpleName.toCharArray,
         enclClassNames.toArray,
-        Array.empty,
-        getSuperNames(c.parents),
+        c.superClassOpt.getOrElse(JAVA_TOPLEVEL_OBJECT_TYPE).canonicalName.toArray,
+        getSuperNames(c.interfaces),
         Array.empty,
         true
       )
     }
 
     def addField(v : Field with Declaration) {
-      indexer.addFieldDeclaration(v.typ.typ.name.toCharArray, v.fieldName.toCharArray())
+      indexer.addFieldDeclaration(v.typ.typ.canonicalName.toCharArray, v.fieldName.toCharArray())
     }
 
     def addMethod(d : MethodDeclaration) {
-      val name = d.name.toCharArray()
+      val name = 
+        if(d.isConstructor) d.enclosingTopLevelClass.typ.simpleName.toCharArray()
+        else d.name.toCharArray()
+      
       val paramTypes = d.signature.getParameterTypes()
       val returnType = d.signature.getReturnType()
       indexer.addMethodDeclaration(
         name,
-        paramTypes.map(_.name.toCharArray()).toArray,
-        returnType.name.toCharArray(),
+        paramTypes.map(_.canonicalName.toCharArray()).toArray,
+        returnType.canonicalName.toCharArray(),
         Array.empty
       )
     }

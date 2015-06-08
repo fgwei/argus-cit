@@ -43,7 +43,8 @@ Require-Bundle:
  org.eclipse.e4.ui.workbench,
  org.eclipse.e4.ui.model.workbench,
  sireum-jawa-compiler;bundle-version="1.0.0",
- org.sireum;bundle-version="2.0.0"
+ org.sireum;bundle-version="2.0.0",
+ com.android.ide.eclipse.ddms;bundle-version="23.0.6"
 Import-Package: 
  argus.tools.eclipse.contribution.weaving.jdt;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.cfprovider;apply-aspects:=false,

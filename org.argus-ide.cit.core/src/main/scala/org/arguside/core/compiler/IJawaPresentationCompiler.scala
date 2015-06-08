@@ -23,6 +23,7 @@ import org.sireum.jawa.sjc.interactive.FreshRunReq
 import org.sireum.jawa.sjc.interactive.MissingResponse
 import org.sireum.jawa.sjc.parser.CompilationUnit
 import org.sireum.jawa.sjc.interactive.{JawaElement => SJCJawaElement}
+import org.sireum.jawa.sjc.parser.JawaSymbol
 
 /** This interface provides access to Jawa Presentation compiler services. Even though methods are inherited from
  *  `org.sireum.jawa.sjc.interactive.Global`, prefer the convenience methods offered in this trait.
@@ -71,9 +72,19 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *  @note This operation does not automatically load `source`. If `source`
    *  is unloaded, it stays that way.
    */
-  def askLinkPos(token: JawaToken): Response[Position] =
-    withResponse[Position](askLinkPos(token, _))
+  def askLinkPos(sym: JawaSymbol): Response[Position] =
+    withResponse[Position](askLinkPos(sym, _))
 
+  /** Returns a `response` containing the smallest fully attributed tree that encloses position `pos`.
+   *
+   *  Sometimes the smallest enclosing tree is not what you expect, for example when a polymorphic
+   *  method call is at `pos`. The returned tree is the tree below the type application, meaning that
+   *  it has the generic type, instead of the applied type.
+   *
+   *  @note Unlike for most other ask... operations, the source file belonging to `pos` needs not be loaded.
+   */
+  def askTypeAt(pos: Position): Response[Option[JawaSymbol]] =
+    withResponse[Option[JawaSymbol]](askTypeAt(pos, _))
 
   /** If source is not yet loaded, get an outline view with askParsedEntered.
    *  If source is loaded, wait for it to be resolved.
@@ -153,7 +164,7 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *        be different from the absolute offset in the workspace file of that unit if the unit is
    *        not a Jawa source file.
    */
-  def findDeclaration(node: JawaAstNode, javaProject: IJavaProject): Option[(InteractiveCompilationUnit, Int)]
+  def findDeclaration(sym: JawaSymbol): Either[IJavaElement, Position]
 
   /** Return the JDT element corresponding to this Jawa symbol. This method is time-consuming
    *  and may trigger building the structure of many Jawa files.
@@ -172,7 +183,7 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *
    *  @param token      The token to seek a compilation unit for.
    */
-  def findCompilationUnit(node: JawaAstNode, javaProject: IJavaProject): Option[InteractiveCompilationUnit]
+  def findCompilationUnit(sym: JawaSymbol, javaProject: IJavaProject): Option[InteractiveCompilationUnit]
 
 
 
@@ -181,14 +192,14 @@ trait IJawaPresentationCompiler extends Global { self: JawaPresentationCompiler 
    *  @note The resulting type does not have any path-dependent types coming from the
    *        compiler instance.
    *
-   * @param node       The ast definition to which the hyperlink should go
+   * @param sym         The ast definition to which the hyperlink should go
    * @param name        The primary information to be displayed, if more than one hyperlink is available
    * @param region      The region to be underlined in the editor
    * @param javaProject The java project where to search for the definition of this symbol
    * @param label       A way to compute the attached hyperlink label. Normally this can be ignored and use the default label,
    *                    consisting of the symbol kind and full name.
    */
-  def mkHyperlink(node: JawaAstNode, name: String, region: IRegion, javaProject: IJavaProject, label: JawaAstNode => String = defaultHyperlinkLabel _): Option[IHyperlink]
+  def mkHyperlink(sym: JawaSymbol, name: String, region: IRegion, label: JawaAstNode => String = defaultHyperlinkLabel _): Option[IHyperlink]
 }
 
 object IJawaPresentationCompiler extends HasLogger {

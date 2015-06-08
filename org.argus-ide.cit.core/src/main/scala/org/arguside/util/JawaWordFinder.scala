@@ -5,6 +5,7 @@ import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.Region
 import org.sireum.jawa.sjc.lexer.Chars._
+import org.sireum.jawa.sjc.lexer.Chars
 
 object JawaWordFinder {
 
@@ -28,33 +29,20 @@ object JawaWordFinder {
 
   def findWord(document: IndexedSeq[Char], offset: Int): IRegion = {
     if (offset < 0 || offset > document.length) throw new IndexOutOfBoundsException("Received an invalid offset for word finding.")
+    val docLenght = document.size
+    var end = offset
+    while (end < docLenght && !Chars.isWhitespace(document(end)) && document(end) != '`') end += 1
+    val isGraveAccent = if(document(end) == '`') true else false
+    end = offset
+    while (end < docLenght && Chars.isIdentifierPart(document(end), isGraveAccent)) end += 1
 
-    def find(p: Char => Boolean): IRegion = {
-      var start = -2
-      var end = -1
+    var start = offset
+    while (start > 0 && Chars.isIdentifierPart(document(start - 1), isGraveAccent)) start -= 1
 
-      var pos = Math.min(offset - 1, document.size - 1)
+    start = Math.max(0, start)
+    end = Math.min(docLenght, end)
 
-      while (pos >= 0 && p(document(pos)))
-        pos -= 1
-
-      start = pos
-
-      pos = offset
-      val len = document.length
-      while (pos < len && p(document(pos)))
-        pos += 1
-
-      end = pos
-
-      new Region(start + 1, end - start - 1)
-    }
-
-    val idRegion = find(ch => isIdentifierPart(ch))
-    if (idRegion.getLength == 0)
-      find(isOperatorPart)
-    else
-      idRegion
+    new Region(start, end - start)
   }
 
   /** See [[findCompletionPoint(IndexedSeq[Char],Int):IRegion]]. */
@@ -69,7 +57,7 @@ object JawaWordFinder {
    * Find the point after which a completion should be inserted in the document.
    */
   def findCompletionPoint(document: IndexedSeq[Char], offset0: Int): IRegion = {
-    def isWordPart(ch: Char) = isIdentifierPart(ch) || isOperatorPart(ch)
+    def isWordPart(ch: Char) = isIdentifierPart(ch, true) || isOperatorPart(ch)
 
     val offset = if (offset0 >= document.length) (document.length - 1) else offset0
     val ch = document(offset)

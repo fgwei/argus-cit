@@ -8,6 +8,7 @@ import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
 import org.sireum.jawa.sjc.lexer.{Token => JawaToken}
 import org.sireum.jawa.sjc.util.Position
 import org.sireum.jawa.sjc.parser.JawaAstNode
+import org.sireum.jawa.sjc.parser.JawaSymbol
 
 class JawaDeclarationHyperlinkComputer extends HasLogger {
   def findHyperlinks(icu: InteractiveCompilationUnit, wordRegion: IRegion): Option[List[IHyperlink]] = {
@@ -22,25 +23,16 @@ class JawaDeclarationHyperlinkComputer extends HasLogger {
         None
       else {
         val start = mappedRegion.getOffset
-        val regionEnd = mappedRegion.getOffset + mappedRegion.getLength
+        val regionEnd = mappedRegion.getOffset + mappedRegion.getLength - 1
         // removing 1 handles correctly hyperlinking requests @ EOF
         val end = if (sourceFile.length == regionEnd) regionEnd - 1 else regionEnd
 
         val pos = Position.range(sourceFile, start, end - start + 1)
-        
-        val nodeOpt: Option[List[(JawaAstNode, String)]] = compiler.asyncExec {
-          val targetsOpt = Option(List[JawaAstNode]())
 
-          for {
-            targets <- targetsOpt.toList
-            target <- targets
-          } yield (target -> target.toString)
-        }.getOption()
+        val typed = compiler.askTypeAt(pos).getOption().getOrElse(None)
 
-        nodeOpt map { nodes =>
-          nodes flatMap {
-            case (node, nodeName) => compiler.mkHyperlink(node, s"Open Declaration (${nodeName})", wordRegion, icu.argusProject.javaProject).toList
-          }
+        typed map { sym =>
+          compiler.mkHyperlink(sym, s"Open Declaration (${sym.id.text})", wordRegion).toList
         }
       }
     }).flatten

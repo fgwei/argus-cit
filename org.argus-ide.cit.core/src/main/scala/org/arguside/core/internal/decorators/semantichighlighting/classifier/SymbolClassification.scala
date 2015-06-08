@@ -46,53 +46,22 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: IJa
   
   def scan(astNode: JawaAstNode) {
     astNode match {
-      case Annotation(at, id, value)                 => 
+      case Annotation(_, id, _)                  =>
         annotations += id.range.toRegion
-        id.text match {
-          case "owner" | "classDescriptor" => classes += value.get.range.toRegion
-          case _ =>
-        }
-      case typ: Type                                 => 
-        typ.typ match{
-          case ot: ObjectType if !ot.isJavaPrimitive(ot.typ) => classes += typ.baseTypeID.range.toRegion
-          case _ =>
-        }
-      case MethodDeclaration(_, _, nameID, _, _, _)  =>
-        methods += nameID.range.toRegion
-      case JawaParam(_, nameID, _)                   =>
-        localvars += nameID.range.toRegion
-      case LocalVarDeclaration(nameID, _, _)         =>
-        localvars += nameID.range.toRegion
-      case CallStatement(_, _, _, invokeID, _, _)    => 
-        methods += invokeID.range.toRegion
-      case ArgClause(_, varIDs, _) =>
-        localvars ++= varIDs.map(_._1.range.toRegion)
-      case ThrowStatement(_, varID)                  =>
-        localvars += varID.range.toRegion
-      case IfStatement(_, _, _, locationID)          =>
-        locations += locationID.range.toRegion
-      case GotoStatement(_, locationID)              =>
-        locations += locationID.range.toRegion
-      case SwitchStatement(_, cond, _, _)            =>
-        localvars += cond.range.toRegion
-      case SwitchCase(_, _, _, _, locationID)        =>
-        locations += locationID.range.toRegion
-      case SwitchDefaultCase(_, _, _, _, locationID) =>
-        locations += locationID.range.toRegion
-      case ne @ NameExpression(nameID, _)            =>
-        if(!ne.isStatic) localvars += nameID.range.toRegion
-      case IndexingExpression(baseID, _)             =>
-        localvars += baseID.range.toRegion
-      case AccessExpression(baseID, _, _)            =>
-        localvars += baseID.range.toRegion
-      case CmpExpression(_, _, var1ID, _, var2ID, _) =>
-        localvars += var1ID.range.toRegion
-        localvars += var2ID.range.toRegion
-      case CatchClause(_, _, _, _, locationID, _)    =>
-        locations += locationID.range.toRegion
-      case CatchRange(_, _, fromID, _, toID, _)      =>
-        locations += fromID.range.toRegion
-        locations += toID.range.toRegion
+      case TypeDefSymbol(id)                        => 
+        classes += id.range.toRegion
+      case MethodDefSymbol(id)  =>
+        methods += id.range.toRegion
+      case VarDefSymbol(id)                    =>
+        localvars += id.range.toRegion
+      case TypeSymbol(id)                        => 
+        classes += id.range.toRegion
+      case MethodNameSymbol(id)  =>
+        methods += id.range.toRegion
+      case VarSymbol(id)                    =>
+        localvars += id.range.toRegion
+      case LocationSymbol(id)                =>
+        locations += id.range.toRegion
       case _ =>
     }
     astNode.immediateChildren.foreach(scan)

@@ -51,6 +51,7 @@ import org.arguside.ui.internal.editor.spelling.JawaSpellingEngine
 import org.arguside.ui.internal.reconciliation.JawaReconciler
 import org.arguside.core.lexical.JawaCodeScanners
 import org.arguside.core.lexical.JawaPartitions
+import org.eclipse.jface.text.ITextDoubleClickStrategy
 
 class JawaSourceViewerConfiguration(
   javaPreferenceStore: IPreferenceStore,
@@ -102,7 +103,7 @@ class JawaSourceViewerConfiguration(
   }
   
   override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
-    val detectors = List(new URLHyperlinkDetector())
+    val detectors = List(DeclarationHyperlinkDetector(), new URLHyperlinkDetector())
     if (editor != null)
       detectors.foreach { d => d.setContext(editor) }
 
@@ -133,6 +134,10 @@ class JawaSourceViewerConfiguration(
 
   override def propertyChange(event: PropertyChangeEvent): Unit = {
     handlePropertyChangeEvent(event)
+  }
+  
+  override def getDoubleClickStrategy(sourceViewer: ISourceViewer, contentType: String): ITextDoubleClickStrategy = {
+    new JawaDoubleClickStrategy
   }
 
   /**
