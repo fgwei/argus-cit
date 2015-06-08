@@ -40,6 +40,7 @@ Import-Package: org.eclipse.equinox.frameworkadmin,
  org.eclipse.equinox.simpleconfigurator.manipulator,
  org.eclipse.jdt.junit.launcher
 Export-Package: argus.tools.eclipse.contribution.weaving.jdt,
+ argus.tools.eclipse.contribution.weaving.jdt.builderoptions,
  argus.tools.eclipse.contribution.weaving.jdt.cfprovider,
  argus.tools.eclipse.contribution.weaving.jdt.configuration,
  argus.tools.eclipse.contribution.weaving.jdt.core,
@@ -51,5 +52,7 @@ Export-Package: argus.tools.eclipse.contribution.weaving.jdt,
  argus.tools.eclipse.contribution.weaving.jdt.ui,
  argus.tools.eclipse.contribution.weaving.jdt.ui.actions,
  argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor,
+ argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter,
  argus.tools.eclipse.contribution.weaving.jdt.util,
- argus.tools.eclipse.contribution.weaving.pde.ui
+ argus.tools.eclipse.contribution.weaving.pde.ui,
+ org.eclipse.jdt.core.dom
