@@ -47,6 +47,7 @@ Require-Bundle:
  com.android.ide.eclipse.ddms;bundle-version="23.0.6"
 Import-Package: 
  argus.tools.eclipse.contribution.weaving.jdt;apply-aspects:=false,
+ argus.tools.eclipse.contribution.weaving.jdt.builderoptions,
  argus.tools.eclipse.contribution.weaving.jdt.cfprovider;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.configuration;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.core;apply-aspects:=false,
@@ -58,6 +59,9 @@ Import-Package:
  argus.tools.eclipse.contribution.weaving.jdt.ui;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.ui.actions;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor;apply-aspects:=false,
+ argus.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter,
+ argus.tools.eclipse.contribution.weaving.jdt.util,
+ argus.tools.eclipse.contribution.weaving.pde.ui,
  com.ibm.icu.text;apply-aspects:=false;org.eclipse.swt.graphics;apply-aspects:=false,
  org.eclipse.core.internal.runtime,
  org.eclipse.core.runtime,
