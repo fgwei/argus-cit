@@ -88,6 +88,9 @@ trait JawaJavaMapper extends InternalCompilerServices with HasLogger { self: Jaw
     if(AccessFlag.isFinal(af))
       jdtMods = jdtMods | ClassFileConstants.AccFinal
 
+    if(AccessFlag.isStatic(af))
+      jdtMods = jdtMods | ClassFileConstants.AccStatic
+      
     if(AccessFlag.isInterface(af))
       jdtMods = jdtMods | ClassFileConstants.AccInterface
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/asm-all.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/asm-all.jar" sourcepath="lib/asm-all.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/AXMLPrinter2.jar" sourcepath="/sireum-amandroid/lib/AXMLPrinter2-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
