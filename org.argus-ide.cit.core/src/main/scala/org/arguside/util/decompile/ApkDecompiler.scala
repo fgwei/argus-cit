@@ -9,6 +9,11 @@ import org.sireum.util.FileResourceUri
 import org.arguside.util.parser.ManifestParser
 import org.sireum.jawa.sjc.util.MyFileUtil
 import org.arguside.core.CitConstants
+import org.sireum.jawa.sjc.refactoring.RefactorJawa
+import java.io.FileWriter
+import org.arguside.core.internal.ArgusPlugin
+import org.sireum.jawa.sjc.util.FgSourceFile
+import org.sireum.jawa.sjc.io.PlainFile
 
 object ApkDecompiler {
   def decompile(apk: File, projectLocation: IPath, removeSupportGen: Boolean): Option[ISet[String]] = {
@@ -53,6 +58,20 @@ object ApkDecompiler {
       MyFileUtil.deleteDir(f)
     }
     MyFileUtil.clearDirIfNoFile(srcDir)
+    
+    /**
+     * refactor phase
+     */
+    FileUtil.listFiles(src, "pilar", true) foreach {
+      f =>
+        val code = new FgSourceFile(new PlainFile(FileUtil.toFile(f))).code
+        val newcode = RefactorJawa(code)
+        ArgusPlugin().eclipseError(newcode)
+        val file = FileUtil.toFile(f)
+        val fw = new FileWriter(file, false)
+        fw.write(newcode)
+        fw.close()
+    }
     dependencies.toSet
   }
 }

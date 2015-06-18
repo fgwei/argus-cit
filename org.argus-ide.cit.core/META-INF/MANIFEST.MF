@@ -55,6 +55,7 @@ Import-Package:
  argus.tools.eclipse.contribution.weaving.jdt.hierarchy;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.imagedescriptor;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.indexerprovider;apply-aspects:=false,
+ argus.tools.eclipse.contribution.weaving.jdt.jcompiler,
  argus.tools.eclipse.contribution.weaving.jdt.search;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.ui;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.ui.actions;apply-aspects:=false,

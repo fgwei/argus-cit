@@ -57,87 +57,85 @@ class JawaBuilder extends IncrementalProjectBuilder with JDTBuilderFacade with H
       return new Array[IProject](0)
     }
 
-//    val allSourceFiles = project.allSourceFiles()
-//    val allFilesInSourceDirs = project.allFilesInSourceDirs()
-//
-//    val needToCopyResources = allSourceFiles.size != allFilesInSourceDirs.size
-//
-//    val (addedOrUpdated, removed) = if (project.prepareBuild())
-//      (allSourceFiles, Set.empty[IFile])
-//    else {
-//      kind match {
-//        case INCREMENTAL_BUILD | AUTO_BUILD =>
-//          val addedOrUpdated0 = new HashSet[IFile] ++ allSourceFiles.filter(FileUtils.hasBuildErrors(_))
-//          val removed0 = new HashSet[IFile]
-//
-//          getDelta(project.underlying).accept(new IResourceDeltaVisitor {
-//            def visit(delta: IResourceDelta) = {
-//              delta.getResource match {
-//                case file: IFile if FileUtils.isBuildable(file) && project.sourceFolders.exists(_.isPrefixOf(file.getLocation)) =>
-//                  delta.getKind match {
-//                    case IResourceDelta.ADDED | IResourceDelta.CHANGED =>
-//                      addedOrUpdated0 += file
-//                    case IResourceDelta.REMOVED =>
-//                      removed0 += file
-//                    case _ =>
-//                  }
-//                case _ =>
-//              }
-//              true
-//            }
-//          })
-//          if (project.buildManager.canTrackDependencies) {
-//            def hasChanges(prj: IProject): Boolean = {
-//              val delta = getDelta(prj)
-//              delta == null || delta.getKind != IResourceDelta.NO_CHANGE
-//            }
-//
-//            if (project.directDependencies.exists(hasChanges)) {
-//              // reset presentation compilers if a dependency has been rebuilt
-//              logger.debug("Resetting presentation compiler for %s due to dependent project change".format(project.underlying.getName()))
-//              project.presentationCompiler.askRestart()
-//
-//              // in theory need to be able to identify the exact dependencies
-//              // but this is deeply rooted inside the sbt dependency tracking mechanism
-//              // so we just tell it to have a look at all the files
-//              // and it will figure out the exact changes during initialization
-//              addedOrUpdated0 ++= allSourceFiles
-//            }
-//          }
-//          (Set.empty ++ addedOrUpdated0, Set.empty ++ removed0)
-//        case CLEAN_BUILD | FULL_BUILD =>
-//          (allSourceFiles, Set.empty[IFile])
-//      }
-//    }
-//
-//    val subMonitor = SubMonitor.convert(monitor, 100).newChild(100, SubMonitor.SUPPRESS_NONE)
-//    subMonitor.beginTask("Running Jawa Builder on " + project.underlying.getName, 100)
-//
-//    logger.info("Building project " + project)
-//    project.build(addedOrUpdated, removed, subMonitor)
-//    TaskManager.updateTasks(project, addedOrUpdated)
-//
-//    val depends = project.transitiveDependencies
-//
-//    /** The Java builder has to be run for copying resources (non-source files) to the output directory.
-//     *
-//     *  We need to run it when no Java sources have been modified
-//     *  (since the SBT builder automatically calls the JDT builder internally if there are modified Java sources).
-//     */
-//    def shouldRunJavaBuilder: Boolean = {
-//      (needToCopyResources && !addedOrUpdated.exists(_.getName().endsWith(CitConstants.JavaFileExtn)))
-//    }
-//
-//    // SBT build manager already calls java builder internally
-//    if (allSourceFiles.exists(FileUtils.hasBuildErrors(_)) || !shouldRunJavaBuilder)
-//      depends.toArray
-//    else {
-//      ensureProject()
-//      val javaDepends = jawaJavaBuilder.build(kind, ignored, subMonitor)
-//      refresh()
-//      (Set.empty ++ depends ++ javaDepends).toArray
-//    }
-    Array()
+    val allSourceFiles = project.allSourceFiles()
+    val allFilesInSourceDirs = project.allFilesInSourceDirs()
+
+    val needToCopyResources = allSourceFiles.size != allFilesInSourceDirs.size
+
+    val (addedOrUpdated, removed) = if (project.prepareBuild())
+      (allSourceFiles, Set.empty[IFile])
+    else {
+      kind match {
+        case INCREMENTAL_BUILD | AUTO_BUILD =>
+          val addedOrUpdated0 = new HashSet[IFile] ++ allSourceFiles.filter(FileUtils.hasBuildErrors(_))
+          val removed0 = new HashSet[IFile]
+
+          getDelta(project.underlying).accept(new IResourceDeltaVisitor {
+            def visit(delta: IResourceDelta) = {
+              delta.getResource match {
+                case file: IFile if FileUtils.isBuildable(file) && project.sourceFolders.exists(_.isPrefixOf(file.getLocation)) =>
+                  delta.getKind match {
+                    case IResourceDelta.ADDED | IResourceDelta.CHANGED =>
+                      addedOrUpdated0 += file
+                    case IResourceDelta.REMOVED =>
+                      removed0 += file
+                    case _ =>
+                  }
+                case _ =>
+              }
+              true
+            }
+          })
+          if (project.buildManager.canTrackDependencies) {
+            def hasChanges(prj: IProject): Boolean = {
+              val delta = getDelta(prj)
+              delta == null || delta.getKind != IResourceDelta.NO_CHANGE
+            }
+
+            if (project.directDependencies.exists(hasChanges)) {
+              // reset presentation compilers if a dependency has been rebuilt
+              logger.debug("Resetting presentation compiler for %s due to dependent project change".format(project.underlying.getName()))
+              project.presentationCompiler.askRestart()
+
+              // in theory need to be able to identify the exact dependencies
+              // but this is deeply rooted inside the sbt dependency tracking mechanism
+              // so we just tell it to have a look at all the files
+              // and it will figure out the exact changes during initialization
+              addedOrUpdated0 ++= allSourceFiles
+            }
+          }
+          (Set.empty ++ addedOrUpdated0, Set.empty ++ removed0)
+        case CLEAN_BUILD | FULL_BUILD =>
+          (allSourceFiles, Set.empty[IFile])
+      }
+    }
+
+    val subMonitor = SubMonitor.convert(monitor, 100).newChild(100, SubMonitor.SUPPRESS_NONE)
+    subMonitor.beginTask("Running Jawa Builder on " + project.underlying.getName, 100)
+
+    logger.info("Building project " + project)
+    project.build(addedOrUpdated, removed, subMonitor)
+    TaskManager.updateTasks(project, addedOrUpdated)
+
+    val depends = project.transitiveDependencies
+
+    /** The Java builder has to be run for copying resources (non-source files) to the output directory.
+     *
+     *  We need to run it when no Java sources have been modified
+     *  (since the SBT builder automatically calls the JDT builder internally if there are modified Java sources).
+     */
+    def shouldRunJavaBuilder: Boolean = {
+      (needToCopyResources && !addedOrUpdated.exists(_.getName().endsWith(CitConstants.JavaFileExtn)))
+    }
+
+    if (allSourceFiles.exists(FileUtils.hasBuildErrors(_)) || !shouldRunJavaBuilder)
+      depends.toArray
+    else {
+      ensureProject()
+      val javaDepends = jawaJavaBuilder.build(kind, ignored, subMonitor)
+      refresh()
+      (Set.empty ++ depends ++ javaDepends).toArray
+    }
   }
 }
 

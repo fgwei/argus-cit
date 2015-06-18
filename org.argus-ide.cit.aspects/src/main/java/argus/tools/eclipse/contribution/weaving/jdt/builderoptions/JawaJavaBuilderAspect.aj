@@ -35,7 +35,7 @@ public privileged aspect JawaJavaBuilderAspect {
     target(builder) &&
     cleanOutputFolders(copyBack) &&
     cflow(build()) {
-    // Suppress the cleaning behaviour but do the extra resource copying if requested
+    // Suppress the cleaning behavior but do the extra resource copying if requested
     if (copyBack)
       for (int i = 0, l = builder.sourceLocations.length; i < l; i++) {
         org.eclipse.jdt.internal.core.builder.ClasspathMultiDirectory sourceLocation = builder.sourceLocations[i];
@@ -48,7 +48,6 @@ public privileged aspect JawaJavaBuilderAspect {
     isJavaLikeFileName(fileName) &&
     cflow(build()) &&
     !cflow(cleanOutputFolders(*)) {
-	ArgusJDTWeavingPlugin.logErrorMessage("javafile:" + fileName);
     if (fileName != null && (fileName.endsWith("pilar") || fileName.endsWith("plr")))
       return false;
     else
@@ -58,7 +57,6 @@ public privileged aspect JawaJavaBuilderAspect {
   boolean around(IResource resource) :
     filterExtraResource(resource) &&
     cflow(build()) {
-	ArgusJDTWeavingPlugin.logErrorMessage("javafileExtra:" + resource.getName());
     return (resource.getName().endsWith(".pilar") || resource.getName().endsWith(".plr")) || proceed(resource);
   }
 }

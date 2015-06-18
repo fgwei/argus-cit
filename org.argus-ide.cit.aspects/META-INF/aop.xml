@@ -13,6 +13,7 @@
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.NameLookupAspect"/>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.RefactoringAvailabilityAspect"/>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.core.SourceLookupAspect"/>
+<aspect name="argus.tools.eclipse.contribution.weaving.jdt.jcompiler.BuildManagerAspect"/>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.hierarchy.HierarchyAspect"/>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.indexerprovider.IndexerProviderAspect"/>
 <aspect name="argus.tools.eclipse.contribution.weaving.jdt.search.SearchAspect"/>

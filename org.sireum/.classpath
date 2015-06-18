@@ -31,11 +31,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/sireum-amandroid.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-cli.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-jawa-alir.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/sireum-jawa.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-jawa.jar" sourcepath="/sireum-jawa"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-macro.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-option.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/sireum-parser.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/sireum-pilar.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-parser.jar" sourcepath="/sireum-parser"/>
+	<classpathentry exported="true" kind="lib" path="lib/sireum-pilar.jar" sourcepath="/sireum-pilar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-pipeline.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-tools.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-util.jar"/>

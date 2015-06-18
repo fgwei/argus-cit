@@ -438,7 +438,7 @@ class ArgusProject private (val underlying: IProject) extends ClasspathManagemen
 //          new SbtScopesBuildManager(this, settings)
 //        else new ProjectsDependentSbtBuildManager(this, settings)
 //      }
-      buildManager0 = new ProjectsDependentSbtBuildManager(this)
+      buildManager0 = new JawaBuildManager(this)
     }
     buildManager0
   }
@@ -460,7 +460,7 @@ class ArgusProject private (val underlying: IProject) extends ClasspathManagemen
     if (!buildManager.hasErrors) {
       // reset presentation compilers of projects that depend on this one
       // since the output directory now contains the up-to-date version of this project
-      // note: ScalaBuilder resets the presentation compiler when a referred project
+      // note: JawaBuilder resets the presentation compiler when a referred project
       // is built, but only when it has changes! this call makes sure that a rebuild,
       // even when there are no changes, propagates the classpath to dependent projects
       resetDependentProjects()
