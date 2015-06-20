@@ -27,21 +27,27 @@ import org.eclipse.jdt.core.ITypeHierarchy
 import org.sireum.util._
 import org.eclipse.jdt.core.IField
 
-
 /**
  * @author fgwei
  */
 object JavaElementFinder {
   def findJavaClass(project: IProject, typ: ObjectType): Option[IType] = {
-    var fqcn = typ.name
+    val fqcn = typ.name
+    var fqcn2: String = fqcn
     // Handle inner classes
     if (fqcn.indexOf('$') != -1) {
-      fqcn = fqcn.replaceAll("\\$", ".") //$NON-NLS-1$ //$NON-NLS-2$
+      fqcn2 = fqcn.replaceAll("\\$", ".") //$NON-NLS-1$ //$NON-NLS-2$
     }
+    
     try {
       if(project.hasNature(JavaCore.NATURE_ID)){
         val javaProject = JavaCore.create(project)
-        Option(javaProject.findType(fqcn))
+        Option(javaProject.findType(fqcn2)) match {
+          case Some(t) => Some(t)
+          case None =>
+            if(fqcn != fqcn2) Option(javaProject.findType(fqcn))
+            else None
+        }
       } else None
     } catch {
       case e: Throwable =>
@@ -96,7 +102,7 @@ object JavaElementFinder {
     var ok = true
     val myMethodName: String = mysig.methodNamePart.replace(JavaKnowledge.constructorName, mysig.getClassType.simpleName)
     if(myMethodName != tarmethod.getElementName) ok = false
-    if(myParams.size == tarParams.size){
+    if(ok && myParams.size == tarParams.size){
       for(i <- 0 to myParams.size - 1){
         val myParam = myParams(i)
         val tarParam = tarParams(i)

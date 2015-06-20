@@ -32,7 +32,7 @@ object JawaWordFinder {
     val docLenght = document.size
     var end = offset
     while (end < docLenght && !Chars.isWhitespace(document(end)) && document(end) != '`') end += 1
-    val isGraveAccent = if(document(end) == '`') true else false
+    val isGraveAccent = if(document(end-1) != '.' && document(end) == '`') true else false
     end = offset
     while (end < docLenght && Chars.isIdentifierPart(document(end), isGraveAccent)) end += 1
 

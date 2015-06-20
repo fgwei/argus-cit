@@ -18,7 +18,7 @@ object WordFinder {
     val docLenght = document.getLength()
     var end = offset
     while (end < docLenght && !Chars.isWhitespace(document.getChar(end)) && document.getChar(end) != '`') end += 1
-    val isGraveAccent = if(document.getChar(end) == '`') true else false
+    val isGraveAccent = if(document.getChar(end-1) != '.' && document.getChar(end) == '`') true else false
     end = offset
     while (end < docLenght && Chars.isIdentifierPart(document.getChar(end), isGraveAccent)) end += 1
 

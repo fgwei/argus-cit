@@ -86,13 +86,13 @@ class JawaSourceTypeElement(parent: JavaElement, name: String)
 }
 
 class JawaClassElement(parent: JavaElement, typ: ObjectType)
-  extends JawaSourceTypeElement(parent, typ.simpleName) {
-  override def getImageDescriptor = ArgusImages.ARGUS_CLASS
+  extends JawaSourceTypeElement(parent, typ.name.substring(typ.name.lastIndexOf(".") + 1)) {
+  override def getImageDescriptor = ArgusImages.JAWA_CLASS
 }
 
 class JawaInterfaceElement(parent: JavaElement, typ: ObjectType)
-  extends JawaSourceTypeElement(parent, typ.name) {
-  override def getImageDescriptor = ArgusImages.ARGUS_INTERFACE
+  extends JawaSourceTypeElement(parent, typ.name.substring(typ.name.lastIndexOf(".") + 1)) {
+  override def getImageDescriptor = ArgusImages.JAWA_INTERFACE
 }
 
 class JawaFieldElement(parent: JavaElement, name: String, display: String)

@@ -14,6 +14,7 @@ import org.sireum.jawa.sjc.parser.Field
 import org.sireum.jawa.sjc.parser.Declaration
 import org.sireum.jawa.sjc.parser.MethodDeclaration
 import org.sireum.jawa.sjc.parser.ClassOrInterfaceDeclaration
+import org.arguside.core.internal.ArgusPlugin
 
 /** Add entries to the JDT index.
  *
@@ -29,21 +30,21 @@ trait JawaIndexBuilder extends HasLogger { self: JawaPresentationCompiler =>
 
   class IndexBuilderTraverser(indexer : JawaSourceIndexer) {
 
-    def getSuperNames(supers: List[ObjectType]): Array[Array[Char]] = {
-      val superNames = supers map (_.canonicalName.toArray)
-      superNames.toArray
-    }
-
     def addClass(c : ClassOrInterfaceDeclaration) {
       val classType = c.typ
+      
+      val pack = c.typ.pkg
+      val sName: String = c.typ.name.substring(c.typ.name.lastIndexOf("."))
       val enclClassNames = classType.getEnclosingTypes.map(_.canonicalName.toCharArray())
+      val superName = c.superClassOpt.getOrElse(JAVA_TOPLEVEL_OBJECT_TYPE).canonicalName
+      val interfaceNames = c.interfaces map (_.canonicalName.toArray)
       indexer.addClassDeclaration(
         mapModifiers(AccessFlag.getAccessFlags(c.accessModifier)),
-        c.typ.pkg.toCharArray,
-        c.typ.simpleName.toCharArray,
+        pack.toCharArray,
+        sName.toCharArray,
         enclClassNames.toArray,
-        c.superClassOpt.getOrElse(JAVA_TOPLEVEL_OBJECT_TYPE).canonicalName.toArray,
-        getSuperNames(c.interfaces),
+        superName.toArray,
+        interfaceNames.toArray,
         Array.empty,
         true
       )

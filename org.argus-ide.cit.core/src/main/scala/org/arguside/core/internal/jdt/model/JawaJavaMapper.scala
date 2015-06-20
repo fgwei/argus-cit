@@ -76,25 +76,43 @@ trait JawaJavaMapper extends InternalCompilerServices with HasLogger { self: Jaw
   }
   
   override def mapModifiers(af: Int): Int = {
-    var jdtMods = 0
+    var mod: Int = 0
     if(AccessFlag.isPrivate(af))
-      jdtMods = jdtMods | ClassFileConstants.AccPrivate
-    else
-      jdtMods = jdtMods | ClassFileConstants.AccPublic
-
-    if(AccessFlag.isAbstract(af))
-      jdtMods = jdtMods | ClassFileConstants.AccAbstract
-
-    if(AccessFlag.isFinal(af))
-      jdtMods = jdtMods | ClassFileConstants.AccFinal
-
-    if(AccessFlag.isStatic(af))
-      jdtMods = jdtMods | ClassFileConstants.AccStatic
+      mod = mod | ClassFileConstants.AccPrivate
+    else if (AccessFlag.isProtected(af))
+      mod = mod | ClassFileConstants.AccProtected
+    else if (AccessFlag.isPublic(af))
+      mod = mod | ClassFileConstants.AccPublic
       
+    if(AccessFlag.isAbstract(af))
+      mod = mod | ClassFileConstants.AccAbstract
+    if(AccessFlag.isAnnotation(af))
+      mod = mod | ClassFileConstants.AccAnnotation
+//    if(AccessFlag.isConstructor(af))
+//      mod = mod | ClassFileConstants.AccC
+    if(AccessFlag.isDeclaredSynchronized(af))
+      mod = mod | ClassFileConstants.AccSynchronized
+    if(AccessFlag.isEnum(af))
+      mod = mod | ClassFileConstants.AccEnum
+    if(AccessFlag.isFinal(af))
+      mod = mod | ClassFileConstants.AccFinal
     if(AccessFlag.isInterface(af))
-      jdtMods = jdtMods | ClassFileConstants.AccInterface
-
-    jdtMods
+      mod = mod | ClassFileConstants.AccInterface
+    if(AccessFlag.isNative(af))
+      mod = mod | ClassFileConstants.AccNative
+    if(AccessFlag.isStatic(af))
+      mod = mod | ClassFileConstants.AccStatic
+    if(AccessFlag.isStrictFP(af))
+      mod = mod | ClassFileConstants.AccStrictfp
+    if(AccessFlag.isSynchronized(af))
+      mod = mod | ClassFileConstants.AccSynchronized
+    if(AccessFlag.isSynthetic(af))
+      mod = mod | ClassFileConstants.AccSynthetic
+    if(AccessFlag.isTransient(af))
+      mod = mod | ClassFileConstants.AccTransient
+    if(AccessFlag.isVolatile(af))
+      mod = mod | ClassFileConstants.AccVolatile
+    mod
   }
 
   override def javaDescriptor(tpe: JawaType): String =

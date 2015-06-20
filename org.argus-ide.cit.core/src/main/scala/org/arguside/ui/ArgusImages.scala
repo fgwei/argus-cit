@@ -12,8 +12,8 @@ object ArgusImages {
   val JAWA_CLASS_FILE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/sclassf_obj.gif")
   val EXCLUDED_JAWA_FILE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/scu_resource_obj.gif")
 
-  val ARGUS_CLASS: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/class_obj.gif")
-  val ARGUS_INTERFACE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/trait_obj.gif")
+  val JAWA_CLASS: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/class_obj.gif")
+  val JAWA_INTERFACE: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/trait_obj.gif")
   
   val PUBLIC_METHOD: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/defpub_obj.gif")
   val PRIVATE_METHOD: ImageDescriptor = OSGiUtils.getImageDescriptorFromCoreBundle("/icons/full/obj16/defpri_obj.gif")

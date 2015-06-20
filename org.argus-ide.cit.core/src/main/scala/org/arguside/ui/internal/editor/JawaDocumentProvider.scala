@@ -21,7 +21,8 @@ import org.arguside.logging.HasLogger
 
 class JawaDocumentProvider
     extends CompilationUnitDocumentProvider
-    with HasLogger {
+    with HasLogger
+    with SaveActionExtensions {
 
   /** Indicates whether the save has been initialized by this provider. */
   private var saveInitialized = false
@@ -81,8 +82,11 @@ class JawaDocumentProvider
       // the Java editor calls [[CleanUpPostSaveListener]] here and calculates
       // changed regions which we don't need
       val doc = info.fTextFileBuffer.getDocument()
+      val listeners = Array(createJawaSaveActionListener(doc))
 
       info.fCopy.commitWorkingCopy(overwrite || isSynchronized, subMonitor)
+      if (listeners.length > 0)
+        notifyPostSaveListeners(info, Array(), listeners, getSubProgressMonitor(monitor, 30))
 
     } catch {
       // inform about the failure
