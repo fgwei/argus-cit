@@ -120,7 +120,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
     projects.synchronized {
       projects.get(project) foreach { (argusProject) =>
         projects.remove(project)
-//        argusProject.dispose()
+        argusProject.dispose()
       }
     }
   }
@@ -166,7 +166,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
           innerDelta.getElement() match {
             // classpath change should only impact projects
             case javaProject: IJavaProject => {
-//              asArgusProject(javaProject.getProject()).foreach{ (p) => p.classpathHasChanged(false) }
+              asArgusProject(javaProject.getProject()).foreach{ (p) => p.classpathHasChanged(false) }
             }
             case _ =>
           }
@@ -214,8 +214,7 @@ class ArgusPlugin extends IArgusPlugin with PluginLogConfigurator with IResource
           // stop recursion here, we need to reset the PC anyway
           !hasContentChanged
 
-        // TODO: the check should be done with isInstanceOf[ArgusSourceFile] instead of
-        // endsWith(scalaFileExtn), but it is not working for Play 2.0 because of #1000434
+        // TODO: the check should be done with isInstanceOf[JawaSourceFile]
         case COMPILATION_UNIT if isChanged && elem.getResource != null && (elem.getResource.getName.endsWith(PilarFileExtn) || elem.getResource.getName.endsWith(PilarFileExtnShort)) =>
           val hasContentChanged = hasFlag(IJavaElementDelta.F_CONTENT)
           if (hasContentChanged)

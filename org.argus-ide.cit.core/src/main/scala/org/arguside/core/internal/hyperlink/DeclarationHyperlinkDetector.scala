@@ -27,7 +27,7 @@ class DeclarationHyperlinkDetector extends BaseHyperlinkDetector with HasLogger 
   }
 
   protected def findHyperlinks(textEditor: ITextEditor, icu: InteractiveCompilationUnit, wordRegion: IRegion): List[IHyperlink] = {
-    findHyperlinks(textEditor, icu, wordRegion, wordRegion.translate(icu.jawaPos))
+    findHyperlinks(textEditor, icu, wordRegion, wordRegion.translate(icu.lastSourceMap().jawaPos))
   }
 
   protected def findHyperlinks(textEditor: ITextEditor, icu: InteractiveCompilationUnit, wordRegion: IRegion, mappedRegion: IRegion): List[IHyperlink] = {

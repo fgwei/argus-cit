@@ -166,7 +166,7 @@ class JawaSourceFile(fragment : PackageFragment, elementName: String, workingCop
 
   /** Ask the compiler to reload {{{this}}} source. */
   final def reload(): Unit = {
-    argusProject.presentationCompiler { _.askReload(this, sourceFile) }
+    argusProject.presentationCompiler { _.askReload(this, lastSourceMap().sourceFile) }
   }
 
   /** Ask the compiler to discard {{{this}}} source. */

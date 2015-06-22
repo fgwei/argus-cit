@@ -33,9 +33,9 @@ class JawaSelectionEngine(nameEnvironment: SearchableEnvironment, requestor: Jaw
   val acceptedAnnotations = new ArrayBuffer[(Array[Char], Array[Char], Int)]
 
   def select(icu: InteractiveCompilationUnit, selectionStart0: Int, selectionEnd0: Int) {
-    val src = icu.sourceFile
+    val src = icu.lastSourceMap().sourceFile
     icu.argusProject.presentationCompiler { compiler =>
-      val source = icu.sourceFile.content
+      val source = icu.lastSourceMap().jawaSource
       val region = JawaWordFinder.findWord(source, selectionStart0)
 
       val (selectionStart, selectionEnd) =

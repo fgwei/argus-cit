@@ -24,7 +24,7 @@ class JawaReconcilingStrategy(icuEditor: InteractiveCompilationUnitEditor) exten
 
   // Our icuEditor can be a source-attached binary, a.k.a ScalaClassFileEditor,
   // for which reconciliation of the locally opened editor makes little sense
-  // (it's more properly a ScalaClassFileViewer) but we still want to flush
+  // (it's more properly a JawaClassFileViewer) but we still want to flush
   // scheduled reloads nonetheless
   private val listeningEditor: Option[IJavaReconcilingListener] =
     icuEditor.asInstanceOfOpt[IJavaReconcilingListener]
@@ -47,7 +47,7 @@ class JawaReconcilingStrategy(icuEditor: InteractiveCompilationUnitEditor) exten
     icuEditor.updateErrorAnnotations(errors, cu.orNull)
 
     // reconciled expects a jdt.core.dom.CompilationUnitEditor as first argument,
-    // which ScalaSourceFileEditor and other ICU Editors aren't
+    // which JawaSourceFileEditor and other ICU Editors aren't
     // it is possible we starve Java-Side IReconcilingListeners here
     listeningEditor.foreach(_.reconciled(null, false, new NullProgressMonitor()))
   }

@@ -196,7 +196,7 @@ class JawaPresentationCompiler(name: String) extends {
    *  If the file has not been 'reloaded' first, it does nothing.
    */
   def askToDoFirst(scu: InteractiveCompilationUnit) {
-    askToDoFirst(scu.sourceFile)
+    askToDoFirst(scu.lastSourceMap().sourceFile)
   }
 
   /** Reload the given compilation unit. If the unit is not tracked by the presentation
@@ -208,18 +208,18 @@ class JawaPresentationCompiler(name: String) extends {
 
   /** Atomically load a list of units in the current presentation compiler. */
   def askReload(units: List[InteractiveCompilationUnit]): Response[Unit] = {
-    withResponse[Unit] { res => askReload(units.map(_.sourceFile), res) }
+    withResponse[Unit] { res => askReload(units.map(_.lastSourceMap().sourceFile), res) }
   }
 
   def filesDeleted(units: Seq[InteractiveCompilationUnit]) {
     logger.info("files deleted:\n" + (units map (_.file.path) mkString "\n"))
     if (!units.isEmpty)
-      askFilesDeleted(units.map(_.sourceFile).toList)
+      askFilesDeleted(units.map(_.lastSourceMap().sourceFile).toList)
   }
 
   def discardCompilationUnit(scu: InteractiveCompilationUnit): Unit = {
     logger.info("discarding " + scu.file.path)
-    asyncExec { removeUnitOf(scu.sourceFile) }.getOption()
+    asyncExec { removeUnitOf(scu.lastSourceMap().sourceFile) }.getOption()
   }
 
   /** Tell the presentation compiler to refresh the given files,

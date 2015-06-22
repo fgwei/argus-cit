@@ -54,6 +54,7 @@ import org.sireum.jawa.sjc.util.Position
 import org.sireum.util._
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
 import org.arguside.core.internal.jdt.search.JawaSourceIndexer
+import org.arguside.core.compiler.ISourceMap
 
 trait JawaCompilationUnit extends Openable
   with env.ICompilationUnit
@@ -68,11 +69,27 @@ trait JawaCompilationUnit extends Openable
 
   override val file : AbstractFile
   
+  override def sourceMap(contents: Array[Char]): ISourceMap = sourceFileLock.synchronized {
+    cachedSourceInfo = ISourceMap.plainJawa(file, contents)
+    cachedSourceInfo
+  }
+
+  override def lastSourceMap(): ISourceMap = sourceFileLock.synchronized {
+    if (cachedSourceInfo == null) sourceMap(getContents)
+    else cachedSourceInfo
+  }
+  
+  /** Lock object for operating on `cachedSourceFile` */
+  private val sourceFileLock = new Object
+
+  // @GuardedBy("sourceFileLock")
+  private var cachedSourceInfo: ISourceMap = _
+  
   override def workspaceFile: IFile = getUnderlyingResource.asInstanceOf[IFile]
 
   override def bufferChanged(e : BufferChangedEvent) {
     if (!e.getBuffer.isClosed)
-      argusProject.presentationCompiler(_.scheduleReload(this, sourceFile))
+      argusProject.presentationCompiler(_.scheduleReload(this, sourceMap(getContents).sourceFile))
 
     super.bufferChanged(e)
   }
@@ -96,6 +113,7 @@ trait JawaCompilationUnit extends Openable
     argusProject.presentationCompiler.internal { compiler =>
       val unsafeElements = newElements.asInstanceOf[JMap[AnyRef, AnyRef]]
       val tmpMap = new java.util.HashMap[AnyRef, AnyRef]
+      val sourceFile = lastSourceMap().sourceFile
       val sourceLength = sourceFile.length
 
       try {
@@ -136,7 +154,7 @@ trait JawaCompilationUnit extends Openable
   def addToIndexer(indexer : JawaSourceIndexer) {
     if (argusProject.hasArgusNature) {
       try argusProject.presentationCompiler.internal { compiler =>
-        val cu = compiler.parseCompilationUnit(sourceFile).get
+        val cu = compiler.parseCompilationUnit(lastSourceMap().sourceFile).get
         new compiler.IndexBuilderTraverser(indexer).traverse(cu)
       } catch {
         case ex: Throwable => logger.error("Compiler crash during indexing of %s".format(getResource()), ex)
@@ -220,7 +238,7 @@ trait JawaCompilationUnit extends Openable
     if (argusProject.hasArgusNature){}
       argusProject.presentationCompiler.internal { compiler =>
         try {
-          compiler.askStructure(sourceFile).get match {
+          compiler.askStructure(lastSourceMap().sourceFile).get match {
             case Left(cu) =>
 //              compiler.asyncExec {
 //                new compiler.OverrideIndicatorBuilderTraverser(this, annotationMap.asInstanceOf[JMap[AnyRef, AnyRef]]).traverse(tree)
@@ -231,7 +249,7 @@ trait JawaCompilationUnit extends Openable
           
         } catch {
           case ex: Exception =>
-           logger.error("Exception thrown while creating override indicators for %s".format(sourceFile), ex)
+           logger.error("Exception thrown while creating override indicators for %s".format(lastSourceMap().sourceFile), ex)
         }
       }
   }

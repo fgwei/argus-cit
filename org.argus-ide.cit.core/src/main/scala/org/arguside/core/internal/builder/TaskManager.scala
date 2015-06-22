@@ -40,7 +40,7 @@ object TaskManager {
     for {
       iFile <- files
       jawaFile <- JawaSourceFile.createFromPath(iFile.getFullPath.toOSString)
-      sourceFile = jawaFile.sourceFile
+      sourceFile = jawaFile.lastSourceMap().sourceFile
       Comment(msg, pos) <- extractComments(sourceFile, iFile.getContents, iFile.getCharset)
       if pos.isDefined
       task <- taskScanner.extractTasks(msg, pos)

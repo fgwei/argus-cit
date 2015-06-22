@@ -15,6 +15,7 @@ import org.eclipse.jface.text.Region
 import org.sireum.jawa.sjc.util.Range
 import org.sireum.jawa.sjc.parser.Annotation
 import org.sireum.jawa.sjc.ObjectType
+import org.arguside.core.internal.ArgusPlugin
 
 class SymbolClassification(protected val sourceFile: SourceFile, val global: IJawaPresentationCompiler, useSyntacticHints: Boolean)
   extends HasLogger {
@@ -24,11 +25,13 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: IJa
   }
   
   def compilationUnitOfFile(f: AbstractFile) = global.getCompilationUnit(f)
-
+  
+  import scala.collection.mutable
+  
   def classifySymbols(progressMonitor: IProgressMonitor): IList[SymbolInfo] = {
     val symbolInfos: MList[SymbolInfo] = mlistEmpty
-    for(rcu <- compilationUnitOfFile(sourceFile.file)){
-      scan(rcu.cu)
+    for(cu <- global.parseCompilationUnit(sourceFile)){
+      scan(cu)
     }
     symbolInfos += SymbolInfo(Class, classes.toList)
     symbolInfos += SymbolInfo(Method, methods.toList)
