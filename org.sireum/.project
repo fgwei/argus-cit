@@ -41,7 +41,7 @@
 	<variableList>
 		<variable>
 			<name>SIREUM_HOME</name>
-			<value>file:/Users/fgwei/Developer/Sireum</value>
+			<value>$%7BPARENT-3-ECLIPSE_HOME%7D</value>
 		</variable>
 	</variableList>
 </projectDescription>

@@ -37,7 +37,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/sireum-parser.jar" sourcepath="/sireum-parser"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-pilar.jar" sourcepath="/sireum-pilar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-pipeline.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/sireum-tools.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sireum-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j-jdk14.jar"/>
