@@ -3,6 +3,7 @@ package org.arguside.logging
 import org.arguside.core.internal.logging.LogManager
 import org.arguside.core.internal.logging.EclipseLogger
 
+// ZW: where are these log message going...
 /**
  * Classes can mix this trait for having access to both the "default" {{{logger}}}
  * and the {{{eclipseLog}}}. The {{{eclipseLog}}} is a handle on the

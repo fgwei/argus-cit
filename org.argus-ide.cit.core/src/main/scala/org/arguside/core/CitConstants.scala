@@ -13,6 +13,10 @@ object CitConstants {
   // project nature
   final val NatureId = "org.argus-ide.cit.core.argusnature"
 
+    // ZW: containers.... to see how to make it works
+  final val ArgusLibContId = "org.argus-ide.sdt.launching.ARGUS_CONTAINER"
+  final val ArgusCompilerContId = "org.argus-ide.sdt.launching.ARGUS_COMPILER_CONTAINER"
+
   // marker ids
   final val ProblemMarkerId = "org.argus-ide.cit.core.problem"
   final val ClasspathProblemMarkerId = "org.argus-ide.cit.core.classpathProblem"

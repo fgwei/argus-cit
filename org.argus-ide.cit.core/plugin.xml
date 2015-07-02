@@ -54,6 +54,7 @@
             class="org.arguside.ui.internal.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -283,6 +284,55 @@
          </contentTypeBinding>
       </editor>
    </extension>
+
+   <extension point="org.eclipse.core.runtime.adapters">
+     <factory
+       class="org.arguside.ui.internal.editor.JawaRetargettableActionAdapterFactory"
+       adaptableType="org.arguside.ui.internal.editor.JawaSourceFileEditor">
+       <adapter type="org.eclipse.debug.ui.actions.IRunToLineTarget"/>
+       <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
+     </factory>
+   </extension>
+   <extension point="org.eclipse.core.runtime.adapters">
+     <factory
+       class="org.arguside.ui.internal.editor.JawaRetargettableActionAdapterFactory"
+       adaptableType="org.arguside.ui.internal.editor.JawaClassFileEditor">
+       <adapter type="org.eclipse.debug.ui.actions.IRunToLineTarget"/>
+       <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
+     </factory>
+   </extension>
+   
+   <extension point = "org.eclipse.debug.core.launchConfigurationTypes">
+     <launchConfigurationType
+           id="argus.application"
+           delegate="org.arguside.core.internal.launching.ArgusLaunchDelegate"
+           delegateDescription="The Argus JVM Launcher supports running and debugging of local Argus applications compiled to the JVM"
+           delegateName="Argus JVM Launcher"
+           modes="run, debug"
+           name="Argus Application"
+           public="true"
+           sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
+           sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
+     </launchConfigurationType>
+   </extension>
+
+   <!-- Breakpoints for scala source/class editors -->
+
+   <extension point="org.eclipse.ui.editorActions">
+      <editorContribution
+         targetID="argus.tools.eclipse.JawaSourceFileEditor"
+         id="org.eclipse.jdt.debug.CompilationUnitEditor.BreakpointRulerActions">
+         <action
+            label="Toggle &amp;Breakpoint"
+            class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+            actionID="RulerDoubleClick"
+            id="org.eclipse.jdt.debug.ui.actions.ManageBreakpointRulerAction">
+         </action>
+      </editorContribution>
+   </extension>
+
+   <!-- end of extensions for breakpoints -->
+
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet

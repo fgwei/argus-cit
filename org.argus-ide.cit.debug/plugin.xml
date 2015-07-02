@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="eventHandler" name="Event Handler" schema="schema/eventHandler.exsd"/>
+
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="org.arguside.debug.internal.model.ArgusDebugModelPresentation"
+            id="org.argus-ide.cit.debug">
+      </debugModelPresentation>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.arguside.debug.internal.ArgusDebugPlugin">
+      </startup>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.core.logicalStructureProviders">
+      <logicalStructureProvider
+            class="org.arguside.debug.internal.model.ArgusLogicalStructureProvider"
+            modelIdentifier="org.argus-ide.cit.debug">
+      </logicalStructureProvider>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.core.launchDelegates">
+      <launchDelegate
+            delegate="org.arguside.debug.internal.launching.ArgusApplicationLaunchConfigurationDelegate"
+            delegateDescription="The Argus JVM Launcher supports debugging of local Argus using the new Argus debugger"
+            id="argus.application.new"
+            modes="debug"
+            name="Argus Application (new debugger)"
+            sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
+            sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer"
+            type="argus.application">
+      </launchDelegate>
+    </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.arguside.ui.preferences"
+            class="org.arguside.debug.internal.preferences.DebuggerPreferencePage"
+            id="org.arguside.ui.preferences.debug"
+            name="Debug">
+      </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.arguside.debug.internal.preferences.DebugerPreferencesInitializer">
+      </initializer>
+   </extension>
+
+   <extension
+         point="org.eclipse.jdt.launching.vmConnectors">
+      <vmConnector
+            class="org.arguside.debug.internal.launching.SocketAttachConnectorArgus"
+            id="org.argus-ide.cit.debug.socketAttachConnector">
+      </vmConnector>
+      <vmConnector
+            class="org.arguside.debug.internal.launching.SocketListenConnectorArgus"
+            id="org.argus-ide.cit.debug.socketListenConnector">
+      </vmConnector>
+   </extension>
+
+</plugin>

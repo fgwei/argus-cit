@@ -33,7 +33,7 @@ import org.arguside.logging.HasLogger
 import org.arguside.util.internal.ReflectionUtils
 
 class JawaToggleBreakpointAdapter extends ToggleBreakpointAdapter with HasLogger { self =>
-  import ArgusToggleBreakpointAdapterUtils._
+  import JawaToggleBreakpointAdapterUtils._
 
   /** Implementation of the breakpoint toggler. This method relies on the JDT being able
    *  to find the corresponding JDT element for the given selection.
@@ -42,7 +42,7 @@ class JawaToggleBreakpointAdapter extends ToggleBreakpointAdapter with HasLogger
    *  (unknown to the JDT, such as inner objects inside objects). Breakpoints could be set
    *  by giving only the line number.
    */
-  private def toggleLineBreakpointsImpl(part : IWorkbenchPart, selection : ISelection) {
+  private def toggleLineBreakpointsImpl(part : IWorkbenchPart, selection : ISelection): Unit = {
     val job = new Job("Toggle Line Breakpoint") {
       override def run(monitor : IProgressMonitor) : IStatus = {
         val editor = getTextEditor(part)
@@ -113,7 +113,7 @@ class JawaToggleBreakpointAdapter extends ToggleBreakpointAdapter with HasLogger
    *
    *  TODO: Rewrite to use the presentation compiler for finding the position.
    */
-  override def toggleBreakpoints(part : IWorkbenchPart, selection : ISelection) {
+  override def toggleBreakpoints(part : IWorkbenchPart, selection : ISelection): Unit = {
     val sel = translateToMembers(part, selection)
 
     sel match {
@@ -135,13 +135,13 @@ class JawaToggleBreakpointAdapter extends ToggleBreakpointAdapter with HasLogger
     }
   }
 
-  override def toggleLineBreakpoints(part : IWorkbenchPart, selection : ISelection) {
+  override def toggleLineBreakpoints(part : IWorkbenchPart, selection : ISelection): Unit = {
     toggleLineBreakpointsImpl(part, selection)
   }
 
   /**
    * The implementation of this method is copied from the super class, which had
-   * to be overwritten because it doesn't know how to get a ArgusCompilationUnit.
+   * to be overwritten because it doesn't know how to get a ScalaCompilationUnit.
    */
   override def translateToMembers(part: IWorkbenchPart, selection: ISelection): ISelection = {
     def typeRoot(input: IEditorInput): Option[ITypeRoot] =
@@ -191,7 +191,7 @@ class JawaToggleBreakpointAdapter extends ToggleBreakpointAdapter with HasLogger
   }
 }
 
-object ArgusToggleBreakpointAdapterUtils extends ReflectionUtils {
+object JawaToggleBreakpointAdapterUtils extends ReflectionUtils {
   val toggleBreakpointAdapterClazz = classOf[ToggleBreakpointAdapter]
   val createQualifiedTypeNameMethod = getDeclaredMethod(toggleBreakpointAdapterClazz, "createQualifiedTypeName", classOf[IType])
 

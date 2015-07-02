@@ -21,6 +21,10 @@ object IArgusPlugin {
  */
 trait IArgusPlugin extends AbstractUIPlugin with HasLogger {
 
+  /* W.Zhou: added to let argus-debug's building pass */
+  lazy val noTimeoutMode: Boolean = false
+  lazy val headlessMode: Boolean = false
+  
   /** Always returns the ArgusProject for the given project, creating a
    *  new instance if needed.
    *

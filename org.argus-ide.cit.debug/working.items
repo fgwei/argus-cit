@@ -1,0 +1,15 @@
+removed pom.xml
+replace s/scala-ide/argus-ide/g
+replace s/sdt/cit/
+
+removed junit-related launchDelegate
+
+
+*** adding back weaving.jdt.launching
+  there is a "?" marker behind the AJ file
+
+removed TextHoverFactory first... (& internal/editor)
+  if needed, will add it back...
+
+removed ArgusEclipseApplicationLaunchConfigurationDelegate from plugin.xml & src/ directory
+
