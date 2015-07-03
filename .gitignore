@@ -1,4 +1,5 @@
 **/.cache
+**/.cache-main
 **/*.tmpBin
 target/
 .idea
