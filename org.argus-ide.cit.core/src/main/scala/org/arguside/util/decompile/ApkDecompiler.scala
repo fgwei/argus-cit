@@ -66,7 +66,6 @@ object ApkDecompiler {
       f =>
         val code = new FgSourceFile(new PlainFile(FileUtil.toFile(f))).code
         val newcode = RefactorJawa(code)
-        ArgusPlugin().eclipseError(newcode)
         val file = FileUtil.toFile(f)
         val fw = new FileWriter(file, false)
         fw.write(newcode)
