@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.OperationCanceledException
 import org.eclipse.core.resources.IResource
 import org.arguside.core.internal.project.Nature
 import com.android.ide.eclipse.adt.AdtConstants
-import org.arguside.util.decompile.ApkDecompiler
 import org.eclipse.core.runtime.IPath
 import java.io.File
 import com.android.ide.eclipse.adt.internal.project.ProjectHelper
@@ -56,6 +55,8 @@ import org.eclipse.jface.text.BadLocationException
 import org.eclipse.text.edits.InsertEdit
 import org.eclipse.ltk.core.refactoring.CompositeChange
 import java.lang.reflect.InvocationTargetException
+import org.siruem.amandroid.decompile.ApkDecompiler
+import org.sireum.amandroid.AndroidConstants
 
 object NewArgusProjectCreator {
   
@@ -217,13 +218,13 @@ object NewArgusProjectCreator {
     val workspaceRunnable = new IWorkspaceRunnable() {
       override def run(submonitor: IProgressMonitor) = {
         try {
-          val dependencies = ApkDecompiler.decompile(apk, new Path(projectLocation), true).get
+          val dependencies = ApkDecompiler.decompile(apk, new File(projectLocation), true)._2
           dependencies foreach {
             d =>
               d match {
-                case CitConstants.MAVEN_SUPPORT_V4 | CitConstants.MAVEN_SUPPORT_V13 => 
+                case AndroidConstants.MAVEN_SUPPORT_V4 | AndroidConstants.MAVEN_SUPPORT_V13 => 
                   val path = 
-                    if(d == CitConstants.MAVEN_SUPPORT_V4) AddSupportJarAction.getSupportJarFile
+                    if(d == AndroidConstants.MAVEN_SUPPORT_V4) AddSupportJarAction.getSupportJarFile
                     else AddSupportJarAction.getSupport13JarFile
                   val to = getTargetPath(SdkConstants.FD_NATIVE_LIBS + '/' + path.getName)
                   mValues.finalizingActions.addAction(new Runnable(){
@@ -249,7 +250,7 @@ object NewArgusProjectCreator {
                       }
                     }
                   })
-                case CitConstants.MAVEN_APPCOMPAT =>
+                case AndroidConstants.MAVEN_APPCOMPAT =>
                   mValues.finalizingActions.addAction(new Runnable(){
                     override def run(): Unit = {
                       AddSupportJarAction.installAppCompatLibrary(project, true)
