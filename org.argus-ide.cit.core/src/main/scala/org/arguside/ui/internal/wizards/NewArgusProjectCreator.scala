@@ -226,6 +226,10 @@ object NewArgusProjectCreator {
                   val path = 
                     if(d == AndroidConstants.MAVEN_SUPPORT_V4) AddSupportJarAction.getSupportJarFile
                     else AddSupportJarAction.getSupport13JarFile
+                  if(path == null){
+                    ArgusPlugin().logError("You did not install Android Support Library from the SDK, please install that and retry.")
+                    throw new RuntimeException
+                  }
                   val to = getTargetPath(SdkConstants.FD_NATIVE_LIBS + '/' + path.getName)
                   mValues.finalizingActions.addAction(new Runnable(){
                     override def run(): Unit = {

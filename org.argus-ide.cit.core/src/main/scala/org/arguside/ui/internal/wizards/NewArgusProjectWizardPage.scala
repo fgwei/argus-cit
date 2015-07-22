@@ -556,7 +556,7 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
    */
   private def handleImportBrowseButtonPressed = {
     val dialog = new FileDialog(mApplicationText.getShell())
-    val exts = Set( "apk" ).toArray
+    val exts = Set( "*", "*.apk" ).toArray
     dialog.setFilterExtensions(exts)
 
     val apkPath = getApplicationTextValue
