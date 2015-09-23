@@ -7,8 +7,8 @@ Bundle-Activator: org.arguside.core.internal.ArgusPlugin
 Bundle-Vendor: arguslab.org
 Bundle-ActivationPolicy: lazy
 Require-Bundle: 
- com.android.ide.eclipse.adt;bundle-version="23.0.6",
- com.android.ide.eclipse.base;bundle-version="23.0.6",
+ com.android.ide.eclipse.adt,
+ com.android.ide.eclipse.base,
  org.eclipse.core.expressions,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources,
