@@ -8,7 +8,7 @@ import org.arguside.util.Utils
 import scala.ref.WeakReference
 import org.arguside.core.compiler.IJawaPresentationCompiler
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
-import org.sireum.jawa.sjc.util.SourceFile
+import org.sireum.jawa.io.SourceFile
 
 //case class Occurrences(name: String, locations: List[IRegion])
 //

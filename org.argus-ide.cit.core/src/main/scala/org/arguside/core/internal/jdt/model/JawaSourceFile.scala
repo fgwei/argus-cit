@@ -27,13 +27,12 @@ import org.eclipse.core.runtime.NullProgressMonitor
 import scala.util.control.Exception
 import org.eclipse.core.runtime.CoreException
 import org.arguside.core.compiler.InteractiveCompilationUnit
-import org.sireum.jawa.sjc.io.AbstractFile
+import org.sireum.jawa.io.AbstractFile
 import org.arguside.core.resources.EclipseFile
-import org.sireum.jawa.sjc.io.VirtualFile
+import org.sireum.jawa.io.VirtualFile
 import org.sireum.jawa.sjc.interactive.Response
 import org.arguside.core.compiler.JawaCompilationProblem
 import org.arguside.core.internal.ArgusPlugin
-import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin
 import org.eclipse.jdt.core.IJavaModelMarker
 
 class JawaSourceFileProvider extends SourceFileProvider {

@@ -62,7 +62,7 @@ class NewArgusProjectWizard extends NewProjectWizard with HasLogger{
       val name = mValues.projectName
       val apk: File = new File(mValues.applicationName)
       mProject = root.getProject(name)
-      NewArgusProjectCreator.create(monitor, mProject, mValues.target, apk, mValues.projectLocation, mValues.workingSets, mValues)
+      NewArgusProjectCreator.create(monitor, mProject, mValues.target, apk, mValues.projectLocation, mValues.dpsuri, mValues.workingSets, mValues)
       
       val javaProject = BaseProjectHelper.getJavaProject(mProject)
       if(javaProject != null){

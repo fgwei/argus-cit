@@ -15,7 +15,7 @@ import org.eclipse.ui.texteditor.ITextEditor
 import org.arguside.util.eclipse.FileUtils
 import org.arguside.util.eclipse.RegionUtils
 import org.sireum.jawa.sjc.util.TextChange
-import org.sireum.jawa.sjc.io.AbstractFile
+import org.sireum.jawa.io.AbstractFile
 
 object TextEditUtils {
 

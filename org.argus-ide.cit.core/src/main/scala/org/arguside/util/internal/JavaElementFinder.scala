@@ -1,10 +1,10 @@
 package org.arguside.util.internal
 
 import org.eclipse.core.resources.IProject
-import org.sireum.jawa.sjc.ObjectType
+import org.sireum.jawa.ObjectType
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.JavaCore
-import org.sireum.jawa.sjc.Signature
+import org.sireum.jawa.Signature
 import java.util.concurrent.atomic.AtomicBoolean
 import org.eclipse.jdt.core.search.SearchRequestor
 import org.eclipse.jdt.core.search.SearchMatch
@@ -20,7 +20,7 @@ import org.eclipse.jdt.core.search.SearchParticipant
 import org.eclipse.jdt.core.search.SearchPattern
 import org.eclipse.jdt.core.search.IJavaSearchConstants
 import org.eclipse.core.runtime.NullProgressMonitor
-import org.sireum.jawa.sjc.JavaKnowledge
+import org.sireum.jawa.JavaKnowledge
 import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.jdt.internal.corext.util.MethodOverrideTester
 import org.eclipse.jdt.core.ITypeHierarchy

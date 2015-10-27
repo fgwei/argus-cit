@@ -41,7 +41,6 @@ import com.android.SdkConstants
 import com.android.ide.eclipse.adt.internal.project.AndroidManifestHelper
 import org.eclipse.swt.events.ModifyEvent
 import org.eclipse.core.runtime.Platform
-import org.arguside.util.parser.ManifestParser
 import com.android.ide.eclipse.adt.internal.wizards.newproject.WorkingSetGroup
 import org.eclipse.ui.IWorkingSet
 import org.eclipse.jface.viewers.IStructuredSelection
@@ -50,6 +49,7 @@ import com.android.ide.eclipse.adt.internal.wizards.newproject.WorkingSetHelper
 import org.eclipse.swt.widgets.Shell
 import org.eclipse.swt.widgets.DirectoryDialog
 import org.eclipse.jface.dialogs.IMessageProvider
+import org.sireum.amandroid.parser.ManifestParser
 
 
 class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends WizardPage("newArgusProject")
@@ -71,16 +71,19 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
   
   // widgets
   private var mApplicationText: Text = null
+  private var mDependenceText: Text = null
   private var mProjectText: Text = null
   private var mMinSdkCombo: Combo = null
   private var mTargetSdkCombo: Combo = null
   private var mBuildSdkCombo: Combo = null
   private var mBrowseApkButton: Button = null
+  private var mBrowseDependenceButton: Button = null
   
   private var mHelpIcon: Label = null
   private var mTipLabel: Label = null
   
   private var mApplicationDec: ControlDecoration = null
+  private var mDependenceDec: ControlDecoration = null
   private var mProjectDec: ControlDecoration = null
   private var mMinSdkDec: ControlDecoration = null
   private var mTargetSdkDec: ControlDecoration = null
@@ -154,6 +157,25 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
     mBrowseApkButton.setText("Browse...")
     mBrowseApkButton.addSelectionListener(this)
     mBrowseApkButton.setEnabled(true)
+    
+     val dependenceLabel = new Label(container, SWT.NONE)
+    dependenceLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1))
+    dependenceLabel.setText("Odex Dependence Dir:")
+    
+    mDependenceText = new Text(container, SWT.BORDER)
+    val gdDependenceText = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1)
+    gdDependenceText.widthHint = FIELD_WIDTH
+    mDependenceText.setLayoutData(gdApplicationText)
+    mDependenceText.addModifyListener(this)
+    mDependenceText.addFocusListener(this)
+    mDependenceText.setEnabled(true)
+    mDependenceText.setEditable(false)
+    mDependenceDec = createFieldDecoration(mDependenceText, "The dependence directory is supposed to contain dependencies necessary for ODEX disassembly.")
+            
+    mBrowseDependenceButton = new Button(container, SWT.NONE)
+    mBrowseDependenceButton.setText("Browse...")
+    mBrowseDependenceButton.addSelectionListener(this)
+    mBrowseDependenceButton.setEnabled(true)
     
     val projectLabel = new Label(container, SWT.NONE)
     projectLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1))
@@ -409,6 +431,23 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
     }
   }
   
+  /**
+   * Returns the value of the dependence location field with leading and trailing
+   * spaces removed.
+   * 
+   * @return the dependence location directory in the field
+   */
+  def getDependenceTextValue: Option[FileResourceUri] = {
+    if (mDependenceText == null) {
+      None //$NON-NLS-1$
+    } else {
+      mDependenceText.getText() match {
+        case x if x.isEmpty() => None
+        case x => Some(FileUtil.toUri(x))
+      }
+    }
+  }
+  
   // ---- Implements ModifyListener ----
 
   override def modifyText(e: ModifyEvent): Unit = {
@@ -436,6 +475,8 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
         } finally {
           mIgnore = false
         }
+      case x if x == mDependenceText =>
+        mValues.dpsuri = getDependenceTextValue
       case x if x == mLocationText => mValues.projectLocation = mLocationText.getText.trim()
     }
     validatePage
@@ -515,7 +556,8 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
     
     val source = event.getSource
     source match {
-      case x if x == mBrowseApkButton => handleImportBrowseButtonPressed
+      case x if x == mBrowseApkButton => handleApkBrowseButtonPressed
+      case x if x == mBrowseDependenceButton => handleDependenceBrowseButtonPressed
       case x if x == mMinSdkCombo => handleMinSdkComboPressed
       case x if x == mBuildSdkCombo => handleBuildSdkComboPressed
       case x if x == mTargetSdkCombo => mValues.targetSdkLevel = getSelectedTargetSdk
@@ -554,7 +596,7 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
   /**
    * Open an appropriate file browser
    */
-  private def handleImportBrowseButtonPressed = {
+  private def handleApkBrowseButtonPressed = {
     val dialog = new FileDialog(mApplicationText.getShell())
     val exts = Set( "*", "*.apk" ).toArray
     dialog.setFilterExtensions(exts)
@@ -570,6 +612,28 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
     val selectedDirectory = dialog.open()
     if (selectedDirectory != null) {
       mApplicationText.setText(selectedDirectory)
+    }
+  }
+  
+  /**
+   * Open an appropriate file browser
+   */
+  private def handleDependenceBrowseButtonPressed = {
+    val dialog = new FileDialog(mDependenceText.getShell())
+    val exts = Set("*").toArray
+    dialog.setFilterExtensions(exts)
+
+    val dpsPath = getDependenceTextValue
+    if (dpsPath.isDefined) { //$NON-NLS-1$
+      val dps = FileUtil.toFile(dpsPath.get)
+      if (dps.exists()) {
+        dialog.setFilterPath(new Path(dps.getPath).toOSString())
+      }
+    }
+
+    val selectedDirectory = dialog.open()
+    if (selectedDirectory != null) {
+      mDependenceText.setText(selectedDirectory)
     }
   }
   
@@ -676,6 +740,8 @@ class NewArgusProjectWizardPage(values: NewArgusProjectWizardState) extends Wiza
     source match {
       case x if x == mApplicationText =>
         tip = mApplicationDec.getDescriptionText
+      case x if x == mDependenceText =>
+        tip = mDependenceDec.getDescriptionText
       case x if x == mProjectText =>
         tip = mProjectDec.getDescriptionText
       case x if x == mBuildSdkCombo =>

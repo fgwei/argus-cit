@@ -6,15 +6,15 @@ import org.eclipse.core.runtime.IProgressMonitor
 import org.arguside.core.compiler.IJawaPresentationCompiler
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
 import org.sireum.util._
-import org.sireum.jawa.sjc.io.AbstractFile
-import org.sireum.jawa.sjc.util.SourceFile
+import org.sireum.jawa.io.AbstractFile
+import org.sireum.jawa.io.SourceFile
 import org.sireum.jawa.sjc.parser._
 import org.sireum.jawa.sjc.parser.{Param => JawaParam}
 import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.Region
-import org.sireum.jawa.sjc.util.Range
+import org.sireum.jawa.io.Range
 import org.sireum.jawa.sjc.parser.Annotation
-import org.sireum.jawa.sjc.ObjectType
+import org.sireum.jawa.ObjectType
 import org.arguside.core.internal.ArgusPlugin
 
 class SymbolClassification(protected val sourceFile: SourceFile, val global: IJawaPresentationCompiler, useSyntacticHints: Boolean)

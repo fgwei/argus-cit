@@ -17,8 +17,8 @@ import org.eclipse.jdt.internal.core.JavaModelStatus
 import org.eclipse.jdt.internal.core.PackageFragment
 import org.eclipse.jdt.internal.core.util.Util
 import org.arguside.core.compiler.JawaCompilationProblem
-import org.sireum.jawa.sjc.io.AbstractFile
-import org.sireum.jawa.sjc.io.VirtualFile
+import org.sireum.jawa.io.AbstractFile
+import org.sireum.jawa.io.VirtualFile
 import org.sireum.util.IList
 
 class JawaClassFile(parent : PackageFragment, name : String, srcFile : String)

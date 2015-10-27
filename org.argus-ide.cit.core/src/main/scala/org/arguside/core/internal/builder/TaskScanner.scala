@@ -4,7 +4,7 @@ import java.{ util => ju }
 import scala.collection.mutable.ArrayBuffer
 import org.eclipse.jdt.core.JavaCore
 import org.arguside.core.IArgusProject
-import org.sireum.jawa.sjc.util.{Position, RangePosition}
+import org.sireum.jawa.io.{Position, RangePosition}
 
 class TaskScanner(project : IArgusProject) {
   import TaskScanner._

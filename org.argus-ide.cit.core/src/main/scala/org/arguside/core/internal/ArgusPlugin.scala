@@ -32,7 +32,6 @@ import org.arguside.core.internal.jdt.model.JawaClassFile
 import org.arguside.ui.internal.diagnostic
 import org.arguside.core.internal.jdt.model.JawaCompilationUnit
 import org.eclipse.core.resources.IFile
-import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin
 
 object ArgusPlugin {
 

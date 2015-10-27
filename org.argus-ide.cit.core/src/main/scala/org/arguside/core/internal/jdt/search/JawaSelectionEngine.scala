@@ -20,7 +20,7 @@ import org.arguside.core.compiler.InteractiveCompilationUnit
 import org.arguside.util.JawaWordFinder
 import org.arguside.core.internal.jdt.model.JawaLocalVariableElement
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
-import org.sireum.jawa.sjc.util.Position
+import org.sireum.jawa.io.Position
 
 class JawaSelectionEngine(nameEnvironment: SearchableEnvironment, requestor: JawaSelectionRequestor, settings: ju.Map[_, _]) extends Engine(settings) with ISearchRequestor with HasLogger {
 

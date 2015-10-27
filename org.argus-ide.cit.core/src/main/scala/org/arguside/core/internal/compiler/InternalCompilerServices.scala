@@ -1,9 +1,9 @@
 package org.arguside.core.internal.compiler
 
 import org.sireum.jawa.sjc.lexer.Token
-import org.sireum.jawa.sjc.JawaType
+import org.sireum.jawa.JawaType
 import org.sireum.jawa.sjc.interactive.Global
-import org.sireum.jawa.sjc.interactive.{JawaElement => SJCJawaElement}
+import org.sireum.jawa.{JawaElement => SJCJawaElement}
 
 /** This trait groups methods are only available to core IDE implementations.
  *  They may change without notice or deprecation cycle.

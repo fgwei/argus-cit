@@ -7,7 +7,7 @@ import org.arguside.core.internal.hyperlink.DeclarationHyperlinkDetector
 import org.arguside.core.internal.hyperlink.JawaHyperlink
 import org.sireum.jawa.sjc.parser.JawaSymbol
 import org.eclipse.jdt.core.IJavaElement
-import org.sireum.jawa.sjc.util.Position
+import org.sireum.jawa.io.Position
 
 /** Factory object for creating jawa-specific editor goodies, like auto-edits or
  *  hyperlink detectors.

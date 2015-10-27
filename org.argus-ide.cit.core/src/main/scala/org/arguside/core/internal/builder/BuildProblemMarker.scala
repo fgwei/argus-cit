@@ -7,7 +7,7 @@ import org.arguside.core.resources.MarkerFactory.Position
 import org.arguside.core.resources.MarkerFactory.NoPosition
 import org.arguside.core.resources.MarkerFactory.RegionPosition
 import org.arguside.core.IArgusProject
-import org.sireum.jawa.sjc.util.{ Position => JawaPosition }
+import org.sireum.jawa.io.{ Position => JawaPosition }
 import org.arguside.core.CitConstants
 
 /** Factory for creating markers used to report build problems (i.e., compilation errors). */

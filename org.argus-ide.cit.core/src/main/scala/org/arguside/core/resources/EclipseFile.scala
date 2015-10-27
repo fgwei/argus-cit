@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Path
 import org.arguside.logging.HasLogger
 import scala.util.Try
 import org.arguside.util.eclipse.FileUtils
-import org.sireum.jawa.sjc.io.AbstractFile
+import org.sireum.jawa.io.AbstractFile
 
 object EclipseResource extends HasLogger {
   def apply(r: IResource): EclipseResource[_ <: IResource] = r match {

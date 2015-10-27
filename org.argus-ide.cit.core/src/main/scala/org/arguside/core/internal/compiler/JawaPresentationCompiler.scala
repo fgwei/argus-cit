@@ -25,24 +25,24 @@ import org.arguside.util.eclipse.RegionUtils
 import org.sireum.jawa.sjc.interactive.Global
 import org.arguside.core.compiler.IJawaPresentationCompiler
 import org.arguside.core.compiler.InteractiveCompilationUnit
-import org.sireum.jawa.sjc.util.SourceFile
+import org.sireum.jawa.io.SourceFile
 import org.sireum.jawa.sjc.interactive.Response
 import org.arguside.core.resources.EclipseFile
-import org.sireum.jawa.sjc.util.Position
+import org.sireum.jawa.io.Position
 import org.sireum.util._
 import org.sireum.jawa.sjc.parser.JawaAstNode
-import org.sireum.jawa.sjc.io.AbstractFile
+import org.sireum.jawa.io.AbstractFile
 import org.arguside.core.compiler.JawaCompilationProblem
-import org.sireum.jawa.sjc.util.RangePosition
-import org.sireum.jawa.sjc.util.FgSourceFile
+import org.sireum.jawa.io.RangePosition
+import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.sjc.interactive.InteractiveReporter
-import org.sireum.jawa.sjc.interactive.Problem
-import org.sireum.jawa.sjc.io.VirtualFile
+import org.sireum.jawa.Problem
+import org.sireum.jawa.io.VirtualFile
 import org.arguside.util.JawaWordFinder
 import org.arguside.core.resources.EclipseResource
 import org.arguside.core.compiler.IJawaPresentationCompiler._
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
-import org.sireum.jawa.sjc.util.NoPosition
+import org.sireum.jawa.io.NoPosition
 import org.sireum.jawa.sjc.lexer.{Token => JawaToken}
 import org.sireum.jawa.sjc.parser.CompilationUnit
 import org.arguside.core.internal.hyperlink.JawaHyperlink
@@ -441,7 +441,7 @@ object JawaPresentationCompiler {
             }
           fileName.map(JawaCompilationProblem(
             _,
-            citSeverityToEclipse(severityLevel),
+            citSeverityToEclipse(sev),
             formatMessage(msg),
             reducedPos.start,
             scala.math.max(reducedPos.start, reducedPos.end - 1),

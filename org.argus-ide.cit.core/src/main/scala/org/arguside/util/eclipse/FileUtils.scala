@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.IPath
 import org.eclipse.core.internal.resources.ResourceException
 import java.io.File
 import org.arguside.core.CitConstants
-import org.sireum.jawa.sjc.io.AbstractFile
+import org.sireum.jawa.io.AbstractFile
 
 object FileUtils {
 

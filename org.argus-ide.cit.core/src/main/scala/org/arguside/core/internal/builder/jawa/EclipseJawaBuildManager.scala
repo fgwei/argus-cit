@@ -21,9 +21,9 @@ import EclipseJawaBuildManager.FileHelper
 import org.sireum.jawa.sjc.compile.CompileFailed
 import org.sireum.jawa.sjc.compile.AggressiveCompile
 import org.sireum.jawa.sjc.log.{Logger => sjcLogger}
-import org.sireum.jawa.sjc.util.NoPosition
+import org.sireum.jawa.io.NoPosition
 import org.sireum.jawa.sjc.log.Severity
-import org.sireum.jawa.sjc.DefaultReporter
+import org.sireum.jawa.DefaultReporter
 
 
 /**

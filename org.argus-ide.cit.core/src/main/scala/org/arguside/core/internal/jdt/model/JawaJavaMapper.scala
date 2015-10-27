@@ -8,12 +8,12 @@ import org.eclipse.core.runtime.Path
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
 import org.arguside.core.internal.compiler.InternalCompilerServices
 import org.arguside.core.internal.compiler.JawaPresentationCompiler
-import org.sireum.jawa.sjc.interactive.{JawaElement => SJCJawaElement}
-import org.sireum.jawa.sjc.interactive.JawaClass
-import org.sireum.jawa.sjc.interactive.JawaMethod
-import org.sireum.jawa.sjc.interactive.JawaField
-import org.sireum.jawa.sjc.AccessFlag
-import org.sireum.jawa.sjc.JawaType
+import org.sireum.jawa.{JawaElement => SJCJawaElement}
+import org.sireum.jawa.JawaClass
+import org.sireum.jawa.JawaMethod
+import org.sireum.jawa.JawaField
+import org.sireum.jawa.AccessFlag
+import org.sireum.jawa.JawaType
 
 /** Implementation of a internal compiler services dealing with mapping Jawa types and symbols
  *  to internal JDT counterparts.

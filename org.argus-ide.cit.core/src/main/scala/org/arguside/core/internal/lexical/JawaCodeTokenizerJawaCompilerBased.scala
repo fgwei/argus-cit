@@ -9,7 +9,7 @@ import org.sireum.jawa.sjc.lexer.{ Token => JawaToken }
 import org.sireum.jawa.sjc.lexer.Tokens._
 import org.arguside.core.lexical.JawaCodeTokenizer
 import org.sireum.jawa.sjc.lexer.JawaLexer
-import org.sireum.jawa.sjc.DefaultReporter
+import org.sireum.jawa.DefaultReporter
 
 class JawaCodeTokenizerJawaCompilerBased extends JawaCodeTokenizer {
 

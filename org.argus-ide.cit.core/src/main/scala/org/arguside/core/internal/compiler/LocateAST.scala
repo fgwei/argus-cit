@@ -6,9 +6,9 @@ import org.sireum.jawa.sjc.parser._
 import org.eclipse.jdt.core.IJavaProject
 import org.arguside.util.internal.JavaElementFinder
 import org.arguside.core.compiler.InteractiveCompilationUnit
-import org.sireum.jawa.sjc.util.Position
+import org.sireum.jawa.io.Position
 import org.eclipse.jdt.core.IJavaElement
-import org.sireum.jawa.sjc.ObjectType
+import org.sireum.jawa.ObjectType
 import org.eclipse.core.runtime.IPath
 import org.eclipse.core.runtime.Path
 import org.eclipse.core.resources.ResourcesPlugin

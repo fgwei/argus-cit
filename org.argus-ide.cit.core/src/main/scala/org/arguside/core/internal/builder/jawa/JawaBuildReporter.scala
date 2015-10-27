@@ -8,12 +8,11 @@ import org.arguside.core.IArgusProject
 import org.arguside.core.internal.builder.BuildProblemMarker
 import org.arguside.logging.HasLogger
 import org.arguside.core.resources.MarkerFactory
-import org.sireum.jawa.sjc.Reporter
-import org.sireum.jawa.sjc.util.Position
+import org.sireum.jawa.Reporter
+import org.sireum.jawa.io.Position
 import org.sireum.jawa.sjc.log.Problem
 import org.sireum.util._
-import org.sireum.jawa.sjc.lexer.Chars
-import org.sireum.jawa.sjc.ReporterImpl
+import org.sireum.jawa.ReporterImpl
 import org.sireum.jawa.sjc.log.Severity
 
 private case class JawaProblem(severity: Severity.Value, message: String, position: Position, category: String) extends Problem {

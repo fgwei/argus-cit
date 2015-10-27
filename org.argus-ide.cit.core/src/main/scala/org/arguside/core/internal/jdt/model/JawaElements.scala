@@ -33,7 +33,7 @@ import org.arguside.ui.ArgusImages
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaElement
 import argus.tools.eclipse.contribution.weaving.jdt.ui.IMethodOverrideInfo
 import org.arguside.util.internal.ReflectionUtils
-import org.sireum.jawa.sjc.ObjectType
+import org.sireum.jawa.ObjectType
 
 trait JawaElement extends JavaElement with IJawaElement {
   def getElementInfo: AnyRef

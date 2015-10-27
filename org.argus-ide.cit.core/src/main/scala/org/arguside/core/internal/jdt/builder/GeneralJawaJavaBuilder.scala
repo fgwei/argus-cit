@@ -1,9 +1,9 @@
 package org.arguside.core.internal.jdt.builder
 
-import argus.tools.eclipse.contribution.weaving.jdt.builderoptions.JawaJavaBuilder
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.internal.resources.BuildConfiguration
 import org.arguside.util.internal.ReflectionUtils
+import argus.tools.eclipse.contribution.weaving.jdt.builderoptions.JawaJavaBuilder
 
 /**
  *

@@ -4,7 +4,7 @@ import org.arguside.core.compiler.InteractiveCompilationUnit
 import org.arguside.core.resources.EclipseResource
 import org.eclipse.core.resources.IFile
 import org.eclipse.jface.text.IDocument
-import org.sireum.jawa.sjc.io.AbstractFile
+import org.sireum.jawa.io.AbstractFile
 
 abstract class CompilationUnit(override val workspaceFile: IFile) extends InteractiveCompilationUnit {
 

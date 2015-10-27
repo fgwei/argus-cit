@@ -55,7 +55,7 @@ import org.eclipse.jface.text.BadLocationException
 import org.eclipse.text.edits.InsertEdit
 import org.eclipse.ltk.core.refactoring.CompositeChange
 import java.lang.reflect.InvocationTargetException
-import org.siruem.amandroid.decompile.ApkDecompiler
+import org.sireum.amandroid.decompile.ApkDecompiler
 import org.sireum.amandroid.AndroidConstants
 
 object NewArgusProjectCreator {
@@ -201,6 +201,7 @@ object NewArgusProjectCreator {
              target: IAndroidTarget,
              apk: File,
              projectLocation: String,
+             dpsuri: Option[FileResourceUri],
              workingSets: IList[IWorkingSet],
              mValues: NewArgusProjectWizardState): Unit = {
     val workspace = ResourcesPlugin.getWorkspace
@@ -218,7 +219,7 @@ object NewArgusProjectCreator {
     val workspaceRunnable = new IWorkspaceRunnable() {
       override def run(submonitor: IProgressMonitor) = {
         try {
-          val dependencies = ApkDecompiler.decompile(apk, new File(projectLocation), true)._2
+          val dependencies = ApkDecompiler.decompile(apk, new File(projectLocation), dpsuri, false, false, true)._2
           dependencies foreach {
             d =>
               d match {

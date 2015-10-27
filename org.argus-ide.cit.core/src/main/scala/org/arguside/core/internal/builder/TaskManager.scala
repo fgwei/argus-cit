@@ -13,10 +13,10 @@ import org.arguside.core.IArgusProject
 import org.arguside.core.CitConstants
 import org.arguside.core.internal.jdt.model.JawaSourceFile
 import org.arguside.core.resources.EclipseResource
-import org.sireum.jawa.sjc.util.Position
-import org.sireum.jawa.sjc.util.SourceFile
+import org.sireum.jawa.io.Position
+import org.sireum.jawa.io.SourceFile
 import org.sireum.jawa.sjc.lexer.JawaLexer
-import org.sireum.jawa.sjc.DefaultReporter
+import org.sireum.jawa.DefaultReporter
 
 object TaskManager {
 

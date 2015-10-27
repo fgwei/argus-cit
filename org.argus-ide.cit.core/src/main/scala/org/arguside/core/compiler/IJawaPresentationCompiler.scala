@@ -13,8 +13,8 @@ import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.hyperlink.IHyperlink
 import org.sireum.jawa.sjc.interactive.Global
 import org.sireum.jawa.sjc.parser.JawaAstNode
-import org.sireum.jawa.sjc.util.Position
-import org.sireum.jawa.sjc.util.SourceFile
+import org.sireum.jawa.io.Position
+import org.sireum.jawa.io.SourceFile
 import org.sireum.jawa.sjc.interactive.Response
 import org.sireum.util.IList
 import org.sireum.jawa.sjc.lexer.{Token => JawaToken}
@@ -22,7 +22,7 @@ import org.sireum.jawa.sjc.util.FailedInterrupt
 import org.sireum.jawa.sjc.interactive.FreshRunReq
 import org.sireum.jawa.sjc.interactive.MissingResponse
 import org.sireum.jawa.sjc.parser.CompilationUnit
-import org.sireum.jawa.sjc.interactive.{JawaElement => SJCJawaElement}
+import org.sireum.jawa.{JawaElement => SJCJawaElement}
 import org.sireum.jawa.sjc.parser.JawaSymbol
 
 /** This interface provides access to Jawa Presentation compiler services. Even though methods are inherited from

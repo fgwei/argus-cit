@@ -8,8 +8,8 @@ import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
 import org.arguside.logging.HasLogger
 import org.sireum.jawa.sjc.parser.CompilationUnit
 import org.sireum.jawa.sjc.parser.ClassOrInterfaceDeclaration
-import org.sireum.jawa.sjc.AccessFlag
-import org.sireum.jawa.sjc.ObjectType
+import org.sireum.jawa.AccessFlag
+import org.sireum.jawa.ObjectType
 import org.sireum.jawa.sjc.parser.Field
 import org.sireum.jawa.sjc.parser.Declaration
 import org.sireum.jawa.sjc.parser.MethodDeclaration

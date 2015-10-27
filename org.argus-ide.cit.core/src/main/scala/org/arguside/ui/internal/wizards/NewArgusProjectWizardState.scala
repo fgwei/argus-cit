@@ -26,6 +26,9 @@ class NewArgusProjectWizardState {
 
   /** The compilation target to use for this project */
   var target: IAndroidTarget = null
+  
+  /** The odex dependence file uri to use for this project */
+  var dpsuri: Option[FileResourceUri] = None
 
   /** The minimum SDK API level, as a string (if the API is a preview release with a codename) */
   var minSdk: String = null

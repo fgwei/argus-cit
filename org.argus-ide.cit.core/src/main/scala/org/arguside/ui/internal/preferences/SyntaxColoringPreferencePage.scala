@@ -13,7 +13,7 @@ import org.arguside.util.eclipse.SWTUtils._
 import org.arguside.core.internal.decorators.semantichighlighting.Position
 import org.arguside.core.internal.decorators.semantichighlighting.classifier.SymbolTypes
 import org.sireum.jawa.sjc.lexer.JawaLexer
-import org.sireum.jawa.sjc.DefaultReporter
+import org.sireum.jawa.DefaultReporter
 
 /** Syntax Coloring preference page for the Jawa editors.
  */

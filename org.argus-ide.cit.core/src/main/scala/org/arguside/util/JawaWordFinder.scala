@@ -4,8 +4,8 @@ import org.eclipse.jdt.core.IBuffer
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.Region
-import org.sireum.jawa.sjc.lexer.Chars._
-import org.sireum.jawa.sjc.lexer.Chars
+import org.sireum.jawa.Chars._
+import org.sireum.jawa.Chars
 
 object JawaWordFinder {
 

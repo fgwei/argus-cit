@@ -48,9 +48,9 @@ import org.arguside.core.compiler.InteractiveCompilationUnit
 import org.arguside.core.internal
 import org.arguside.core.internal.ArgusPlugin
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.PositionInformation
-import org.sireum.jawa.sjc.io.AbstractFile
+import org.sireum.jawa.io.AbstractFile
 import org.arguside.core.internal.hyperlink.DeclarationHyperlinkDetector
-import org.sireum.jawa.sjc.util.Position
+import org.sireum.jawa.io.Position
 import org.sireum.util._
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
 import org.arguside.core.internal.jdt.search.JawaSourceIndexer

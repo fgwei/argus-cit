@@ -6,9 +6,9 @@ import org.eclipse.jdt.core.compiler.IProblem
 import org.arguside.core.IArgusProject
 import org.sireum.jawa.sjc.interactive.Response
 import org.sireum.util.IList
-import org.sireum.jawa.sjc.io.AbstractFile
-import org.sireum.jawa.sjc.util.SourceFile
-import org.sireum.jawa.sjc.util.FgSourceFile
+import org.sireum.jawa.io.AbstractFile
+import org.sireum.jawa.io.SourceFile
+import org.sireum.jawa.io.FgSourceFile
 import org.arguside.core.internal.ArgusPlugin
 
 /** This trait represents a possibly translated Scala source. In the default case,

@@ -125,7 +125,7 @@ class ListenForConnectionProcess private (launch: ILaunch, port: Int) extends IP
 
   // -- from org.eclipse.core.runtime.IAdaptable
 
-  def getAdapter(adapter: Class[_]): Object = null
+  def getAdapter[T](adapter: Class[T]): T = null.asInstanceOf[T]
 
   // ----------
 

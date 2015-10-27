@@ -2,9 +2,9 @@ package org.arguside.core.internal.compiler
 
 import org.arguside.core.compiler.IPositionInformation
 import org.arguside.core.compiler.ISourceMap
-import org.sireum.jawa.sjc.util.SourceFile
-import org.sireum.jawa.sjc.io.AbstractFile
-import org.sireum.jawa.sjc.util.FgSourceFile
+import org.sireum.jawa.io.SourceFile
+import org.sireum.jawa.io.AbstractFile
+import org.sireum.jawa.io.FgSourceFile
 
 /** An implementation of position information that is based on a Jawa SourceFile implementation
  */

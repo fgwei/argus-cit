@@ -6,7 +6,7 @@ import org.arguside.logging.HasLogger
 import org.arguside.core.compiler.InteractiveCompilationUnit
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
 import org.sireum.jawa.sjc.lexer.{Token => JawaToken}
-import org.sireum.jawa.sjc.util.Position
+import org.sireum.jawa.io.Position
 import org.sireum.jawa.sjc.parser.JawaAstNode
 import org.sireum.jawa.sjc.parser.JawaSymbol
 

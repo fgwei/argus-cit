@@ -7,13 +7,13 @@ import org.eclipse.jdt.internal.debug.ui.actions.RunToLineAdapter
 
 // Zw: what does adapter means in elcipse IDE???
 class JawaRetargettableActionAdapterFactory extends IAdapterFactory {
-  override def getAdapter(adaptableObject : AnyRef, adapterType : Class[_]) =
+  override def getAdapter[T](adaptableObject : AnyRef, adapterType : Class[T]): T =
     if (adapterType == classOf[IRunToLineTarget])
-      new RunToLineAdapter
+      {new RunToLineAdapter}.asInstanceOf[T]
     else if (adapterType == classOf[IToggleBreakpointsTarget])
-      new JawaToggleBreakpointAdapter
+      {new JawaToggleBreakpointAdapter}.asInstanceOf[T]
     else
-      null
+      null.asInstanceOf[T]
 
   override def getAdapterList : Array[Class[_]] =
     Array(classOf[IRunToLineTarget], classOf[IToggleBreakpointsTarget])

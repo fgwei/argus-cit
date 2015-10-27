@@ -3,7 +3,7 @@ package org.arguside.ui.editor
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.Region
-import org.sireum.jawa.sjc.lexer.Chars
+import org.sireum.jawa.Chars
 
 object WordFinder {
   /** Returns the region of the word enclosing the given offset in the document.

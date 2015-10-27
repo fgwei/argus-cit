@@ -9,7 +9,7 @@ import org.eclipse.core.resources.IProject
 import org.eclipse.jdt.ui.JavaUI
 import org.eclipse.core.runtime.Path
 import org.eclipse.jdt.core.IJavaElement
-import org.sireum.jawa.sjc.util.Position
+import org.sireum.jawa.io.Position
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.jface.text.IRegion
 

@@ -6,7 +6,7 @@ import org.eclipse.jface.action.Action
 import org.eclipse.jface.text.ITextSelection
 import org.arguside.ui.internal.editor.JawaSourceFileEditor
 import org.sireum.jawa.sjc.parser.JawaParserException
-import org.sireum.jawa.sjc.util.Range
+import org.sireum.jawa.io.Range
 import org.sireum.jawa.sjc.astselect.AstSelector
 
 /**
