@@ -71,6 +71,7 @@ object NewArgusProjectCreator {
   private def createEclipseProject(
       monitor: IProgressMonitor,
       project: IProject,
+      srcFolders: ISet[String],
       description: IProjectDescription,
       target: IAndroidTarget): IProject = {
     
@@ -84,7 +85,7 @@ object NewArgusProjectCreator {
     
     addDefaultDirectories(project, AdtConstants.WS_ROOT, DEFAULT_DIRECTORIES, monitor)
     
-    val sourceFolders: IList[String] = List("src")
+    val sourceFolders: IList[String] = srcFolders.toList
     
     val javaProject = JavaCore.create(project)
     setupSourceFolders(javaProject, sourceFolders, monitor)
@@ -219,7 +220,7 @@ object NewArgusProjectCreator {
     val workspaceRunnable = new IWorkspaceRunnable() {
       override def run(submonitor: IProgressMonitor) = {
         try {
-          val dependencies = ApkDecompiler.decompile(apk, new File(projectLocation), dpsuri, false, false, true)._2
+          val (_, srcFolders, dependencies) = ApkDecompiler.decompile(apk, new File(projectLocation), dpsuri, false, false, true, true)
           dependencies foreach {
             d =>
               d match {
@@ -264,7 +265,7 @@ object NewArgusProjectCreator {
                 case _ =>
               }
           }
-          createEclipseProject(monitor, project, description, target)
+          createEclipseProject(monitor, project, srcFolders, description, target)
         } catch {
           case e: IOException =>
             throw new CoreException(new Status(IStatus.ERROR, CitConstants.PluginId,
