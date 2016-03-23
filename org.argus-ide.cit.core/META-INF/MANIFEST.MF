@@ -42,14 +42,15 @@ Require-Bundle:
  org.eclipse.nebula.widgets.tablecombo,
  org.eclipse.e4.ui.workbench,
  org.eclipse.e4.ui.model.workbench,
- sireum-jawa-compiler;bundle-version="1.0.0",
+ sireum-jawa-compiler;bundle-version="2.0.0",
  org.sireum;bundle-version="2.0.0",
  com.android.ide.eclipse.ddms;bundle-version="23.0.6",
- sireum-amandroid;bundle-version="1.0.0",
- sireum-amandroid-alir;bundle-version="1.0.0",
- sireum-amandroid-security;bundle-version="1.0.0",
- sireum-jawa;bundle-version="1.0.0",
- sireum-jawa-alir;bundle-version="1.0.0"
+ sireum-amandroid;bundle-version="2.0.0",
+ sireum-amandroid-alir;bundle-version="2.0.0",
+ sireum-amandroid-security;bundle-version="2.0.0",
+ sireum-jawa;bundle-version="2.0.0",
+ sireum-jawa-alir;bundle-version="2.0.0",
+ sireum-amandroid-dedex;bundle-version="2.0.0"
 Import-Package: 
  argus.tools.eclipse.contribution.weaving.jdt;apply-aspects:=false,
  argus.tools.eclipse.contribution.weaving.jdt.builderoptions,
