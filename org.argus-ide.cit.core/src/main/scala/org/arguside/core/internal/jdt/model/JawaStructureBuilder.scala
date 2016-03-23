@@ -40,7 +40,7 @@ import org.sireum.jawa.sjc.parser.MethodDeclaration
 import org.sireum.jawa.sjc.parser.Field
 import org.sireum.jawa.sjc.parser.Declaration
 import org.sireum.jawa.sjc.parser.CompilationUnit
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 import org.sireum.jawa.sjc.lexer.{Token => JawaToken}
 import org.sireum.jawa.sjc.lexer.Tokens._
 import org.sireum.jawa.ResolveLevel
@@ -90,7 +90,7 @@ trait JawaStructureBuilder extends IJawaPresentationCompiler { pc : JawaPresenta
       override val classes = new HashMap[ClassOrInterfaceDeclaration, (JawaElement, JawaElementInfo)]
 
       override def addClass(c : ClassOrInterfaceDeclaration) : Owner = {
-        val typ: ObjectType = c.typ
+        val typ: JawaType = c.typ
         
         val classElem = 
           if(c.isInterface) new JawaInterfaceElement(element, typ)

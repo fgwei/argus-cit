@@ -14,7 +14,6 @@ import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.Region
 import org.sireum.jawa.io.Range
 import org.sireum.jawa.sjc.parser.Annotation
-import org.sireum.jawa.ObjectType
 import org.arguside.core.internal.ArgusPlugin
 
 class SymbolClassification(protected val sourceFile: SourceFile, val global: IJawaPresentationCompiler, useSyntacticHints: Boolean)

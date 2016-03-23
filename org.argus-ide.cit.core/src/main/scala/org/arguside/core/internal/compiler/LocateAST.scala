@@ -8,7 +8,6 @@ import org.arguside.util.internal.JavaElementFinder
 import org.arguside.core.compiler.InteractiveCompilationUnit
 import org.sireum.jawa.io.Position
 import org.eclipse.jdt.core.IJavaElement
-import org.sireum.jawa.ObjectType
 import org.eclipse.core.runtime.IPath
 import org.eclipse.core.runtime.Path
 import org.eclipse.core.resources.ResourcesPlugin
@@ -18,6 +17,7 @@ import org.eclipse.jdt.internal.core.JavaProject
 import org.arguside.core.internal.jdt.model.JawaClassFile
 import org.arguside.core.extensions.SourceFileProviderRegistry
 import org.arguside.core.compiler.IJawaPresentationCompiler.Implicits._
+import org.sireum.jawa.JawaType
 
 trait LocateAST { self: JawaPresentationCompiler =>
 
@@ -26,7 +26,7 @@ trait LocateAST { self: JawaPresentationCompiler =>
     /**
      * need to rethink later
      */
-    def astClassType(node: JawaAstNode): Option[ObjectType] = asyncExec {
+    def astClassType(node: JawaAstNode): Option[JawaType] = asyncExec {
       node.enclosingTopLevelClass.typ
     }.getOption()
 
@@ -35,7 +35,7 @@ trait LocateAST { self: JawaPresentationCompiler =>
 
       val typOpt = astClassType(sym)
       typOpt.flatMap { typ =>
-        val pfs = new SearchableEnvironment(javaProject.asInstanceOf[JavaProject], null: WorkingCopyOwner).nameLookup.findPackageFragments(typ.pkg, false)
+        val pfs = new SearchableEnvironment(javaProject.asInstanceOf[JavaProject], null: WorkingCopyOwner).nameLookup.findPackageFragments(typ.getPackageName, false)
         if (pfs eq null) None else pfs.toStream map
           { pf => logger.debug("Trying out to get " + typ); pf.getClassFile(typ.name) } collectFirst
           {

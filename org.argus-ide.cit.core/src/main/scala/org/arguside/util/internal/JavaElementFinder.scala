@@ -1,7 +1,7 @@
 package org.arguside.util.internal
 
 import org.eclipse.core.resources.IProject
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.JavaCore
 import org.sireum.jawa.Signature
@@ -31,7 +31,7 @@ import org.eclipse.jdt.core.IField
  * @author fgwei
  */
 object JavaElementFinder {
-  def findJavaClass(project: IProject, typ: ObjectType): Option[IType] = {
+  def findJavaClass(project: IProject, typ: JawaType): Option[IType] = {
     val fqcn = typ.name
     var fqcn2: String = fqcn
     // Handle inner classes
@@ -100,7 +100,7 @@ object JavaElementFinder {
     val myParams = mysig.getParameterTypes()
     val tarParams = tarmethod.getParameterTypes
     var ok = true
-    val myMethodName: String = mysig.methodNamePart.replace(JavaKnowledge.constructorName, mysig.getClassType.simpleName)
+    val myMethodName: String = mysig.methodName.replace(JavaKnowledge.constructorName, mysig.getClassType.simpleName)
     if(myMethodName != tarmethod.getElementName) ok = false
     if(ok && myParams.size == tarParams.size){
       for(i <- 0 to myParams.size - 1){
@@ -117,7 +117,7 @@ object JavaElementFinder {
     if(fqn == null) return None
     var result: Option[IField] = None
     try {
-      val classType: ObjectType = JavaKnowledge.getClassTypeFromFieldFQN(fqn)
+      val classType: JawaType = JavaKnowledge.getClassTypeFromFieldFQN(fqn)
       val receiverTypeOpt: Option[IType] = findJavaClass(project, classType)
       receiverTypeOpt match {
         case Some(c) =>

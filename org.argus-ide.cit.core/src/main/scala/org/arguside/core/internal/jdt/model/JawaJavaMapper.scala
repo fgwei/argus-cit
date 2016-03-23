@@ -138,11 +138,10 @@ trait JawaJavaMapper extends InternalCompilerServices with HasLogger { self: Jaw
    *  the empty string, instead of <empty>.
    */
   override def javaEnclosingPackage(je: SJCJawaElement): String = {
-    val enclPackage = je match {
-      case c: JawaClass => c.getPackage
-      case m: JawaMethod => m.getDeclaringClass.getPackage
-      case f: JawaField => f.getDeclaringClass.getPackage
+    je match {
+      case c: JawaClass => c.typ.getPackageName
+      case m: JawaMethod => m.getDeclaringClass.typ.getPackageName
+      case f: JawaField => f.getDeclaringClass.typ.getPackageName
     }
-    enclPackage
   }
 }

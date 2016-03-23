@@ -9,7 +9,7 @@ import org.arguside.logging.HasLogger
 import org.sireum.jawa.sjc.parser.CompilationUnit
 import org.sireum.jawa.sjc.parser.ClassOrInterfaceDeclaration
 import org.sireum.jawa.AccessFlag
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 import org.sireum.jawa.sjc.parser.Field
 import org.sireum.jawa.sjc.parser.Declaration
 import org.sireum.jawa.sjc.parser.MethodDeclaration
@@ -33,7 +33,7 @@ trait JawaIndexBuilder extends HasLogger { self: JawaPresentationCompiler =>
     def addClass(c : ClassOrInterfaceDeclaration) {
       val classType = c.typ
       
-      val pack = c.typ.pkg
+      val pack = c.typ.getPackageName
       val sName: String = c.typ.name.substring(c.typ.name.lastIndexOf("."))
       val enclClassNames = classType.getEnclosingTypes.map(_.canonicalName.toCharArray())
       val superName = c.superClassOpt.getOrElse(JAVA_TOPLEVEL_OBJECT_TYPE).canonicalName

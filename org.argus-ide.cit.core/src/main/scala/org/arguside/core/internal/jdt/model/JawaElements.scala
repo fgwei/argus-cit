@@ -33,7 +33,7 @@ import org.arguside.ui.ArgusImages
 import argus.tools.eclipse.contribution.weaving.jdt.IJawaElement
 import argus.tools.eclipse.contribution.weaving.jdt.ui.IMethodOverrideInfo
 import org.arguside.util.internal.ReflectionUtils
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 trait JawaElement extends JavaElement with IJawaElement {
   def getElementInfo: AnyRef
@@ -85,12 +85,12 @@ class JawaSourceTypeElement(parent: JavaElement, name: String)
   }
 }
 
-class JawaClassElement(parent: JavaElement, typ: ObjectType)
+class JawaClassElement(parent: JavaElement, typ: JawaType)
   extends JawaSourceTypeElement(parent, typ.name.substring(typ.name.lastIndexOf(".") + 1)) {
   override def getImageDescriptor = ArgusImages.JAWA_CLASS
 }
 
-class JawaInterfaceElement(parent: JavaElement, typ: ObjectType)
+class JawaInterfaceElement(parent: JavaElement, typ: JawaType)
   extends JawaSourceTypeElement(parent, typ.name.substring(typ.name.lastIndexOf(".") + 1)) {
   override def getImageDescriptor = ArgusImages.JAWA_INTERFACE
 }

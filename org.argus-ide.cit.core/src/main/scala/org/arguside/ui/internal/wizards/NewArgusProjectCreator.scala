@@ -91,14 +91,13 @@ object NewArgusProjectCreator {
     setupSourceFolders(javaProject, sourceFolders, monitor)
     
     // add the default proguard config
-    val libFolder = new File(AdtPlugin.getOsSdkToolsFolder,
-          SdkConstants.FD_LIB);
+    val libFolder = new File(AdtPlugin.getOsSdkToolsFolder, SdkConstants.FD_LIB)
     addLocalFile(project,
-          new File(libFolder, SdkConstants.FN_PROJECT_PROGUARD_FILE),
-          // Write ProGuard config files with the extension .pro which
-          // is what is used in the ProGuard documentation and samples
-          SdkConstants.FN_PROJECT_PROGUARD_FILE,
-          monitor);
+        new File(libFolder, SdkConstants.FN_PROJECT_PROGUARD_FILE),
+        // Write ProGuard config files with the extension .pro which
+        // is what is used in the ProGuard documentation and samples
+        SdkConstants.FN_PROJECT_PROGUARD_FILE,
+        monitor)
 
     // Set output location
     javaProject.setOutputLocation(project.getFolder(BIN_CLASSES_DIRECTORY).getFullPath(),
@@ -220,7 +219,7 @@ object NewArgusProjectCreator {
     val workspaceRunnable = new IWorkspaceRunnable() {
       override def run(submonitor: IProgressMonitor) = {
         try {
-          val (_, srcFolders, dependencies) = ApkDecompiler.decompile(apk, new File(projectLocation), dpsuri, false, false, true, true)
+          val (_, srcFolders, dependencies) = ApkDecompiler.decompile(apk, new File(projectLocation), dpsuri, false, false, true, true, createFolder = false)
           dependencies foreach {
             d =>
               d match {
