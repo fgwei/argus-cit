@@ -2,8 +2,6 @@ package argus.tools.eclipse.contribution.weaving.jdt.configuration;
 
 import org.eclipse.jdt.core.ToolFactory;
 
-import argus.tools.eclipse.contribution.weaving.jdt.ArgusJDTWeavingPlugin;
-
 /**
  * This aspect tests to see if the weaving service is properly installed.
  * 
