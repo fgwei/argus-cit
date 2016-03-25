@@ -1,3 +1,3 @@
-Argus IDE
+Argus CIT
 ==========
 Under heavily implementation.
